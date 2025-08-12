@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspiring Quote Generator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f7f6;
+            color: #333;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            text-align: center;
+        }
+
+        .quote-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            margin: 20px;
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #quote-text {
+            font-size: 1.8em;
+            font-style: italic;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            color: #555;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #quote-author {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #7f8c8d;
+            align-self: flex-end;
+            margin-top: 15px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            background-color: #2471a3;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .quote-container {
+                padding: 25px;
+                min-height: 180px;
+            }
+
+            #quote-text {
+                font-size: 1.4em;
+            }
+
+            #quote-author {
+                font-size: 1em;
+            }
+
+            button {
+                padding: 12px 25px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Inspiring Quote Generator</h1>
+    <div class="quote-container">
+        <p id="quote-text">Loading quote...</p>
+        <p id="quote-author"></p>
+    </div>
+    <button id="generate-btn">Generate New Quote</button>
+
+    <script>
+        const quotes = [
+            {
+                quote: "The only way to do great work is to love what you do.",
+                author: "Steve Jobs"
+            },
+            {
+                quote: "Believe you can and you're halfway there.",
+                author: "Theodore Roosevelt"
+            },
+            {
+                quote: "The future belongs to those who believe in the beauty of their dreams.",
+                author: "Eleanor Roosevelt"
+            },
+            {
+                quote: "It is during our darkest moments that we must focus to see the light.",
+                author: "Aristotle Onassis"
+            },
+            {
+                quote: "Strive not to be a success, but rather to be of value.",
+                author: "Albert Einstein"
+            },
+            {
+                quote: "The best way to predict the future is to create it.",
+                author: "Peter Drucker"
+            },
+            {
+                quote: "Innovation distinguishes between a leader and a follower.",
+                author: "Steve Jobs"
+            },
+            {
+                quote: "The mind is everything. What you think you become.",
+                author: "Buddha"
+            },
+            {
+                quote: "Everything you can imagine is real.",
+                author: "Pablo Picasso"
+            },
+            {
+                quote: "The unexamined life is not worth living.",
+                author: "Socrates"
+            }
+        ];
+
+        const quoteText = document.getElementById('quote-text');
+        const quoteAuthor = document.getElementById('quote-author');
+        const generateBtn = document.getElementById('generate-btn');
+
+        function generateQuote() {
+            const randomIndex = Math.floor(Math.random() * quotes.length);
+            const randomQuote = quotes[randomIndex];
+            quoteText.textContent = `"${randomQuote.quote}"`;
+            quoteAuthor.textContent = `- ${randomQuote.author}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', generateQuote);
+
+        generateBtn.addEventListener('click', generateQuote);
+    </script>
+</body>
+</html>

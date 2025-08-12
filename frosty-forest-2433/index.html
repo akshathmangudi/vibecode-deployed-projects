@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Notes App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+
+        h1, h2 {
+            color: #333;
+            text-align: center;
+            margin-top: 0;
+        }
+
+        #note-input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #note-text {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 100px;
+            resize: vertical;
+            font-size: 1rem;
+        }
+
+        #add-note-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        #add-note-btn:hover {
+            background-color: #0056b3;
+        }
+
+        #notes-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .note-item {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .note-content {
+            flex-grow: 1;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .note-date {
+            font-size: 0.8em;
+            color: #888;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            align-self: flex-end;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+                margin: 10px;
+            }
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simple Notes</h1>
+        <div id="note-input-section">
+            <textarea id="note-text" placeholder="Write your note here..."></textarea>
+            <button id="add-note-btn">Add Note</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Your Notes</h2>
+        <div id="notes-container">
+            <p style="text-align: center; color: #888;">No notes yet. Add one above!</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const noteTextarea = document.getElementById('note-text');
+            const addNoteBtn = document.getElementById('add-note-btn');
+            const notesContainer = document.getElementById('notes-container');
+
+            let notes = [];
+            const STORAGE_KEY = 'simpleNotesApp';
+
+            function loadNotes() {
+                const storedNotes = localStorage.getItem(STORAGE_KEY);
+                if (storedNotes) {
+                    notes = JSON.parse(storedNotes);
+                } else {
+                    notes = [];
+                }
+                renderNotes();
+            }
+
+            function saveNotes() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+            }
+
+            function renderNotes() {
+                notesContainer.innerHTML = '';
+                if (notes.length === 0) {
+                    notesContainer.innerHTML = '<p style="text-align: center; color: #888;">No notes yet. Add one above!</p>';
+                    return;
+                }
+
+                notes.forEach(note => {
+                    const noteItem = document.createElement('div');
+                    noteItem.classList.add('note-item');
+                    noteItem.dataset.id = note.id;
+
+                    const noteContent = document.createElement('div');
+                    noteContent.classList.add('note-content');
+                    noteContent.textContent = note.content;
+
+                    const noteDate = document.createElement('div');
+                    noteDate.classList.add('note-date');
+                    const date = new Date(note.timestamp);
+                    noteDate.textContent = `Created: ${date.toLocaleString()}`;
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.classList.add('delete-btn');
+                    deleteBtn.textContent = 'Delete';
+                    deleteBtn.addEventListener('click', () => deleteNote(note.id));
+
+                    noteItem.appendChild(noteContent);
+                    noteItem.appendChild(noteDate);
+                    noteItem.appendChild(deleteBtn);
+                    notesContainer.appendChild(noteItem);
+                });
+            }
+
+            function addNote() {
+                const content = noteTextarea.value.trim();
+                if (content) {
+                    const newNote = {
+                        id: Date.now().toString(),
+                        content: content,
+                        timestamp: new Date().toISOString()
+                    };
+                    notes.unshift(newNote);
+                    saveNotes();
+                    noteTextarea.value = '';
+                    renderNotes();
+                } else {
+                    alert('Note cannot be empty!');
+                }
+            }
+
+            function deleteNote(idToDelete) {
+                notes = notes.filter(note => note.id !== idToDelete);
+                saveNotes();
+                renderNotes();
+            }
+
+            addNoteBtn.addEventListener('click', addNote);
+
+            loadNotes();
+        });
+    </script>
+</body>
+</html>

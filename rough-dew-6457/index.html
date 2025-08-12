@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venom: Lethal Protector</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Orbitron:wght@400;700&display=swap');
+
+        :root {
+            --dark-bg: #1a1a1a;
+            --text-color: #e0e0e0;
+            --accent-color: #b00020; /* Dark red/maroon */
+            --light-accent: #ff0033; /* Brighter red for highlights */
+            --section-bg: #222222;
+            --border-color: #444444;
+            --nav-bg: #0d0d0d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        a {
+            color: var(--light-accent);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--text-color);
+        }
+
+        header {
+            background-color: var(--nav-bg);
+            padding: 1rem 0;
+            border-bottom: 2px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://via.placeholder.com/1600x600/101010/880000?text=VENOM') no-repeat center center/cover;
+            color: white;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(0,0,0,0.8), transparent);
+            z-index: -1;
+        }
+
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px var(--accent-color);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: var(--light-accent);
+            text-shadow: 0 0 5px var(--accent-color);
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+        }
+
+        .nav-links li {
+            margin-left: 30px;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: color 0.3s ease, transform 0.3s ease;
+            position: relative;
+            padding: 5px 0;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--light-accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--light-accent);
+            transform: translateY(-2px);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .hamburger div {
+            width: 25px;
+            height: 3px;
+            background-color: var(--text-color);
+            margin: 4px 0;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active .bar:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active .bar:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .hamburger.active .bar:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        section {
+            padding: 60px 0;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--section-bg);
+            margin-bottom: 20px;
+        }
+
+        section:last-of-type {
+            border-bottom: none;
+        }
+
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            color: var(--light-accent);
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            text-shadow: 0 0 8px rgba(255, 0, 51, 0.7);
+        }
+
+        h2::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 3px;
+            background-color: var(--accent-color);
+            margin: 15px auto 0;
+            border-radius: 5px;
+        }
+
+        .content-block {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .content-block:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .content-text, .content-image {
+            flex: 1;
+            padding: 20px;
+            min-width: 300px;
+        }
+
+        .content-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--accent-color);
+            transition: transform 0.3s ease;
+        }
+
+        .content-image img:hover {
+            transform: scale(1.02);
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        ul li::before {
+            content: '•';
+            color: var(--light-accent);
+            position: absolute;
+            left: 0;
+            font-size: 1.2em;
+            line-height: 1;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .gallery-item {
+            background-color: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .gallery-item .caption {
+            padding: 15px;
+            font-size: 0.9em;
+            color: var(--text-color);
+            text-align: center;
+        }
+
+        footer {
+            background-color: var(--nav-bg);
+            color: var(--border-color);
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 40px;
+            font-size: 0.9em;
+            border-top: 2px solid var(--border-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                position: absolute;
+                top: 70px; /* Adjust based on header height */
+                left: 0;
+                width: 100%;
+                background-color: var(--nav-bg);
+                border-top: 1px solid var(--border-color);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                transform: translateY(-100%);
+                transition: transform 0.3s ease-in-out;
+                padding: 20px 0;
+                display: flex; /* Ensure it's a flex container */
+                align-items: center; /* Center items */
+                opacity: 0;
+                pointer-events: none;
+            }
+
+            .nav-links.active {
+                transform: translateY(0);
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            .nav-links li {
+                margin: 15px 0;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .content-block {
+                flex-direction: column;
+            }
+
+            .content-block:nth-child(even) {
+                flex-direction: column;
+            }
+
+            .content-image {
+                order: -1; /* Image appears first on mobile */
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            section {
+                padding: 40px 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">VENOM</div>
+                <ul class="nav-links">
+                    <li><a href="#origin">Origin Story</a></li>
+                    <li><a href="#powers">Powers & Abilities</a></li>
+                    <li><a href="#appearances">Appearances</a></li>
+                    <li><a href="#gallery">Gallery</a></li>
+                </ul>
+                <div class="hamburger">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>WE ARE VENOM</h1>
+            <p>Explore the terrifying and thrilling world of the Lethal Protector, one of Marvel's most iconic anti-heroes.</p>
+        </section>
+
+        <section id="origin" class="container">
+            <h2>Origin Story</h2>
+            <div class="content-block">
+                <div class="content-text">
+                    <p>The story of Venom begins with an alien symbiote, a sentient extraterrestrial organism, that first bonded with Spider-Man during the Secret Wars storyline. Initially enhancing his abilities, the symbiote was rejected by Peter Parker due to its increasingly aggressive and possessive nature.</p>
+                    <p>It then sought out a new host, finding one in Eddie Brock, a disgraced journalist who harbored a deep resentment towards Peter Parker (both as Spider-Man and in his civilian identity). The symbiote, sensing Brock's hatred, bonded with him, creating a being driven by a singular purpose: to torment and destroy Spider-Man. This union of a powerful alien entity and a vengeful human formed Venom, a dark reflection of Spider-Man with enhanced abilities and a menacing persona.</p>
+                </div>
+                <div class="content-image">
+                    <img src="https://via.placeholder.com/600x400/300000/ff0033?text=Venom+Origin+Story" alt="Venom Origin Story - Symbiote Bonding">
+                </div>
+            </div>
+        </section>
+
+        <section id="powers" class="container">
+            <h2>Powers & Abilities</h2>
+            <div class="content-block">
+                <div class="content-image">
+                    <img src="https://via.placeholder.com/600x400/330000/ff3366?text=Venom+Powers" alt="Venom's Powers">
+                </div>
+                <div class="content-text">
+                    <p>The Venom symbiote grants its host a formidable array of powers, making them one of the most dangerous entities in the Marvel Universe:</p>
+                    <ul>
+                        <li><strong>Superhuman Strength & Durability:</strong> Far exceeding Spider-Man's, capable of lifting several tons and withstanding heavy impacts.</li>
+                        <li><strong>Enhanced Agility & Reflexes:</strong> Though less agile than Spider-Man, Venom possesses peak human to superhuman levels of speed and reflexes.</li>
+                        <li><strong>Shapeshifting & Camouflage:</strong> The symbiote can alter its form, mimic clothing, and blend into surroundings, making the host virtually invisible.</li>
+                        <li><strong>Regenerative Healing Factor:</strong> Rapidly heals from injuries that would be fatal to normal humans.</li>
+                        <li><strong>Web-like Constructs:</strong> Can generate organic webbing from its body, stronger than Spider-Man's synthetic webs.</li>
+                        <li><strong>Immunity to Spider-Sense:</strong> Due to its prior bond with Peter Parker, Venom is undetectable by Spider-Man's precognitive Spider-Sense.</li>
+                        <li><strong>Wall-Crawling:</strong> Similar to Spider-Man, can cling to surfaces.</li>
+                        <li><strong>Fangs and Claws:</strong> Can manifest razor-sharp fangs and claws for combat.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="appearances" class="container">
+            <h2>Notable Appearances</h2>
+            <div class="content-block">
+                <div class="content-text">
+                    <p>Venom has terrorized and sometimes protected the Marvel Universe across various media:</p>
+                    <h3>In Comics:</h3>
+                    <ul>
+                        <li><strong>The Amazing Spider-Man #300 (1988):</strong> Marks the full debut of Eddie Brock as Venom.</li>
+                        <li><strong>Venom: Lethal Protector (1993):</strong> The first solo Venom mini-series, establishing him as an anti-hero.</li>
+                        <li><strong>Maximum Carnage (1993):</strong> A major crossover event featuring Venom, Spider-Man, and Carnage.</li>
+                        <li><strong>Venom (2011 series):</strong> Flash Thompson takes on the mantle of Agent Venom, working for the U.S. government.</li>
+                        <li><strong>King in Black (2020-2021):</strong> A massive event where Knull, the Symbiote God, invades Earth, with Venom at the center.</li>
+                    </ul>
+                    <h3>In Movies:</h3>
+                    <ul>
+                        <li><strong>Spider-Man 3 (2007):</strong> Topher Grace portrays Eddie Brock/Venom in his first live-action film appearance.</li>
+                        <li><strong>Venom (2018):</strong> Tom Hardy stars as Eddie Brock, with the symbiote voiced by himself. The film explores their anti-hero dynamic.</li>
+                        <li><strong>Venom: Let There Be Carnage (2021):</strong> Tom Hardy reprises his role, facing off against Cletus Kasady/Carnage.</li>
+                        <li><strong>Spider-Man: No Way Home (2021):</strong> Features a post-credits scene cameo, hinting at future integration.</li>
+                    </ul>
+                </div>
+                <div class="content-image">
+                    <img src="https://via.placeholder.com/600x400/400000/ff6699?text=Venom+Comics+Movies" alt="Venom in Comics and Movies">
+                </div>
+            </div>
+        </section>
+
+        <section id="gallery" class="container">
+            <h2>Gallery</h2>
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <img src="https://via.placeholder.com/400x250/151515/800000?text=Venom+Art+1" alt="Venom Concept Art">
+                    <div class="caption">Concept Art: The Symbiote's Form</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://via.placeholder.com/400x250/1A1A1A/A00000?text=Venom+Art+2" alt="Venom in Action">
+                    <div class="caption">Venom in Action: Urban Terror</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://via.placeholder.com/400x250/202020/C00000?text=Venom+Art+3" alt="Eddie Brock as Venom">
+                    <div class="caption">Eddie Brock: The First Venom</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://via.placeholder.com/400x250/252525/E00000?text=Venom+Art+4" alt="We Are Venom">
+                    <div class="caption">"We Are Venom": Iconic Pose</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 Venom Fan Page. All characters and related indicia &copy; Marvel Comics. Created for educational/demonstration purposes only.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const hamburger = document.querySelector('.hamburger');
+            const navLinks = document.querySelector('.nav-links');
+
+            hamburger.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                hamburger.classList.toggle('active');
+            });
+
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+
+                    if (targetElement) {
+                        // Close mobile nav if open
+                        if (navLinks.classList.contains('active')) {
+                            navLinks.classList.remove('active');
+                            hamburger.classList.remove('active');
+                        }
+
+                        window.scrollTo({
+                            top: targetElement.offsetTop - (document.querySelector('header').offsetHeight + 20), // Adjust for fixed header
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

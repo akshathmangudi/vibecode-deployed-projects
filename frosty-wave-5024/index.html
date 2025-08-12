@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nike. Just Do It. Nike.com</title>
+    <style>
+        :root {
+            --nike-black: #111;
+            --nike-gray: #f5f5f5;
+            --text-color: #333;
+            --link-color: #000;
+            --hover-color: #777;
+        }
+
+        /* Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #fff;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--link-color);
+        }
+
+        a:hover {
+            color: var(--hover-color);
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--nike-black);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background-color: var(--hover-color);
+            color: #fff;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.9em;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            background-color: #fff;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.8em;
+            font-weight: 900;
+            color: var(--nike-black);
+            letter-spacing: -1px;
+        }
+
+        .main-nav ul {
+            display: flex;
+            gap: 25px;
+        }
+
+        .main-nav a {
+            font-weight: 600;
+            font-size: 0.95em;
+            padding: 5px 0;
+            position: relative;
+        }
+
+        .main-nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: var(--nike-black);
+            left: 0;
+            bottom: -5px;
+            transition: width 0.3s ease;
+        }
+
+        .main-nav a:hover::after {
+            width: 100%;
+        }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-input {
+            border: none;
+            background-color: var(--nike-gray);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            width: 150px;
+            transition: width 0.3s ease;
+        }
+
+        .search-input:focus {
+            width: 200px;
+            outline: none;
+        }
+
+        .icon-link {
+            font-size: 1.2em;
+            color: var(--nike-black);
+        }
+
+        .nav-toggle {
+            display: none; /* Hidden on desktop */
+            background: none;
+            border: none;
+            font-size: 1.8em;
+            cursor: pointer;
+            color: var(--nike-black);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            margin-bottom: 40px;
+            background-color: var(--nike-gray); /* Fallback/background for carousel */
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 0; /* Aspect ratio trick */
+            padding-bottom: 46.6%; /* For 1500x700 image, 700/1500 = 0.466 */
+            overflow: hidden;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .hero-content {
+            position: relative; /* To be on top of image */
+            z-index: 1;
+            text-align: center;
+            color: #fff; /* Assuming dark hero images */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            padding: 20px;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .hero-content p {
+            font-size: 1.5em;
+            margin-bottom: 25px;
+        }
+
+        .hero-content .btn {
+            background-color: #fff;
+            color: var(--nike-black);
+            text-shadow: none;
+        }
+        .hero-content .btn:hover {
+            background-color: #eee;
+        }
+
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 1.5em;
+            z-index: 2;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+        }
+
+        .carousel-nav:hover {
+            background: rgba(0,0,0,0.8);
+        }
+
+        .carousel-nav.prev {
+            left: 20px;
+        }
+
+        .carousel-nav.next {
+            right: 20px;
+        }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 2;
+        }
+
+        .carousel-dot {
+            width: 12px;
+            height: 12px;
+            background-color: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .carousel-dot.active {
+            background-color: white;
+            transform: scale(1.2);
+        }
+
+        /* Section Styling */
+        section {
+            padding: 40px 5%;
+            margin-bottom: 40px;
+        }
+
+        section h2 {
+            font-size: 2.2em;
+            text-align: center;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .product-card {
+            background-color: #fff;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            overflow: hidden;
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .product-card h3 {
+            font-size: 1.4em;
+            margin-bottom: 5px;
+        }
+
+        .product-card p {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        /* Category Grid */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .category-card {
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: scale(1.03);
+        }
+
+        .category-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+            border-radius: 10px;
+        }
+
+        .category-card a {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+            white-space: nowrap;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .category-card a:hover {
+            background-color: var(--nike-black);
+            color: #fff;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--nike-black);
+            color: #aaa;
+            padding: 40px 5%;
+            font-size: 0.9em;
+        }
+
+        .footer-columns {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto 30px auto;
+            border-bottom: 1px solid #444;
+            padding-bottom: 30px;
+        }
+
+        .footer-col h3 {
+            color: #fff;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            text-transform: uppercase;
+        }
+
+        .footer-col ul {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-col a {
+            color: #aaa;
+            transition: color 0.3s ease;
+        }
+
+        .footer-col a:hover {
+            color: #fff;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end; /* Align to right */
+            align-items: flex-start;
+        }
+
+        .social-icons a {
+            background-color: #444;
+            color: #fff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            background-color: #E03010; /* Example red for social hover */
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 20px;
+        }
+
+        .footer-bottom p {
+            margin-bottom: 10px;
+        }
+
+        .legal-links {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legal-links a {
+            color: #aaa;
+            white-space: nowrap;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 900px) {
+            .main-nav {
+                display: none; /* Hide main nav by default on smaller screens */
+                position: absolute;
+                top: 70px; /* Below header */
+                left: 0;
+                width: 100%;
+                background-color: #fff;
+                box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+                padding: 20px 0;
+                z-index: 999;
+            }
+
+            .main-nav.active {
+                display: block;
+            }
+
+            .main-nav ul {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .nav-toggle {
+                display: block; /* Show hamburger icon */
+            }
+
+            .nav-icons .search-input {
+                width: 100px; /* Smaller search bar on mobile */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 2.5em;
+            }
+
+            .hero-content p {
+                font-size: 1.2em;
+            }
+
+            .carousel-nav {
+                padding: 8px 12px;
+                font-size: 1.2em;
+            }
+
+            section {
+                padding: 30px 4%;
+            }
+
+            section h2 {
+                font-size: 1.8em;
+                margin-bottom: 25px;
+            }
+
+            .product-card {
+                padding: 15px;
+            }
+
+            .footer-columns {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .footer-col ul {
+                align-items: center;
+            }
+
+            .social-icons {
+                justify-content: center;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .legal-links {
+                justify-content: center;
+                margin-top: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 10px 4%;
+            }
+            .logo {
+                font-size: 1.5em;
+            }
+            .nav-icons {
+                gap: 10px;
+            }
+            .search-input {
+                width: 80px;
+                padding: 6px 10px;
+            }
+            .icon-link {
+                font-size: 1em;
+            }
+            .nav-toggle {
+                font-size: 1.5em;
+            }
+
+            .hero-content h1 {
+                font-size: 2em;
+            }
+            .hero-content p {
+                font-size: 1em;
+            }
+            .hero-content .btn {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+
+            .product-grid, .category-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">NIKE</div>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="#">New & Featured</a></li>
+                <li><a href="#">Men</a></li>
+                <li><a href="#">Women</a></li>
+                <li><a href="#">Kids</a></li>
+                <li><a href="#">Sale</a></li>
+                <li><a href="#">SNKRS</a></li>
+            </ul>
+        </nav>
+        <div class="nav-icons">
+            <input type="text" placeholder="Search..." class="search-input">
+            <a href="#" class="icon-link" aria-label="Shopping Cart">🛒</a>
+            <a href="#" class="icon-link" aria-label="User Profile">👤</a>
+        </div>
+        <button class="nav-toggle" aria-label="Toggle navigation">&#9776;</button>
+    </header>
+
+    <main>
+        <section class="hero-section">
+            <div class="carousel-container">
+                <div class="carousel-slide active">
+                    <img src="https://via.placeholder.com/1500x700/f0f0f0/333?text=Nike+Air+Max" alt="Nike Air Max Hero">
+                    <div class="hero-content">
+                        <h1>STEP INTO AIR</h1>
+                        <p>Our most iconic innovation. Ready for yours.</p>
+                        <a href="#" class="btn">Shop Air Max</a>
+                    </div>
+                </div>
+                <div class="carousel-slide">
+                    <img src="https://via.placeholder.com/1500x700/e0e0e0/333?text=Nike+Sportswear" alt="Nike Sportswear Hero">
+                    <div class="hero-content">
+                        <h1>FRESH FOR FALL</h1>
+                        <p>New gear built for cooler days and bolder looks.</p>
+                        <a href="#" class="btn">Shop Sportswear</a>
+                    </div>
+                </div>
+                <div class="carousel-slide">
+                    <img src="https://via.placeholder.com/1500x700/d0d0d0/333?text=Nike+Basketball" alt="Nike Basketball Hero">
+                    <div class="hero-content">
+                        <h1>COURT-READY</h1>
+                        <p>Dominate the game with our latest basketball collection.</p>
+                        <a href="#" class="btn">Shop Basketball</a>
+                    </div>
+                </div>
+                <div class="carousel-dots"></div>
+                <button class="carousel-nav prev" aria-label="Previous slide">&#10094;</button>
+                <button class="carousel-nav next" aria-label="Next slide">&#10095;</button>
+            </div>
+        </section>
+
+        <section class="featured-products">
+            <h2>Featured Today</h2>
+            <div class="product-grid">
+                <div class="product-card">
+                    <img src="https://via.placeholder.com/400x400/ccc/333?text=Product+1" alt="Nike Pegasus Running Shoes">
+                    <h3>Nike Pegasus</h3>
+                    <p>Men's Road Running Shoes</p>
+                    <a href="#" class="btn btn-small">Shop Now</a>
+                </div>
+                <div class="product-card">
+                    <img src="https://via.placeholder.com/400x400/ccc/333?text=Product+2" alt="Nike Tech Fleece Hoodie">
+                    <h3>Nike Tech Fleece</h3>
+                    <p>Men's Full-Zip Hoodie</p>
+                    <a href="#" class="btn btn-small">Shop Now</a>
+                </div>
+                <div class="product-card">
+                    <img src="https://via.placeholder.com/400x400/ccc/333?text=Product+3" alt="Nike Dunk Low Shoes">
+                    <h3>Nike Dunk Low</h3>
+                    <p>Women's Shoes</p>
+                    <a href="#" class="btn btn-small">Shop Now</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="shop-by-category">
+            <h2>Shop by Category</h2>
+            <div class="category-grid">
+                <div class="category-card">
+                    <img src="https://via.placeholder.com/300x200/eee/333?text=Running" alt="Running Category">
+                    <a href="#">Running</a>
+                </div>
+                <div class="category-card">
+                    <img src="https://via.placeholder.com/300x200/eee/333?text=Jordan" alt="Jordan Category">
+                    <a href="#">Jordan</a>
+                </div>
+                <div class="category-card">
+                    <img src="https://via.placeholder.com/300x200/eee/333?text=Football" alt="Football Category">
+                    <a href="#">Football</a>
+                </div>
+                <div class="category-card">
+                    <img src="https://via.placeholder.com/300x200/eee/333?text=Lifestyle" alt="Lifestyle Category">
+                    <a href="#">Lifestyle</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-columns">
+            <div class="footer-col">
+                <h3>Gift Cards</h3>
+                <ul>
+                    <li><a href="#">Gift Cards</a></li>
+                    <li><a href="#">Student Discount</a></li>
+                    <li><a href="#">Promotions</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>GET HELP</h3>
+                <ul>
+                    <li><a href="#">Order Status</a></li>
+                    <li><a href="#">Shipping & Delivery</a></li>
+                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">Payment Options</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>COMPANY</h3>
+                <ul>
+                    <li><a href="#">About Nike</a></li>
+                    <li><a href="#">News</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Investors</a></li>
+                    <li><a href="#">Sustainability</a></li>
+                </ul>
+            </div>
+            <div class="footer-col social-icons">
+                <a href="#" aria-label="Facebook">FB</a>
+                <a href="#" aria-label="Twitter">TW</a>
+                <a href="#" aria-label="Instagram">IG</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 Nike, Inc. All Rights Reserved</p>
+            <div class="legal-links">
+                <a href="#">Guides</a>
+                <a href="#">Terms of Sale</a>
+                <a href="#">Terms of Use</a>
+                <a href="#">Nike Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Navigation Toggle
+            const navToggle = document.querySelector('.nav-toggle');
+            const mainNav = document.querySelector('.main-nav');
+
+            if (navToggle && mainNav) {
+                navToggle.addEventListener('click', () => {
+                    mainNav.classList.toggle('active');
+                    const isExpanded = mainNav.classList.contains('active');
+                    navToggle.setAttribute('aria-expanded', isExpanded);
+                });
+            }
+
+            // Hero Carousel
+            const slides = document.querySelectorAll('.carousel-slide');
+            const nextBtn = document.querySelector('.carousel-nav.next');
+            const prevBtn = document.querySelector('.carousel-nav.prev');
+            const carouselDotsContainer = document.querySelector('.carousel-dots');
+            let currentSlide = 0;
+            let slideInterval;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.remove('active');
+                    if (i === index) {
+                        slide.classList.add('active');
+                    }
+                });
+                updateDots(index);
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % slides.length;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+                showSlide(currentSlide);
+            }
+
+            function createDots() {
+                slides.forEach((_, i) => {
+                    const dot = document.createElement('div');
+                    dot.classList.add('carousel-dot');
+                    dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+                    if (i === currentSlide) {
+                        dot.classList.add('active');
+                    }
+                    dot.addEventListener('click', () => {
+                        clearInterval(slideInterval); // Stop auto-play on manual navigation
+                        currentSlide = i;
+                        showSlide(currentSlide);
+                        startAutoPlay(); // Restart auto-play
+                    });
+                    carouselDotsContainer.appendChild(dot);
+                });
+            }
+
+            function updateDots(index) {
+                const dots = document.querySelectorAll('.carousel-dot');
+                dots.forEach((dot, i) => {
+                    dot.classList.remove('active');
+                    if (i === index) {
+                        dot.classList.add('active');
+                    }
+                });
+            }
+
+            function startAutoPlay() {
+                clearInterval(slideInterval); // Clear any existing interval
+                slideInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
+            }
+
+            if (slides.length > 0) {
+                createDots();
+                showSlide(currentSlide); // Initialize first slide
+                startAutoPlay();
+
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => {
+                        clearInterval(slideInterval);
+                        nextSlide();
+                        startAutoPlay();
+                    });
+                }
+
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', () => {
+                        clearInterval(slideInterval);
+                        prevSlide();
+                        startAutoPlay();
+                    });
+                }
+
+                // Pause auto-play on hover, resume on mouse leave
+                const carouselContainer = document.querySelector('.carousel-container');
+                if (carouselContainer) {
+                    carouselContainer.addEventListener('mouseenter', () => clearInterval(slideInterval));
+                    carouselContainer.addEventListener('mouseleave', startAutoPlay);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

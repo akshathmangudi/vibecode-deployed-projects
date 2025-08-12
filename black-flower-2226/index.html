@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StegaApp - Hide & Seek Messages</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel CDN for JSX transformation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                font-family: 'Inter', sans-serif;
+            }
+        }
+        @layer utilities {
+            .animate-fade-in-down {
+                animation: fadeInDown 1s ease-out forwards;
+            }
+            .animate-fade-in-up {
+                animation: fadeInUp 1s ease-out forwards;
+            }
+            .animate-fade-in {
+                animation: fadeIn 1s ease-out forwards;
+            }
+            .animate-bounce-slow {
+                animation: bounceSlow 2s infinite;
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes bounceSlow {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // --- Steganography Utilities ---
+        const textToBinary = (text) => {
+            return Array.from(text).map(char => {
+                const bin = char.charCodeAt(0).toString(2);
+                return '0'.repeat(8 - bin.length) + bin; // Ensure 8-bit representation
+            }).join('');
+        };
+
+        const binaryToText = (binary) => {
+            let text = '';
+            for (let i = 0; i < binary.length; i += 8) {
+                const byte = binary.substring(i, i + 8);
+                text += String.fromCharCode(parseInt(byte, 2));
+            }
+            return text;
+        };
+
+        // Converts a number to a 32-bit binary string
+        const numToBinary = (num) => {
+            const bin = num.toString(2);
+            return '0'.repeat(32 - bin.length) + bin;
+        };
+
+        // Converts a 32-bit binary string to a number
+        const binaryToNum = (binary) => {
+            return parseInt(binary, 2);
+        };
+
+        const hideMessage = (imageData, message) => {
+            const pixels = imageData.data;
+            const messageBinary = textToBinary(message);
+            const messageLengthBinary = numToBinary(messageBinary.length); // 32 bits for length
+            const fullBinaryMessage = messageLengthBinary + messageBinary;
+
+            const totalCapacityBits = imageData.width * imageData.height * 3; // R, G, B channels per pixel
+            if (fullBinaryMessage.length > totalCapacityBits) {
+                throw new Error(`Message too long for this image. Max capacity: ${totalCapacityBits} bits.`);
+            }
+
+            let bitIndex = 0;
+            for (let i = 0; i < pixels.length; i += 4) { // Iterate over RGBA pixel data
+                for (let j = 0; j < 3; j++) { // Iterate over R, G, B channels
+                    if (bitIndex < fullBinaryMessage.length) {
+                        const bit = parseInt(fullBinaryMessage[bitIndex], 10);
+                        pixels[i + j] = (pixels[i + j] & 0xFE) | bit; // Set LSB
+                        bitIndex++;
+                    } else {
+                        // All bits hidden, can return early
+                        return imageData;
+                    }
+                }
+            }
+            return imageData;
+        };
+
+        const revealMessage = (imageData) => {
+            const pixels = imageData.data;
+            let extractedBits = '';
+            const lengthBitsNeeded = 32; // We hid the length in 32 bits
+
+            for (let i = 0; i < pixels.length; i += 4) {
+                for (let j = 0; j < 3; j++) { // Extract from R, G, B channels
+                    extractedBits += (pixels[i + j] & 0x01).toString(); // Get LSB
+                    if (extractedBits.length === lengthBitsNeeded) {
+                        break;
+                    }
+                }
+                if (extractedBits.length === lengthBitsNeeded) {
+                    break;
+                }
+            }
+
+            if (extractedBits.length < lengthBitsNeeded) {
+                return ""; // Not enough data to even read the length
+            }
+
+            const messageLength = binaryToNum(extractedBits.substring(0, lengthBitsNeeded));
+            let messageBinary = '';
+            let bitIndex = lengthBitsNeeded;
+
+            // Continue extracting bits for the actual message
+            for (let i = 0; i < pixels.length; i += 4) {
+                for (let j = 0; j < 3; j++) {
+                    if (bitIndex < lengthBitsNeeded + messageLength) {
+                        messageBinary += (pixels[i + j] & 0x01).toString();
+                        bitIndex++;
+                    } else {
+                        // All message bits extracted
+                        return binaryToText(messageBinary);
+                    }
+                }
+            }
+            return binaryToText(messageBinary); // In case image ends exactly when message does
+        };
+
+        // --- React Components ---
+        const { useState, useEffect, useRef } = React;
+
+        const Navbar = () => {
+            return (
+                <nav className="bg-gray-800 p-4 shadow-md">
+                    <div className="container mx-auto flex justify-between items-center">
+                        <a href="#home" className="text-2xl font-bold text-teal-400 hover:text-teal-300 transition-colors">StegaApp</a>
+                        <div className="flex space-x-4">
+                            <a href="#home" className="text-gray-300 hover:text-white transition-colors">Home</a>
+                            <a href="#contact" className="text-gray-300 hover:text-white transition-colors">Contact Us</a>
+                        </div>
+                    </div>
+                </nav>
+            );
+        };
+
+        const HomePage = ({ navigate }) => {
+            return (
+                <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] p-4 text-center">
+                    <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6 animate-fade-in-down">
+                        Welcome to StegaApp
+                    </h1>
+                    <p className="text-xl md:text-2xl text-gray-300 mb-10 max-w-2xl animate-fade-in-up">
+                        Easily hide secret messages within images or reveal hidden messages from them.
+                        Your privacy, powered by steganography.
+                    </p>
+                    <button
+                        onClick={() => navigate('select')}
+                        className="bg-teal-500 hover:bg-teal-600 text-white font-bold py-4 px-8 rounded-full text-lg md:text-xl shadow-lg transform hover:scale-105 transition-all duration-300 animate-bounce-slow"
+                    >
+                        Get Started
+                    </button>
+                </div>
+            );
+        };
+
+        const SelectionPage = ({ navigate }) => {
+            return (
+                <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] p-4 text-center bg-gradient-to-br from-gray-900 to-gray-800">
+                    <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-12 animate-fade-in">
+                        What would you like to do?
+                    </h2>
+                    <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-8">
+                        <button
+                            onClick={() => navigate('hide')}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-5 px-12 rounded-lg text-2xl shadow-xl transform hover:scale-105 transition-all duration-300 w-full md:w-auto"
+                        >
+                            Hide a Message
+                        </button>
+                        <button
+                            onClick={() => navigate('seek')}
+                            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-5 px-12 rounded-lg text-2xl shadow-xl transform hover:scale-105 transition-all duration-300 w-full md:w-auto"
+                        >
+                            Reveal a Message
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const HidePage = () => {
+            const [imageFile, setImageFile] = useState(null);
+            const [message, setMessage] = useState('');
+            const [hiddenImageUrl, setHiddenImageUrl] = useState(null);
+            const [error, setError] = useState('');
+            const canvasRef = useRef(null);
+
+            const handleImageChange = (e) => {
+                setImageFile(e.target.files[0]);
+                setHiddenImageUrl(null);
+                setError('');
+            };
+
+            const handleHideClick = async () => {
+                setError('');
+                setHiddenImageUrl(null);
+                if (!imageFile || !message) {
+                    setError('Please select an image and enter a message.');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = canvasRef.current;
+                        const ctx = canvas.getContext('2d');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+
+                        try {
+                            const imageData = ctx.getImageData(0, 0, img.width, img.height);
+                            const newImageData = hideMessage(imageData, message);
+                            ctx.putImageData(newImageData, 0, 0);
+                            setHiddenImageUrl(canvas.toDataURL('image/png')); // Use PNG for lossless save
+                        } catch (err) {
+                            setError(err.message);
+                        }
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(imageFile);
+            };
+
+            const handleDownload = () => {
+                if (hiddenImageUrl) {
+                    const link = document.createElement('a');
+                    link.href = hiddenImageUrl;
+                    link.download = 'stega_image.png';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            };
+
+            return (
+                <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] p-4 bg-gradient-to-br from-gray-800 to-gray-700 text-gray-100">
+                    <h2 className="text-4xl font-extrabold text-white mb-8">Hide Message in Image</h2>
+                    <div className="bg-gray-900 p-8 rounded-lg shadow-xl w-full max-w-md space-y-6">
+                        <div>
+                            <label htmlFor="imageUpload" className="block text-gray-300 text-lg font-medium mb-2">Upload Image:</label>
+                            <input
+                                type="file"
+                                id="imageUpload"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className="w-full px-3 py-2 text-gray-300 bg-gray-700 rounded-md file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-500 file:text-white hover:file:bg-teal-600 cursor-pointer"
+                            />
+                            {imageFile && <p className="text-sm text-gray-400 mt-2">Selected: {imageFile.name}</p>}
+                        </div>
+                        <div>
+                            <label htmlFor="messageText" className="block text-gray-300 text-lg font-medium mb-2">Enter Message:</label>
+                            <textarea
+                                id="messageText"
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                rows="4"
+                                className="w-full px-3 py-2 bg-gray-700 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                placeholder="Your secret message..."
+                            ></textarea>
+                        </div>
+                        {error && <p className="text-red-400 text-center">{error}</p>}
+                        <button
+                            onClick={handleHideClick}
+                            className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-md text-lg shadow-md transition-all duration-200"
+                        >
+                            Hide Message
+                        </button>
+
+                        {hiddenImageUrl && (
+                            <div className="mt-8 text-center">
+                                <h3 className="text-xl font-semibold text-gray-200 mb-4">Hidden Image Ready!</h3>
+                                <img src={hiddenImageUrl} alt="Hidden Message" className="max-w-full h-auto mx-auto border border-gray-600 rounded-md mb-4" />
+                                <button
+                                    onClick={handleDownload}
+                                    className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-md text-lg shadow-md transition-all duration-200"
+                                >
+                                    Download Hidden Image
+                                </button>
+                            </div>
+                        )}
+                        <canvas ref={canvasRef} className="hidden"></canvas> {/* Hidden canvas */}
+                    </div>
+                </div>
+            );
+        };
+
+        const SeekPage = () => {
+            const [imageFile, setImageFile] = useState(null);
+            const [revealedMessage, setRevealedMessage] = useState('');
+            const [error, setError] = useState('');
+            const canvasRef = useRef(null);
+
+            const handleImageChange = (e) => {
+                setImageFile(e.target.files[0]);
+                setRevealedMessage('');
+                setError('');
+            };
+
+            const handleRevealClick = async () => {
+                setError('');
+                setRevealedMessage('');
+                if (!imageFile) {
+                    setError('Please select an image to reveal the message from.');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = canvasRef.current;
+                        const ctx = canvas.getContext('2d');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+
+                        try {
+                            const imageData = ctx.getImageData(0, 0, img.width, img.height);
+                            const message = revealMessage(imageData);
+                            setRevealedMessage(message || "No message found or message is empty.");
+                        } catch (err) {
+                            setError(err.message);
+                        }
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(imageFile);
+            };
+
+            return (
+                <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] p-4 bg-gradient-to-br from-gray-800 to-gray-700 text-gray-100">
+                    <h2 className="text-4xl font-extrabold text-white mb-8">Reveal Message from Image</h2>
+                    <div className="bg-gray-900 p-8 rounded-lg shadow-xl w-full max-w-md space-y-6">
+                        <div>
+                            <label htmlFor="imageUpload" className="block text-gray-300 text-lg font-medium mb-2">Upload Image:</label>
+                            <input
+                                type="file"
+                                id="imageUpload"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className="w-full px-3 py-2 text-gray-300 bg-gray-700 rounded-md file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-500 file:text-white hover:file:bg-purple-600 cursor-pointer"
+                            />
+                            {imageFile && <p className="text-sm text-gray-400 mt-2">Selected: {imageFile.name}</p>}
+                        </div>
+                        {error && <p className="text-red-400 text-center">{error}</p>}
+                        <button
+                            onClick={handleRevealClick}
+                            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-md text-lg shadow-md transition-all duration-200"
+                        >
+                            Reveal Message
+                        </button>
+
+                        {revealedMessage && (
+                            <div className="mt-8 text-center bg-gray-700 p-6 rounded-md">
+                                <h3 className="text-xl font-semibold text-gray-200 mb-4">Revealed Message:</h3>
+                                <p className="text-gray-300 text-lg break-words">{revealedMessage}</p>
+                            </div>
+                        )}
+                        <canvas ref={canvasRef} className="hidden"></canvas> {/* Hidden canvas */}
+                    </div>
+                </div>
+            );
+        };
+
+        const ContactUsPage = () => {
+            return (
+                <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] p-4 text-center bg-gradient-to-br from-gray-900 to-gray-800">
+                    <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-8">Contact Us</h2>
+                    <div className="bg-gray-900 p-8 rounded-lg shadow-xl w-full max-w-md">
+                        <p className="text-lg text-gray-300 mb-4">
+                            Have questions or feedback about StegaApp? Feel free to reach out!
+                        </p>
+                        <p className="text-lg text-gray-300 mb-6">
+                            Email: <a href="mailto:support@stegaapp.com" className="text-teal-400 hover:underline">support@stegaapp.com</a>
+                        </p>
+                        <p className="text-md text-gray-400">
+                            This is a demo application. Steganography, while interesting, does not provide robust security.
+                        </p>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [path, setPath] = useState(window.location.hash.slice(1) || 'home');
+
+            useEffect(() => {
+                const handleHashChange = () => {
+                    setPath(window.location.hash.slice(1) || 'home');
+                };
+                window.addEventListener('hashchange', handleHashChange);
+                return () => window.removeEventListener('hashchange', handleHashChange);
+            }, []);
+
+            const navigate = (newPath) => {
+                window.location.hash = newPath;
+            };
+
+            const renderPage = () => {
+                switch (path) {
+                    case 'home':
+                        return <HomePage navigate={navigate} />;
+                    case 'select':
+                        return <SelectionPage navigate={navigate} />;
+                    case 'hide':
+                        return <HidePage />;
+                    case 'seek':
+                        return <SeekPage />;
+                    case 'contact':
+                        return <ContactUsPage />;
+                    default:
+                        return <HomePage navigate={navigate} />;
+                }
+            };
+
+            return (
+                <div className="flex flex-col min-h-screen">
+                    <Navbar />
+                    <main className="flex-grow">
+                        {renderPage()}
+                    </main>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

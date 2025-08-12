@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #e0e0e0;
+            margin: 0;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .calculator {
+            background-color: #333;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            width: 300px;
+            padding: 20px;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            gap: 15px;
+        }
+
+        .calculator-display {
+            background-color: #222;
+            color: #eee;
+            font-size: 2.8em;
+            padding: 15px 10px;
+            border: none;
+            border-radius: 8px;
+            text-align: right;
+            margin-bottom: 15px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            text-overflow: clip;
+            box-sizing: border-box;
+        }
+
+        .calculator-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .calculator-button {
+            background-color: #555;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 20px;
+            font-size: 1.8em;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            user-select: none;
+            outline: none;
+            -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+        }
+
+        .calculator-button:hover {
+            background-color: #777;
+            transform: translateY(-2px);
+        }
+
+        .calculator-button:active {
+            background-color: #444;
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .calculator-button.operator {
+            background-color: #f7923b;
+            color: #fff;
+        }
+
+        .calculator-button.operator:hover {
+            background-color: #ffaa5c;
+        }
+
+        .calculator-button.operator:active {
+            background-color: #e67d22;
+        }
+
+        .calculator-button.clear {
+            background-color: #d9534f;
+        }
+
+        .calculator-button.clear:hover {
+            background-color: #e06d69;
+        }
+
+        .calculator-button.clear:active {
+            background-color: #c44743;
+        }
+
+        .calculator-button.equals {
+            background-color: #5cb85c;
+            grid-column: span 2;
+        }
+
+        .calculator-button.equals:hover {
+            background-color: #6edc6e;
+        }
+
+        .calculator-button.equals:active {
+            background-color: #4cae4c;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" class="calculator-display" value="0" readonly>
+        <div class="calculator-buttons">
+            <button class="calculator-button clear" data-action="clear">C</button>
+            <button class="calculator-button operator" data-action="divide">/</button>
+            <button class="calculator-button operator" data-action="multiply">*</button>
+            <button class="calculator-button" data-action="number">7</button>
+            <button class="calculator-button" data-action="number">8</button>
+            <button class="calculator-button" data-action="number">9</button>
+            <button class="calculator-button operator" data-action="subtract">-</button>
+            <button class="calculator-button" data-action="number">4</button>
+            <button class="calculator-button" data-action="number">5</button>
+            <button class="calculator-button" data-action="number">6</button>
+            <button class="calculator-button operator" data-action="add">+</button>
+            <button class="calculator-button" data-action="number">1</button>
+            <button class="calculator-button" data-action="number">2</button>
+            <button class="calculator-button" data-action="number">3</button>
+            <button class="calculator-button equals" data-action="equals">=</button>
+            <button class="calculator-button" data-action="number">0</button>
+            <button class="calculator-button" data-action="decimal">.</button>
+        </div>
+    </div>
+
+    <script>
+        const calculatorDisplay = document.querySelector('.calculator-display');
+        const calculatorButtons = document.querySelector('.calculator-buttons');
+
+        let currentOperand = '';
+        let previousOperand = '';
+        let operation = undefined;
+
+        function clear() {
+            currentOperand = '';
+            previousOperand = '';
+            operation = undefined;
+            updateDisplay();
+        }
+
+        function appendNumber(number) {
+            if (number === '.' && currentOperand.includes('.')) return;
+            if (currentOperand === '0' && number !== '.') {
+                currentOperand = number;
+            } else {
+                currentOperand = currentOperand.toString() + number.toString();
+            }
+            updateDisplay();
+        }
+
+        function chooseOperation(selectedOperation) {
+            if (currentOperand === '' && previousOperand === '') return;
+
+            if (previousOperand !== '' && currentOperand !== '') {
+                compute();
+            } else if (currentOperand !== '') {
+                previousOperand = currentOperand;
+                currentOperand = '';
+            }
+            operation = selectedOperation;
+            updateDisplay();
+        }
+
+        function compute() {
+            let computation;
+            const prev = parseFloat(previousOperand);
+            const current = parseFloat(currentOperand);
+
+            if (isNaN(prev) || isNaN(current)) return;
+
+            switch (operation) {
+                case 'add':
+                    computation = prev + current;
+                    break;
+                case 'subtract':
+                    computation = prev - current;
+                    break;
+                case 'multiply':
+                    computation = prev * current;
+                    break;
+                case 'divide':
+                    if (current === 0) {
+                        alert("Cannot divide by zero!");
+                        clear();
+                        return;
+                    }
+                    computation = prev / current;
+                    break;
+                default:
+                    return;
+            }
+            currentOperand = computation.toString();
+            operation = undefined;
+            previousOperand = '';
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            if (currentOperand === '') {
+                 calculatorDisplay.value = previousOperand === '' ? '0' : previousOperand;
+            } else {
+                calculatorDisplay.value = currentOperand;
+            }
+        }
+
+        calculatorButtons.addEventListener('click', e => {
+            const button = e.target;
+            const action = button.dataset.action;
+            const buttonText = button.textContent;
+
+            if (button.tagName !== 'BUTTON') return;
+
+            if (action === 'number') {
+                appendNumber(buttonText);
+            } else if (action === 'decimal') {
+                appendNumber('.');
+            } else if (action === 'clear') {
+                clear();
+            } else if (action === 'equals') {
+                compute();
+            } else if (action === 'add' || action === 'subtract' || action === 'multiply' || action === 'divide') {
+                chooseOperation(action);
+            }
+        });
+
+        clear();
+    </script>
+</body>
+</html>

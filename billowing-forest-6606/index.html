@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket Scoreboard</title>
+    <style>
+        :root {
+            --primary-color: #28a745; /* Green */
+            --secondary-color: #007bff; /* Blue */
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --text-color: #212529;
+            --light-text-color: #6c757d;
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            color: var(--text-color);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .app-container {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px var(--shadow-color);
+            width: 90%;
+            max-width: 500px;
+            padding: 25px;
+            margin-top: 30px;
+            text-align: center;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 2.2em;
+            letter-spacing: -0.5px;
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        .team-score {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: var(--background-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .team-score.batting {
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.2);
+        }
+
+        .team-score h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.8em;
+            color: var(--secondary-color);
+        }
+
+        .score-display {
+            font-size: 3em;
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 5px;
+        }
+
+        .overs-display {
+            font-size: 1.2em;
+            color: var(--light-text-color);
+            margin-top: 10px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .controls button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 1.1em;
+            cursor: pointer;
+            outline: none;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            min-width: 80px;
+        }
+
+        .controls button:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        .controls button:active {
+            transform: translateY(0);
+        }
+
+        .reset-button {
+            background-color: #dc3545 !important;
+            margin-top: 20px;
+        }
+
+        .reset-button:hover {
+            background-color: #c82333 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <h1>Cricket Scoreboard</h1>
+
+        <div class="scoreboard">
+            <div id="team1-scorecard" class="team-score">
+                <h2>Team A</h2>
+                <div id="team1-score" class="score-display">0 / 0</div>
+            </div>
+            <div id="team2-scorecard" class="team-score">
+                <h2>Team B</h2>
+                <div id="team2-score" class="score-display">0 / 0</div>
+            </div>
+        </div>
+        <div class="overs-display">Overs: <span id="overs">0.0</span></div>
+
+        <div class="controls">
+            <button data-runs="1">+1 Run</button>
+            <button data-runs="2">+2 Runs</button>
+            <button data-runs="3">+3 Runs</button>
+            <button data-runs="4">+4 Runs</button>
+            <button data-runs="6">+6 Runs</button>
+            <button id="wicket-btn">Wicket</button>
+            <button id="end-over-btn">End Over</button>
+        </div>
+        <button id="reset-btn" class="reset-button">Reset Game</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let team1Runs = 0;
+            let team1Wickets = 0;
+            let team1Overs = 0;
+            let team1Balls = 0;
+
+            let team2Runs = 0;
+            let team2Wickets = 0;
+            let team2Overs = 0;
+            let team2Balls = 0;
+
+            let battingTeam = 1; // 1 for Team A, 2 for Team B
+            let innings = 1; // 1 or 2
+
+            const team1ScoreDisplay = document.getElementById('team1-score');
+            const team2ScoreDisplay = document.getElementById('team2-score');
+            const oversDisplay = document.getElementById('overs');
+            const team1Scorecard = document.getElementById('team1-scorecard');
+            const team2Scorecard = document.getElementById('team2-scorecard');
+
+            const runButtons = document.querySelectorAll('.controls button[data-runs]');
+            const wicketButton = document.getElementById('wicket-btn');
+            const endOverButton = document.getElementById('end-over-btn');
+            const resetBtn = document.getElementById('reset-btn');
+
+            const updateDisplay = () => {
+                team1ScoreDisplay.textContent = `${team1Runs} / ${team1Wickets}`;
+                team2ScoreDisplay.textContent = `${team2Runs} / ${team2Wickets}`;
+
+                if (battingTeam === 1) {
+                    oversDisplay.textContent = `${team1Overs}.${team1Balls}`;
+                    team1Scorecard.classList.add('batting');
+                    team2Scorecard.classList.remove('batting');
+                } else {
+                    oversDisplay.textContent = `${team2Overs}.${team2Balls}`;
+                    team2Scorecard.classList.add('batting');
+                    team1Scorecard.classList.remove('batting');
+                }
+            };
+
+            const declareWinner = () => {
+                let winnerMessage = "Match Draw!";
+                if (team1Runs > team2Runs) {
+                    winnerMessage = `Team A wins by ${team1Runs - team2Runs} runs!`;
+                } else if (team2Runs > team1Runs) {
+                    winnerMessage = `Team B wins by ${10 - team2Wickets} wickets!`;
+                }
+                alert(`Game Over! Final Score:\nTeam A: ${team1Runs}/${team1Wickets} in ${team1Overs}.${team1Balls} overs\nTeam B: ${team2Runs}/${team2Wickets} in ${team2Overs}.${team2Balls} overs\n\n${winnerMessage}`);
+            };
+
+            const checkInningsEnd = () => {
+                if (battingTeam === 1 && team1Wickets === 10) {
+                    alert(`Innings 1 Over! Team A scored ${team1Runs} runs for ${team1Wickets} wickets in ${team1Overs}.${team1Balls} overs.`);
+                    battingTeam = 2;
+                    innings = 2;
+                    team2Overs = 0;
+                    team2Balls = 0;
+                    updateDisplay();
+                } else if (battingTeam === 2 && team2Wickets === 10) {
+                     declareWinner();
+                } else if (battingTeam === 2 && team2Runs > team1Runs) {
+                     declareWinner();
+                }
+            };
+
+            const addRuns = (runs) => {
+                if (battingTeam === 1) {
+                    team1Runs += runs;
+                    team1Balls++;
+                } else {
+                    team2Runs += runs;
+                    team2Balls++;
+                }
+                checkOverProgress();
+                updateDisplay();
+                checkInningsEnd();
+            };
+
+            const addWicket = () => {
+                if (battingTeam === 1) {
+                    team1Wickets++;
+                    team1Balls++;
+                } else {
+                    team2Wickets++;
+                    team2Balls++;
+                }
+                checkOverProgress();
+                updateDisplay();
+                checkInningsEnd();
+            };
+
+            const checkOverProgress = () => {
+                if (battingTeam === 1) {
+                    if (team1Balls === 6) {
+                        team1Overs++;
+                        team1Balls = 0;
+                    }
+                } else {
+                    if (team2Balls === 6) {
+                        team2Overs++;
+                        team2Balls = 0;
+                    }
+                }
+            };
+
+            const endOver = () => {
+                if (battingTeam === 1) {
+                    if (team1Balls > 0) {
+                        team1Overs++;
+                        team1Balls = 0;
+                    }
+                } else {
+                    if (team2Balls > 0) {
+                        team2Overs++;
+                        team2Balls = 0;
+                    }
+                }
+                updateDisplay();
+            };
+
+            const resetGame = () => {
+                if (confirm('Are you sure you want to reset the game?')) {
+                    team1Runs = 0;
+                    team1Wickets = 0;
+                    team1Overs = 0;
+                    team1Balls = 0;
+
+                    team2Runs = 0;
+                    team2Wickets = 0;
+                    team2Overs = 0;
+                    team2Balls = 0;
+
+                    battingTeam = 1;
+                    innings = 1;
+                    updateDisplay();
+                }
+            };
+
+            runButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const runs = parseInt(button.dataset.runs);
+                    addRuns(runs);
+                });
+            });
+
+            wicketButton.addEventListener('click', addWicket);
+            endOverButton.addEventListener('click', endOver);
+            resetBtn.addEventListener('click', resetGame);
+
+            updateDisplay();
+        });
+    </script>
+</body>
+</html>

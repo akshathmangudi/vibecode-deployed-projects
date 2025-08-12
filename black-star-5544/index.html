@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Notes App</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --delete-color: #f44336;
+            --text-color: #333;
+            --bg-color: #f4f7f6;
+            --card-bg-color: #ffffff;
+            --border-color: #e0e0e0;
+            --shadow-light: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--card-bg-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px var(--shadow-light);
+            padding: 30px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            letter-spacing: -0.5px;
+        }
+
+        .note-input {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1em;
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+            color: var(--text-color);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        #add-note-btn {
+            background-color: var(--primary-color);
+            color: white;
+            align-self: flex-end;
+        }
+
+        #add-note-btn:hover {
+            background-color: #43a047;
+        }
+
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .note-item {
+            background-color: var(--card-bg-color);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 150px;
+            position: relative;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .note-content {
+            font-size: 1.05em;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+            flex-grow: 1;
+        }
+
+        .note-content[contenteditable="true"] {
+            border: 1px dashed var(--secondary-color);
+            padding: 5px;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .note-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .edit-btn {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background-color: #1976d2;
+        }
+
+        .delete-btn {
+            background-color: var(--delete-color);
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .notes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>My Notes</h1>
+
+        <div class="note-input">
+            <textarea id="note-content-input" placeholder="Write your note here..."></textarea>
+            <button id="add-note-btn">Add Note</button>
+        </div>
+
+        <div class="notes-grid" id="notes-grid">
+            <!-- Notes will be dynamically loaded here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        const notes = []; // Array of { id: string, content: string, timestamp: number }
+
+        const noteContentInput = document.getElementById('note-content-input');
+        const addNoteBtn = document.getElementById('add-note-btn');
+        const notesGrid = document.getElementById('notes-grid');
+
+        const saveNotes = () => {
+            localStorage.setItem('notesAppNotes', JSON.stringify(notes));
+        };
+
+        const loadNotes = () => {
+            const storedNotes = localStorage.getItem('notesAppNotes');
+            if (storedNotes) {
+                notes.push(...JSON.parse(storedNotes));
+            }
+        };
+
+        const createNoteElement = (note) => {
+            const noteDiv = document.createElement('div');
+            noteDiv.classList.add('note-item');
+            noteDiv.dataset.id = note.id;
+
+            const noteContentDiv = document.createElement('div');
+            noteContentDiv.classList.add('note-content');
+            noteContentDiv.textContent = note.content;
+
+            const noteActionsDiv = document.createElement('div');
+            noteActionsDiv.classList.add('note-actions');
+
+            const editBtn = document.createElement('button');
+            editBtn.classList.add('edit-btn');
+            editBtn.textContent = 'Edit';
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.classList.add('delete-btn');
+            deleteBtn.textContent = 'Delete';
+
+            noteActionsDiv.append(editBtn, deleteBtn);
+            noteDiv.append(noteContentDiv, noteActionsDiv);
+
+            return noteDiv;
+        };
+
+        const renderNotes = () => {
+            notesGrid.innerHTML = '';
+            notes.sort((a, b) => b.timestamp - a.timestamp); // Sort by newest first
+            notes.forEach(note => {
+                notesGrid.appendChild(createNoteElement(note));
+            });
+        };
+
+        const addNote = () => {
+            const content = noteContentInput.value.trim();
+            if (content) {
+                const newNote = {
+                    id: Date.now().toString(),
+                    content: content,
+                    timestamp: Date.now()
+                };
+                notes.push(newNote);
+                saveNotes();
+                renderNotes();
+                noteContentInput.value = '';
+            }
+        };
+
+        notesGrid.addEventListener('click', (event) => {
+            const target = event.target;
+            const noteItem = target.closest('.note-item');
+            if (!noteItem) return;
+
+            const noteId = noteItem.dataset.id;
+            const noteContentDiv = noteItem.querySelector('.note-content');
+            const editBtn = noteItem.querySelector('.edit-btn');
+
+            const noteToModify = notes.find(n => n.id === noteId);
+
+            if (target.classList.contains('delete-btn')) {
+                if (confirm('Are you sure you want to delete this note?')) {
+                    notes.splice(notes.findIndex(n => n.id === noteId), 1);
+                    saveNotes();
+                    noteItem.remove();
+                }
+            } else if (target.classList.contains('edit-btn')) {
+                if (noteContentDiv.contentEditable === 'true') {
+                    // Currently editing, save it
+                    noteContentDiv.contentEditable = 'false';
+                    noteContentDiv.style.border = 'none';
+                    if (noteToModify) {
+                        noteToModify.content = noteContentDiv.textContent.trim();
+                        noteToModify.timestamp = Date.now(); // Update timestamp on edit
+                    }
+                    saveNotes();
+                    editBtn.textContent = 'Edit';
+                    renderNotes(); // Re-render to ensure sorting reflects new timestamp
+                } else {
+                    // Start editing
+                    noteContentDiv.contentEditable = 'true';
+                    noteContentDiv.focus();
+                    editBtn.textContent = 'Save';
+                    // Place cursor at the end
+                    const range = document.createRange();
+                    range.selectNodeContents(noteContentDiv);
+                    range.collapse(false); // Collapse to end
+                    const selection = window.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNotes();
+            renderNotes();
+        });
+
+        addNoteBtn.addEventListener('click', addNote);
+
+        noteContentInput.addEventListener('keydown', (event) => {
+            // Add note on Enter, but allow Shift+Enter for new line in textarea
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                addNote();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nike - Just Do It</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            color: #111;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background-color: #fff;
+            border-bottom: 1px solid #eee;
+            padding: 10px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo img {
+            height: 30px;
+        }
+
+        .nav-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links li a {
+            text-decoration: none;
+            color: #111;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links li a:hover {
+            color: #777;
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 20px;
+            font-size: 1.2rem;
+        }
+
+        .nav-icons .icon {
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .nav-icons .icon:hover {
+            color: #777;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .hero-section img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .hero-content {
+            position: absolute;
+            bottom: 5%;
+            left: 5%;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            max-width: 500px;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            line-height: 1.1;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .shop-now-btn {
+            background-color: #111;
+            color: #fff;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: background-color 0.3s ease;
+        }
+
+        .shop-now-btn:hover {
+            background-color: #555;
+        }
+
+        /* Featured Products */
+        .featured-products {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .featured-products h2 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .product-item {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            overflow: hidden;
+            text-align: left;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .product-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-item img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .product-item h3 {
+            font-size: 1.5rem;
+            margin: 15px 15px 5px 15px;
+        }
+
+        .product-item p {
+            font-size: 1rem;
+            color: #555;
+            margin: 0 15px 15px 15px;
+        }
+
+        .product-item .view-btn {
+            display: inline-block;
+            background-color: #111;
+            color: #fff;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 20px;
+            margin: 0 15px 15px 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        .product-item .view-btn:hover {
+            background-color: #555;
+        }
+
+        /* Promotional Banner */
+        .promo-banner {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            margin: 40px 0;
+        }
+
+        .promo-banner img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .promo-content {
+            position: absolute;
+            bottom: 50%; /* Center vertically */
+            left: 5%;
+            transform: translateY(50%); /* Adjust for vertical centering */
+            color: #111;
+            max-width: 500px;
+        }
+
+        .promo-content h2 {
+            font-size: 3rem;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            line-height: 1.1;
+        }
+
+        .promo-content p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #111;
+            color: #fff;
+            padding: 40px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .footer-links div {
+            min-width: 180px;
+        }
+
+        .footer-links h3 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            color: #ccc;
+        }
+
+        .footer-links ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links ul li a {
+            text-decoration: none;
+            color: #aaa;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links ul li a:hover {
+            color: #fff;
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #333;
+            padding-top: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .footer-bottom p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+
+        .social-icons a {
+            color: #fff;
+            font-size: 1.2rem;
+            margin-left: 15px;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: #ccc;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 900px) {
+            .nav-links {
+                display: none;
+            }
+
+            nav {
+                justify-content: space-between;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-content p {
+                font-size: 1rem;
+            }
+
+            .promo-content h2 {
+                font-size: 2.2rem;
+            }
+
+            .promo-content p {
+                font-size: 1rem;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            header,
+            .featured-products,
+            footer {
+                padding: 20px;
+            }
+
+            .nav-icons {
+                gap: 15px;
+                font-size: 1rem;
+            }
+
+            .hero-content {
+                bottom: 2%;
+                left: 3%;
+                max-width: 90%;
+            }
+
+            .hero-content h1 {
+                font-size: 2rem;
+                margin-bottom: 5px;
+            }
+
+            .hero-content p {
+                font-size: 0.9rem;
+                margin-bottom: 15px;
+            }
+
+            .shop-now-btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+
+            .featured-products h2 {
+                font-size: 2rem;
+            }
+
+            .product-item img {
+                height: 200px;
+            }
+
+            .promo-content {
+                left: 3%;
+                max-width: 90%;
+                bottom: 50%;
+                transform: translateY(50%);
+            }
+
+            .promo-content h2 {
+                font-size: 1.8rem;
+                margin-bottom: 5px;
+            }
+
+            .promo-content p {
+                font-size: 0.9rem;
+                margin-bottom: 15px;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .social-icons {
+                margin-top: 15px;
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/1200px-Logo_NIKE.svg.png" alt="Nike Logo">
+            </div>
+            <ul class="nav-links">
+                <li><a href="#">New Arrivals</a></li>
+                <li><a href="#">Men</a></li>
+                <li><a href="#">Women</a></li>
+                <li><a href="#">Kids</a></li>
+                <li><a href="#">Sale</a></li>
+                <li><a href="#">Customize</a></li>
+            </ul>
+            <div class="nav-icons">
+                <span class="icon" id="search-icon">&#128269;</span>
+                <span class="icon" id="cart-icon">&#128722;</span>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero-section">
+            <img src="https://static.nike.com/a/images/f_auto/dpr_1.0/w_1920,c_limit/d2d90236-4e5c-443b-93fe-c6a666e5797f/nike-just-do-it.jpg" alt="Hero Image - Nike Sportswear">
+            <div class="hero-content">
+                <h1>NIKE SPORTSWEAR</h1>
+                <p>New styles that push the boundaries of sport and culture.</p>
+                <button class="shop-now-btn">Shop Now</button>
+            </div>
+        </section>
+
+        <section class="featured-products">
+            <h2>Featured Categories</h2>
+            <div class="product-grid">
+                <div class="product-item">
+                    <img src="https://static.nike.com/a/images/t_default/eb2ea854-9a4f-4d6d-9b5d-9b0d2d31c4f6/image.jpg" alt="Shoes">
+                    <h3>Shoes</h3>
+                    <p>Explore the latest in footwear.</p>
+                    <a href="#" class="view-btn">View All</a>
+                </div>
+                <div class="product-item">
+                    <img src="https://static.nike.com/a/images/t_default/89047395-e8d1-4357-bbfa-b9a35e82b716/image.jpg" alt="Apparel">
+                    <h3>Apparel</h3>
+                    <p>Performance and style for every move.</p>
+                    <a href="#" class="view-btn">View All</a>
+                </div>
+                <div class="product-item">
+                    <img src="https://static.nike.com/a/images/t_default/d371d37b-91d5-455b-b9f1-d005f1f9f257/image.jpg" alt="Accessories">
+                    <h3>Accessories</h3>
+                    <p>Complete your look with essential gear.</p>
+                    <a href="#" class="view-btn">View All</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="promo-banner">
+            <img src="https://static.nike.com/a/images/f_auto/dpr_1.0/w_1920,c_limit/5d05c06d-e4fb-4b53-a4c4-7b7891cf16f9/nike-just-do-it.jpg" alt="Nike Membership">
+            <div class="promo-content">
+                <h2>BECOME A NIKE MEMBER</h2>
+                <p>Sign up for free. Join the community.</p>
+                <button class="shop-now-btn">Join Us</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <div>
+                <h3>Find a Store</h3>
+                <ul>
+                    <li><a href="#">About Nike</a></li>
+                    <li><a href="#">News</a></li>
+                    <li><a href="#">Careers</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3>Help</h3>
+                <ul>
+                    <li><a href="#">Order Status</a></li>
+                    <li><a href="#">Shipping & Delivery</a></li>
+                    <li><a href="#">Returns</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3>Company</h3>
+                <ul>
+                    <li><a href="#">About Nike</a></li>
+                    <li><a href="#">News</a></li>
+                    <li><a href="#">Careers</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 Nike, Inc. All Rights Reserved</p>
+            <div class="social-icons">
+                <a href="#">FB</a>
+                <a href="#">TW</a>
+                <a href="#">IG</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchIcon = document.getElementById('search-icon');
+            const cartIcon = document.getElementById('cart-icon');
+            const shopNowButtons = document.querySelectorAll('.shop-now-btn');
+            const viewButtons = document.querySelectorAll('.view-btn');
+
+            if (searchIcon) {
+                searchIcon.addEventListener('click', () => {
+                    alert('Search functionality coming soon!');
+                });
+            }
+
+            if (cartIcon) {
+                cartIcon.addEventListener('click', () => {
+                    alert('Your cart is empty. Start shopping!');
+                });
+            }
+
+            shopNowButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    alert('Redirecting to shopping page...');
+                });
+            });
+
+            viewButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const category = button.closest('.product-item').querySelector('h3').textContent;
+                    alert(`Viewing all ${category} products...`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+            color: #333;
+        }
+
+        #calculator {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 25px;
+            width: 320px;
+            box-sizing: border-box;
+        }
+
+        #display {
+            width: calc(100% - 20px);
+            padding: 15px 10px;
+            font-size: 2.5em;
+            text-align: right;
+            border: none;
+            background-color: #eef1f5;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+            color: #222;
+            box-sizing: border-box;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .button {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.4em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background-color: #e0e0e0;
+            color: #333;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .button:hover {
+            background-color: #d0d0d0;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .button:active {
+            background-color: #c0c0c0;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+            transform: translateY(0);
+        }
+
+        .button.operator {
+            background-color: #ff9500;
+            color: #fff;
+        }
+
+        .button.operator:hover {
+            background-color: #e08000;
+        }
+
+        .button.operator:active {
+            background-color: #c07000;
+        }
+
+        .button.equals {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+
+        .button.equals:hover {
+            background-color: #45a049;
+        }
+
+        .button.equals:active {
+            background-color: #3e8e41;
+        }
+
+        .button.clear {
+            background-color: #f44336;
+            color: #fff;
+        }
+
+        .button.clear:hover {
+            background-color: #da3e32;
+        }
+
+        .button.clear:active {
+            background-color: #c0362c;
+        }
+
+        .button.function {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .button.function:hover {
+            background-color: #0069d9;
+        }
+
+        .button.function:active {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div id="calculator">
+        <input type="text" id="display" value="0" readonly>
+        <div id="buttons">
+            <button class="button clear" data-action="clear">C</button>
+            <button class="button function" data-action="sqrt">√</button>
+            <button class="button function" data-action="pow">x<sup>y</sup></button>
+            <button class="button operator" data-action="divide">/</button>
+
+            <button class="button" data-value="7">7</button>
+            <button class="button" data-value="8">8</button>
+            <button class="button" data-value="9">9</button>
+            <button class="button operator" data-action="multiply">*</button>
+
+            <button class="button" data-value="4">4</button>
+            <button class="button" data-value="5">5</button>
+            <button class="button" data-value="6">6</button>
+            <button class="button operator" data-action="subtract">-</button>
+
+            <button class="button" data-value="1">1</button>
+            <button class="button" data-value="2">2</button>
+            <button class="button" data-value="3">3</button>
+            <button class="button operator" data-action="add">+</button>
+
+            <button class="button function" data-action="sin">sin</button>
+            <button class="button function" data-action="cos">cos</button>
+            <button class="button function" data-action="tan">tan</button>
+            <button class="button" data-value="0">0</button>
+            
+            <button class="button" data-value=".">.</button>
+            <button class="button equals" data-action="calculate">=</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+        const buttons = document.getElementById('buttons');
+
+        let currentInput = '0';
+        let previousInput = '';
+        let operator = null;
+        let waitingForSecondOperand = false;
+
+        function updateDisplay() {
+            display.value = currentInput;
+        }
+
+        function clear() {
+            currentInput = '0';
+            previousInput = '';
+            operator = null;
+            waitingForSecondOperand = false;
+            updateDisplay();
+        }
+
+        function appendNumber(number) {
+            if (currentInput === 'Error') {
+                currentInput = '0';
+            }
+            if (waitingForSecondOperand) {
+                currentInput = number;
+                waitingForSecondOperand = false;
+            } else {
+                if (currentInput === '0' && number !== '.') {
+                    currentInput = number;
+                } else if (number === '.' && currentInput.includes('.')) {
+                    // Do nothing if decimal already exists
+                } else {
+                    currentInput += number;
+                }
+            }
+            updateDisplay();
+        }
+
+        function handleOperator(nextOperator) {
+            const inputValue = parseFloat(currentInput);
+
+            if (operator && waitingForSecondOperand) {
+                operator = nextOperator;
+                return;
+            }
+
+            if (previousInput === '') {
+                previousInput = inputValue;
+            } else if (operator) {
+                const result = calculate();
+                currentInput = String(result);
+                previousInput = result;
+            }
+
+            waitingForSecondOperand = true;
+            operator = nextOperator;
+            updateDisplay();
+        }
+
+        function calculate() {
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+
+            if (isNaN(prev) || isNaN(current)) return currentInput;
+
+            let calculation;
+            switch (operator) {
+                case 'add':
+                    calculation = prev + current;
+                    break;
+                case 'subtract':
+                    calculation = prev - current;
+                    break;
+                case 'multiply':
+                    calculation = prev * current;
+                    break;
+                case 'divide':
+                    if (current === 0) {
+                        return 'Error';
+                    }
+                    calculation = prev / current;
+                    break;
+                case 'pow':
+                    calculation = Math.pow(prev, current);
+                    break;
+                default:
+                    return currentInput;
+            }
+            return calculation;
+        }
+
+        function handleEquals() {
+            if (operator === null || waitingForSecondOperand) {
+                return;
+            }
+            const result = calculate();
+            currentInput = String(result);
+            operator = null;
+            previousInput = '';
+            waitingForSecondOperand = false;
+            updateDisplay();
+        }
+
+        function handleScientificFunction(func) {
+            const value = parseFloat(currentInput);
+            if (isNaN(value)) return;
+
+            let result;
+            switch (func) {
+                case 'sqrt':
+                    if (value < 0) {
+                        result = 'Error';
+                    } else {
+                        result = Math.sqrt(value);
+                    }
+                    break;
+                case 'sin':
+                    result = Math.sin(value * (Math.PI / 180)); // Convert to radians
+                    break;
+                case 'cos':
+                    result = Math.cos(value * (Math.PI / 180)); // Convert to radians
+                    break;
+                case 'tan':
+                    result = Math.tan(value * (Math.PI / 180)); // Convert to radians
+                    break;
+                default:
+                    return;
+            }
+            currentInput = String(result);
+            previousInput = '';
+            operator = null;
+            waitingForSecondOperand = false;
+            updateDisplay();
+        }
+
+        buttons.addEventListener('click', (event) => {
+            if (!event.target.matches('.button')) return;
+
+            const button = event.target;
+            const action = button.dataset.action;
+            const value = button.dataset.value;
+
+            if (value) {
+                appendNumber(value);
+            } else if (action === 'clear') {
+                clear();
+            } else if (action === 'calculate') {
+                handleEquals();
+            } else if (['add', 'subtract', 'multiply', 'divide', 'pow'].includes(action)) {
+                handleOperator(action);
+            } else if (['sqrt', 'sin', 'cos', 'tan'].includes(action)) {
+                handleScientificFunction(action);
+            }
+        });
+
+        updateDisplay();
+    </script>
+</body>
+</html>

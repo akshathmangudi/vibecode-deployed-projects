@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chronotype Test</title>
+<style>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #f0f2f5;
+    color: #333;
+}
+.app-container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+}
+h1, h2 {
+    color: #0056b3;
+    margin-bottom: 20px;
+}
+p {
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+.button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+}
+.button:hover {
+    background-color: #0056b3;
+}
+.button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+.hidden {
+    display: none;
+}
+.question-container {
+    margin-top: 20px;
+}
+.answer-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    background-color: #e9ecef;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border 0.2s ease;
+    text-align: left;
+    border: 1px solid transparent;
+}
+.answer-option:hover {
+    background-color: #d8e0e7;
+}
+.answer-option input[type="radio"] {
+    margin-right: 15px;
+    transform: scale(1.3);
+}
+.answer-option label {
+    flex-grow: 1;
+    cursor: pointer;
+    font-size: 1.1em;
+}
+.answer-option.selected {
+    background-color: #cce5ff;
+    border: 1px solid #007bff;
+}
+</style>
+</head>
+<body>
+<div class="app-container">
+    <div id="intro-screen">
+        <h1>Discover Your Chronotype</h1>
+        <p>This simple test will help you determine your natural chronotype – whether you're a morning lark, a night owl, or somewhere in between. Answer the following questions based on your natural inclinations, not your current work or social schedule.</p>
+        <button id="start-button" class="button">Start Test</button>
+    </div>
+
+    <div id="question-screen" class="hidden">
+        <p>Question <span id="current-q-number">1</span> of <span id="total-q-number"></span></p>
+        <h2 id="question-text"></h2>
+        <div id="answer-options">
+        </div>
+        <button id="next-button" class="button">Next Question</button>
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <h2 id="result-title">Your Chronotype: </h2>
+        <p id="result-description"></p>
+        <button id="restart-button" class="button">Retake Test</button>
+    </div>
+</div>
+
+<script>
+const questions = [
+    {
+        question: "Assuming you have a completely free choice, at what time would you get up?",
+        options: [
+            { text: "5:00-6:00 AM", score: 5 },
+            { text: "6:00-7:00 AM", score: 4 },
+            { text: "7:00-8:00 AM", score: 3 },
+            { text: "8:00-9:00 AM", score: 2 },
+            { text: "9:00 AM or later", score: 1 }
+        ]
+    },
+    {
+        question: "Assuming you have a completely free choice, at what time would you go to bed?",
+        options: [
+            { text: "9:00-10:00 PM", score: 5 },
+            { text: "10:00-11:00 PM", score: 4 },
+            { text: "11:00 PM-12:00 AM", score: 3 },
+            { text: "12:00-1:00 AM", score: 2 },
+            { text: "1:00 AM or later", score: 1 }
+        ]
+    },
+    {
+        question: "How effective do you feel during the first hour after waking up?",
+        options: [
+            { text: "Very effective", score: 5 },
+            { text: "Fairly effective", score: 4 },
+            { text: "Somewhat effective", score: 3 },
+            { text: "Not very effective", score: 2 },
+            { text: "Completely ineffective", score: 1 }
+        ]
+    },
+    {
+        question: "At what time do you feel at your peak physically and mentally?",
+        options: [
+            { text: "Early morning (e.g., 7-9 AM)", score: 5 },
+            { text: "Late morning (e.g., 9 AM - 12 PM)", score: 4 },
+            { text: "Afternoon (e.g., 12 PM - 5 PM)", score: 3 },
+            { text: "Evening (e.g., 5 PM - 9 PM)", score: 2 },
+            { text: "Late night (e.g., 9 PM onwards)", score: 1 }
+        ]
+    },
+    {
+        question: "If you had to wake up at a specific time daily, without an alarm, how accurate would your internal clock be?",
+        options: [
+            { text: "Highly accurate (within 15 mins)", score: 5 },
+            { text: "Fairly accurate (within 30 mins)", score: 4 },
+            { text: "Somewhat accurate (within 1 hour)", score: 3 },
+            { text: "Not very accurate (off by more than 1 hour)", score: 2 },
+            { text: "Highly inaccurate (would sleep through)", score: 1 }
+        ]
+    },
+    {
+        question: "You have to do two hours of hard physical work. When would you prefer to do it?",
+        options: [
+            { text: "6:00 AM - 8:00 AM", score: 5 },
+            { text: "8:00 AM - 10:00 AM", score: 4 },
+            { text: "10:00 AM - 12:00 PM", score: 3 },
+            { text: "12:00 PM - 2:00 PM", score: 2 },
+            { text: "2:00 PM - 4:00 PM", score: 1 }
+        ]
+    }
+];
+
+let currentQuestionIndex = 0;
+let totalScore = 0;
+
+const introScreen = document.getElementById('intro-screen');
+const questionScreen = document.getElementById('question-screen');
+const resultScreen = document.getElementById('result-screen');
+const startButton = document.getElementById('start-button');
+const nextButton = document.getElementById('next-button');
+const restartButton = document.getElementById('restart-button');
+const questionText = document.getElementById('question-text');
+const answerOptionsDiv = document.getElementById('answer-options');
+const currentQNumberSpan = document.getElementById('current-q-number');
+const totalQNumberSpan = document.getElementById('total-q-number');
+const resultTitle = document.getElementById('result-title');
+const resultDescription = document.getElementById('result-description');
+
+function showScreen(screenToShow) {
+    introScreen.classList.add('hidden');
+    questionScreen.classList.add('hidden');
+    resultScreen.classList.add('hidden');
+    screenToShow.classList.remove('hidden');
+}
+
+function loadQuestion() {
+    const question = questions[currentQuestionIndex];
+    questionText.textContent = question.question;
+    answerOptionsDiv.innerHTML = '';
+
+    currentQNumberSpan.textContent = currentQuestionIndex + 1;
+    totalQNumberSpan.textContent = questions.length;
+
+    question.options.forEach((option, index) => {
+        const optionDiv = document.createElement('div');
+        optionDiv.classList.add('answer-option');
+
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'answer';
+        input.id = `option${index}`;
+        input.value = option.score;
+
+        const label = document.createElement('label');
+        label.htmlFor = `option${index}`;
+        label.textContent = option.text;
+
+        optionDiv.appendChild(input);
+        optionDiv.appendChild(label);
+        answerOptionsDiv.appendChild(optionDiv);
+
+        input.addEventListener('change', () => {
+            document.querySelectorAll('.answer-option').forEach(opt => opt.classList.remove('selected'));
+            optionDiv.classList.add('selected');
+            nextButton.disabled = false;
+        });
+
+        optionDiv.addEventListener('click', () => {
+            input.checked = true;
+            document.querySelectorAll('.answer-option').forEach(opt => opt.classList.remove('selected'));
+            optionDiv.classList.add('selected');
+            nextButton.disabled = false;
+        });
+    });
+    nextButton.textContent = currentQuestionIndex === questions.length - 1 ? 'Get Results' : 'Next Question';
+    nextButton.disabled = true;
+}
+
+function startTest() {
+    currentQuestionIndex = 0;
+    totalScore = 0;
+    showScreen(questionScreen);
+    loadQuestion();
+}
+
+function nextQuestion() {
+    const selectedOption = document.querySelector('input[name="answer"]:checked');
+    if (!selectedOption) {
+        alert('Please select an answer.');
+        return;
+    }
+
+    totalScore += parseInt(selectedOption.value);
+    currentQuestionIndex++;
+
+    if (currentQuestionIndex < questions.length) {
+        loadQuestion();
+    } else {
+        showResults();
+    }
+}
+
+function showResults() {
+    let chronotypeTitle = '';
+    let chronotypeDescription = '';
+
+    if (totalScore >= 26) {
+        chronotypeTitle = 'Definitely Morning Lark';
+        chronotypeDescription = 'You thrive in the early hours and feel your best in the morning. Your internal clock is set for early rising and peak performance before noon.';
+    } else if (totalScore >= 21) {
+        chronotypeTitle = 'Moderately Morning Lark';
+        chronotypeDescription = 'You generally prefer mornings and find it easier to be productive then, but you can adapt to later schedules when needed.';
+    } else if (totalScore >= 16) {
+        chronotypeTitle = 'Neither Type (Balanced)';
+        chronotypeDescription = 'You have a balanced chronotype, feeling good throughout the day. You can adapt relatively well to both morning and evening activities.';
+    } else if (totalScore >= 11) {
+        chronotypeTitle = 'Moderately Night Owl';
+        chronotypeDescription = 'You tend to be more active and productive in the evenings. Waking up early might be a struggle, but you shine later in the day.';
+    } else {
+        chronotypeTitle = 'Definitely Night Owl';
+        chronotypeDescription = 'Your energy peaks late, and you find it challenging to function in the early morning. You are most alert and productive during the evening and night.';
+    }
+
+    resultTitle.textContent = `Your Chronotype: ${chronotypeTitle}`;
+    resultDescription.textContent = chronotypeDescription;
+    showScreen(resultScreen);
+}
+
+function restartTest() {
+    startTest();
+}
+
+startButton.addEventListener('click', startTest);
+nextButton.addEventListener('click', nextQuestion);
+restartButton.addEventListener('click', restartTest);
+
+document.addEventListener('DOMContentLoaded', () => {
+    showScreen(introScreen);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum State Dynamics Simulator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .section {
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 20px;
+            background-color: #fdfdfd;
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #34495e;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .matrix-input, .vector-input {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .matrix-input {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .vector-input {
+            grid-template-columns: 1fr;
+        }
+        .matrix-cell, .vector-element {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .matrix-cell label, .vector-element label {
+            font-size: 0.9em;
+            color: #555;
+            white-space: nowrap;
+        }
+        input[type="number"] {
+            width: calc(50% - 5px);
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 0.9em;
+        }
+        .param-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        .param-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #444;
+        }
+        .buttons {
+            text-align: center;
+            margin-top: 25px;
+        }
+        button {
+            padding: 12px 25px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        button#runSimulation {
+            background-color: #28a745;
+            color: white;
+        }
+        button#runSimulation:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+        button#resetInputs {
+            background-color: #dc3545;
+            color: white;
+        }
+        button#resetInputs:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+        }
+        .output-console {
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85em;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #495057;
+            margin-top: 20px;
+        }
+        #resultsTableContainer {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        #resultsTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+        #resultsTable th, #resultsTable td {
+            border: 1px solid #dee2e6;
+            padding: 8px;
+            text-align: center;
+        }
+        #resultsTable th {
+            background-color: #f0f2f5;
+            color: #444;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        #resultsTable tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        #resultsTable td {
+            vertical-align: top;
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="full-width">Quantum State Dynamics Simulator</h1>
+
+        <div class="section">
+            <h3>Hamiltonian Matrix (H) - 3x3 Complex</h3>
+            <p>Enter real (Re) and imaginary (Im) parts for each element H<sub>ij</sub>.</p>
+            <div class="matrix-input">
+                <div class="matrix-cell"><label for="h00re">H<sub>00</sub>:</label><input type="number" id="h00re" value="0.0"> Re <input type="number" id="h00im" value="0.0"> Im</div>
+                <div class="matrix-cell"><label for="h01re">H<sub>01</sub>:</label><input type="number" id="h01re" value="0.1"> Re <input type="number" id="h01im" value="0.0"> Im</div>
+                <div class="matrix-cell"><label for="h02re">H<sub>02</sub>:</label><input type="number" id="h02re" value="0.0"> Re <input type="number" id="h02im" value="0.0"> Im</div>
+                <div class="matrix-cell"><label for="h10re">H<sub>10</sub>:</label><input type="number" id="h10re" value="0.1"> Re <input type="number" id="h10im" value="0.0"> Im</div>
+                <div class="matrix-cell"><label for="h11re">H<sub>11</sub>:</label><input type="number" id="h11re" value="0.0"> Re <input type="number" id="h11im" value="0.0"> Im</div>
+                <div class="matrix-cell"><label for="h12re">H<sub>12</sub>:</label><input type="number" id="h12re" value="0.1"> Re <input type="number" id="h12im" value="0.0"> Im</div>
+                <div class="matrix-cell"><label for="h20re">H<sub>20</sub>:</label><input type="number" id="h20re" value="0.0"> Re <input type="number" id="h20im" value="0.0"> Im</div>
+                <div class="matrix-cell"><label for="h21re">H<sub>21</sub>:</label><input type="number" id="h21re" value="0.1"> Re <input type="number" id="h21im" value="0.0"> Im</div>
+                <div class="matrix-cell"><label for="h22re">H<sub>22</sub>:</label><input type="number" id="h22re" value="0.0"> Re <input type="number" id="h22im" value="0.0"> Im</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Initial State Vector (|ψ(0)⟩) - 3 Complex Components</h3>
+            <p>Enter real (Re) and imaginary (Im) parts for each component c<sub>i</sub>.</p>
+            <div class="vector-input">
+                <div class="vector-element"><label for="psi0re">ψ<sub>0</sub>:</label><input type="number" id="psi0re" value="1.0"> Re <input type="number" id="psi0im" value="0.0"> Im</div>
+                <div class="vector-element"><label for="psi1re">ψ<sub>1</sub>:</label><input type="number" id="psi1re" value="0.0"> Re <input type="number" id="psi1im" value="0.0"> Im</div>
+                <div class="vector-element"><label for="psi2re">ψ<sub>2</sub>:</label><input type="number" id="psi2re" value="0.0"> Re <input type="number" id="psi2im" value="0.0"> Im</div>
+            </div>
+
+            <h3>Simulation Parameters</h3>
+            <div class="param-group">
+                <label for="timeStep">Time Step (dt):</label>
+                <input type="number" id="timeStep" value="0.01" min="0.001" step="0.001">
+            </div>
+            <div class="param-group">
+                <label for="totalTime">Total Simulation Time (T):</label>
+                <input type="number" id="totalTime" value="10.0" min="0.1" step="0.1">
+            </div>
+            <div class="param-group">
+                <label for="hbar">Reduced Planck Constant (ħ):</label>
+                <input type="number" id="hbar" value="1.0" min="0.01" step="0.01">
+            </div>
+        </div>
+
+        <div class="buttons full-width">
+            <button id="runSimulation">Run Simulation</button>
+            <button id="resetInputs">Reset Inputs</button>
+        </div>
+
+        <div class="section full-width">
+            <h3>Simulation Results</h3>
+            <div id="resultsTableContainer">
+                <table id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>|ψ<sub>0</sub>|²</th>
+                            <th>|ψ<sub>1</sub>|²</th>
+                            <th>|ψ<sub>2</sub>|²</th>
+                            <th>Sum P</th>
+                            <th>J<sub>01</sub></th>
+                            <th>J<sub>02</sub></th>
+                            <th>J<sub>12</sub></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div class="output-console" id="outputConsole">
+                Simulation log will appear here...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class Complex {
+            constructor(re, im) {
+                this.re = re;
+                this.im = im;
+            }
+
+            add(other) {
+                return new Complex(this.re + other.re, this.im + other.im);
+            }
+
+            subtract(other) {
+                return new Complex(this.re - other.re, this.im - other.im);
+            }
+
+            multiply(other) {
+                if (typeof other === 'number') {
+                    return new Complex(this.re * other, this.im * other);
+                }
+                return new Complex(this.re * other.re - this.im * other.im,
+                                   this.re * other.im + this.im * other.re);
+            }
+
+            divide(other) {
+                const denominator = other.re * other.re + other.im * other.im;
+                return new Complex(
+                    (this.re * other.re + this.im * other.im) / denominator,
+                    (this.im * other.re - this.re * other.im) / denominator
+                );
+            }
+
+            conjugate() {
+                return new Complex(this.re, -this.im);
+            }
+
+            magnitudeSq() {
+                return this.re * this.re + this.im * this.im;
+            }
+
+            magnitude() {
+                return Math.sqrt(this.magnitudeSq());
+            }
+
+            toString() {
+                if (this.im === 0) return `${this.re.toFixed(4)}`;
+                if (this.re === 0) return `${this.im.toFixed(4)}i`;
+                return `${this.re.toFixed(4)} ${this.im > 0 ? '+' : '-'} ${Math.abs(this.im).toFixed(4)}i`;
+            }
+        }
+
+        function matrixVectorMultiply(matrix, vector) {
+            const result = new Array(matrix.length);
+            for (let i = 0; i < matrix.length; i++) {
+                let sum = new Complex(0, 0);
+                for (let j = 0; j < matrix[i].length; j++) {
+                    sum = sum.add(matrix[i][j].multiply(vector[j]));
+                }
+                result[i] = sum;
+            }
+            return result;
+        }
+
+        function scalarVectorMultiply(scalar, vector) {
+            return vector.map(v => v.multiply(scalar));
+        }
+
+        function vectorAdd(vec1, vec2) {
+            return vec1.map((v, i) => v.add(vec2[i]));
+        }
+
+        function normalizeVector(vector) {
+            let sumSq = 0;
+            for (const c of vector) {
+                sumSq += c.magnitudeSq();
+            }
+            const norm = Math.sqrt(sumSq);
+            if (norm === 0) return vector.map(() => new Complex(0, 0));
+            return vector.map(c => c.multiply(1 / norm));
+        }
+
+        function calculateProbabilityCurrent(H, psi, hbar, m, n) {
+            if (!H[n] || !H[n][m] || !psi[n] || !psi[m]) {
+                return 0;
+            }
+            const H_nm = H[n][m];
+            const c_n_conj = psi[n].conjugate();
+            const c_m = psi[m];
+
+            const term = H_nm.multiply(c_n_conj).multiply(c_m);
+            return (2 / hbar) * term.im;
+        }
+
+        function getInputElement(id) {
+            return document.getElementById(id);
+        }
+
+        function parseInput(id) {
+            const value = parseFloat(getInputElement(id).value);
+            return isNaN(value) ? 0 : value;
+        }
+
+        function readInputs() {
+            const H = Array(3).fill(0).map(() => Array(3).fill(0));
+            const initialPsi = Array(3).fill(0);
+
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    const re = parseInput(`h${i}${j}re`);
+                    const im = parseInput(`h${i}${j}im`);
+                    H[i][j] = new Complex(re, im);
+                }
+            }
+
+            for (let i = 0; i < 3; i++) {
+                const re = parseInput(`psi${i}re`);
+                const im = parseInput(`psi${i}im`);
+                initialPsi[i] = new Complex(re, im);
+            }
+
+            const dt = parseInput('timeStep');
+            const totalTime = parseInput('totalTime');
+            const hbar = parseInput('hbar');
+
+            return { H, initialPsi, dt, totalTime, hbar };
+        }
+
+        function displayResults(results) {
+            const tableBody = document.querySelector('#resultsTable tbody');
+            tableBody.innerHTML = '';
+
+            if (results.length === 0) {
+                logToConsole("No simulation data to display.");
+                return;
+            }
+
+            results.forEach(step => {
+                const row = tableBody.insertRow();
+                row.insertCell().textContent = step.time.toFixed(3);
+                step.probabilities.forEach(p => row.insertCell().textContent = p.toFixed(4));
+                row.insertCell().textContent = step.sumProbabilities.toFixed(4);
+                step.currents.forEach(j => row.insertCell().textContent = j.toFixed(4));
+            });
+            logToConsole(`Simulation complete. Displaying ${results.length} time steps.`);
+            const tableContainer = document.getElementById('resultsTableContainer');
+            tableContainer.scrollTop = tableContainer.scrollHeight;
+        }
+
+        function logToConsole(message) {
+            const consoleDiv = document.getElementById('outputConsole');
+            const now = new Date();
+            const timestamp = now.toLocaleTimeString();
+            consoleDiv.textContent += `[${timestamp}] ${message}\n`;
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+
+        function setDefaultInputs() {
+            getInputElement('h00re').value = '0.0'; getInputElement('h00im').value = '0.0';
+            getInputElement('h01re').value = '0.1'; getInputElement('h01im').value = '0.0';
+            getInputElement('h02re').value = '0.0'; getInputElement('h02im').value = '0.0';
+
+            getInputElement('h10re').value = '0.1'; getInputElement('h10im').value = '0.0';
+            getInputElement('h11re').value = '0.0'; getInputElement('h11im').value = '0.0';
+            getInputElement('h12re').value = '0.1'; getInputElement('h12im').value = '0.0';
+
+            getInputElement('h20re').value = '0.0'; getInputElement('h20im').value = '0.0';
+            getInputElement('h21re').value = '0.1'; getInputElement('h21im').value = '0.0';
+            getInputElement('h22re').value = '0.0'; getInputElement('h22im').value = '0.0';
+
+            getInputElement('psi0re').value = '1.0'; getInputElement('psi0im').value = '0.0';
+            getInputElement('psi1re').value = '0.0'; getInputElement('psi1im').value = '0.0';
+            getInputElement('psi2re').value = '0.0'; getInputElement('psi2im').value = '0.0';
+
+            getInputElement('timeStep').value = '0.01';
+            getInputElement('totalTime').value = '10.0';
+            getInputElement('hbar').value = '1.0';
+
+            document.getElementById('outputConsole').textContent = 'Simulation log will appear here...';
+            document.querySelector('#resultsTable tbody').innerHTML = '';
+            logToConsole('Inputs reset to default values.');
+        }
+
+        async function runSimulation() {
+            logToConsole('Starting simulation...');
+            const { H, initialPsi, dt, totalTime, hbar } = readInputs();
+
+            if (dt <= 0 || totalTime <= 0 || hbar <= 0) {
+                logToConsole('Error: Time Step, Total Time, and ħ must be positive values.');
+                return;
+            }
+
+            let psi = normalizeVector(initialPsi);
+            if (psi.some(c => isNaN(c.re) || isNaN(c.im))) {
+                 logToConsole('Error: Initial state vector contains invalid numbers. Please check your input.');
+                 return;
+            }
+            if (H.some(row => row.some(c => isNaN(c.re) || isNaN(c.im)))) {
+                logToConsole('Error: Hamiltonian matrix contains invalid numbers. Please check your input.');
+                return;
+            }
+
+            const numSteps = Math.ceil(totalTime / dt);
+            const results = [];
+
+            logToConsole(`Simulation parameters: dt=${dt}, T=${totalTime}, ħ=${hbar}, Steps=${numSteps}`);
+            logToConsole('Initial state normalized to: ' + psi.map(p => p.toString()).join(', '));
+
+            for (let step = 0; step <= numSteps; step++) {
+                const currentTime = step * dt;
+
+                const probabilities = psi.map(c => c.magnitudeSq());
+                const sumProbabilities = probabilities.reduce((sum, p) => sum + p, 0);
+
+                const J01 = calculateProbabilityCurrent(H, psi, hbar, 0, 1);
+                const J02 = calculateProbabilityCurrent(H, psi, hbar, 0, 2);
+                const J12 = calculateProbabilityCurrent(H, psi, hbar, 1, 2);
+                const currents = [J01, J02, J12];
+
+                results.push({
+                    time: currentTime,
+                    probabilities: probabilities,
+                    sumProbabilities: sumProbabilities,
+                    currents: currents
+                });
+
+                if (step < numSteps) {
+                    const H_psi = matrixVectorMultiply(H, psi);
+                    const minus_i_over_hbar = new Complex(0, -1 / hbar);
+                    const d_psi_dt = scalarVectorMultiply(minus_i_over_hbar, H_psi);
+                    const delta_psi = scalarVectorMultiply(dt, d_psi_dt);
+                    
+                    psi = vectorAdd(psi, delta_psi);
+                    psi = normalizeVector(psi);
+                }
+            }
+            displayResults(results);
+            logToConsole('Simulation finished.');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setDefaultInputs();
+            document.getElementById('runSimulation').addEventListener('click', runSimulation);
+            document.getElementById('resetInputs').addEventListener('click', setDefaultInputs);
+        });
+    </script>
+</body>
+</html>

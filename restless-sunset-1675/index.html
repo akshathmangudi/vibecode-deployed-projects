@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Learning Companion</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #e8faff; /* Calming light blue */
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12); /* More subtle, pronounced shadow */
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        h2 {
+            color: #2c3e50;
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.6em;
+        }
+
+        h3 {
+            color: #455a64;
+            font-size: 1.1em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        /* Progress Bar Styling */
+        #progressBarContainer {
+            width: 100%;
+            height: 10px;
+            background-color: #e0e0e0; /* Light grey track */
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden; /* Ensures inner bar doesn't overflow corners */
+            display: none; /* Hidden by default */
+        }
+
+        #progressBarFill {
+            height: 100%;
+            width: 0%; /* Starts empty */
+            background-color: #4CAF50; /* Green fill color for success */
+            border-radius: 5px;
+            transition: width 1s ease-in-out; /* Smooth transition for filling */
+        }
+
+
+        form div {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #455a64; /* Darker blue-grey for labels */
+        }
+
+        /* Styling for select inputs */
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cceeff; /* Lighter blue border */
+            border-radius: 8px;
+            font-size: 1em;
+            box-sizing: border-box;
+            background-color: #fcfcfc;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%20viewBox%3D%220%200%20292.4%20292.4%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M287%20197.399L146.2%2056.6l-140.8%20140.8h281.6z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px top 50%;
+            background-size: 12px auto;
+            outline: none; /* Remove default focus outline */
+        }
+
+        select:focus {
+            border-color: #42a5f5; /* Light blue focus border */
+            box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.3); /* Subtle blue glow on focus */
+        }
+
+        /* Styling for radio button containers */
+        .radio-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .radio-option input[type="radio"] {
+            margin-right: 10px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #a5d6a7; /* Light green border */
+            border-radius: 50%;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .radio-option input[type="radio"]:checked {
+            background-color: #4CAF50; /* Green fill when checked */
+            border-color: #4CAF50;
+        }
+
+        .radio-option input[type="radio"]:checked::before {
+            content: '';
+            display: block;
+            width: 8px;
+            height: 8px;
+            background-color: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .radio-option label {
+            margin-bottom: 0;
+            font-weight: normal;
+            color: #333;
+            cursor: pointer;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #42a5f5; /* Calming blue button */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #2196F3; /* Darker blue on hover */
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #messageDiv {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            color: #2e7d32;
+            display: none; /* Hidden by default */
+            line-height: 1.5;
+        }
+        #messageDiv strong {
+            color: #d32f2f; /* A distinct color for correct answers */
+            font-weight: bold;
+        }
+        #messageDiv h3 {
+            color: #2c3e50;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            text-align: left;
+            font-size: 1.2em;
+        }
+        #messageDiv h4 {
+            color: #3f51b5; /* A distinct blue for phase titles */
+            margin-top: 20px;
+            margin-bottom: 10px;
+            text-align: left;
+            font-size: 1.1em;
+        }
+        #messageDiv ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            padding-left: 0;
+            text-align: left;
+            font-weight: normal; /* Override bold from parent */
+        }
+        #messageDiv li {
+            margin-bottom: 8px;
+            color: #333;
+            line-height: 1.4;
+            font-weight: normal; /* Override bold from parent */
+        }
+        #messageDiv p {
+            margin-top: 15px;
+            font-style: italic;
+            color: #555;
+            font-weight: normal; /* Override bold from parent */
+        }
+
+
+        /* Stopwatch Styling */
+        #stopwatchContainer {
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        #stopwatchDisplay {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+        #stopwatchContainer button {
+            width: auto;
+            padding: 10px 20px;
+            margin: 0 5px;
+            font-size: 1em;
+            /* Specific colors for stopwatch buttons */
+        }
+        #startStopwatch { background-color: #4CAF50; }
+        #pauseStopwatch { background-color: #FFC107; }
+        #resetStopwatch { background-color: #F44336; }
+
+        #startStopwatch:hover { background-color: #43A047; }
+        #pauseStopwatch:hover { background-color: #FFB300; }
+        #resetStopwatch:hover { background-color: #E53935; }
+
+        /* Lo-fi Player Styling */
+        #lofiPlayerContainer {
+            margin-top: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        #lofiPlayerContainer iframe {
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 100%; /* Ensure it fits within the container */
+        }
+
+        /* Diagnostic Styling */
+        #diagnosticOutput {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fffde7; /* Light yellow background for output */
+            border: 1px solid #ffeb3b; /* Yellow border */
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: #333;
+            text-align: left;
+            line-height: 1.4;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none; /* Hidden by default */
+        }
+        #diagnosticOutput.error {
+            background-color: #ffebee;
+            border-color: #ffcdd2;
+            color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Learning Companion</h1>
+
+        <div id="progressBarContainer">
+            <div id="progressBarFill"></div>
+        </div>
+
+        <form id="companionForm">
+            <div>
+                <label for="examSelect">Competitive Exam:</label>
+                <select id="examSelect" name="exam">
+                    <option value="JEE">JEE</option>
+                    <option value="NEET">NEET</option>
+                    <option value="CAT">CAT</option>
+                    <option value="UPSC">UPSC</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="skillSelect">Current Skill Level (1-5):</label>
+                <select id="skillSelect" name="skillLevel">
+                    <option value="1">1 (Beginner)</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5 (Expert)</option>
+                </select>
+            </div>
+
+            <button type="submit">Generate Study Plan</button>
+        </form>
+
+        <div id="messageDiv">
+            <!-- Personalized study plan will be displayed here -->
+        </div>
+
+        <h2>Study Timer</h2>
+        <div id="stopwatchContainer">
+            <div id="stopwatchDisplay">00:00:00</div>
+            <button id="startStopwatch">Start</button>
+            <button id="pauseStopwatch">Pause</button>
+            <button id="resetStopwatch">Reset</button>
+        </div>
+
+        <h2>Lo-fi Study Beats</h2>
+        <div id="lofiPlayerContainer">
+            <!-- Embedded YouTube Lo-fi Stream - Controls are built-in -->
+            <iframe id="lofiPlayer" width="100%" height="315" src="https://www.youtube.com/embed/jfKfPfyDnLM?autoplay=0&loop=1&playlist=jfKfPfyDnLM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        </div>
+
+        <h2>Application Diagnostics</h2>
+        <button id="runDiagnostics">Run Diagnostic Check</button>
+        <div id="diagnosticOutput">
+            <!-- Diagnostic results will be displayed here -->
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById('companionForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const exam = document.getElementById('examSelect').value;
+            const skillLevel = document.getElementById('skillSelect').value;
+            const messageDiv = document.getElementById('messageDiv');
+            const progressBarContainer = document.getElementById('progressBarContainer');
+            const progressBarFill = document.getElementById('progressBarFill');
+
+            let studyPlanHtml = ``;
+
+            // Helper function to generate detailed plan sections
+            function generatePlanDetails(examTitle, phaseTitle, topicsHtml, resourcesHtml, studyHours) {
+                return `
+                    <h3>Your Personalized Study Plan for ${examTitle}:</h3>
+                    <h4>${phaseTitle}</h4>
+                    ${topicsHtml}
+                    <h4>Recommended Resources:</h4>
+                    <ul>${resourcesHtml}</ul>
+                    <h4>Suggested Daily Study Hours:</h4>
+                    <p>${studyHours}</p>
+                `;
+            }
+
+            switch (exam) {
+                case 'JEE':
+                    if (skillLevel === '1') {
+                        studyPlanHtml += generatePlanDetails(
+                            'JEE (Beginner)',
+                            'Phase 1: Foundational Concepts (Weeks 1-4)',
+                            `<h4>Week 1: Physics & Chemistry Basics</h4>
+                            <ul>
+                                <li><strong>Physics:</strong> Units & Dimensions, Vectors.</li>
+                                <li><strong>Chemistry:</strong> Basic Concepts of Chemistry (Mole Concept, Stoichiometry - part 1).</li>
+                            </ul>
+                            <h4>Week 2: Mechanics & Atomic Structure</h4>
+                            <ul>
+                                <li><strong>Physics:</strong> Kinematics (Motion in 1D & 2D), Newton's Laws of Motion.</li>
+                                <li><strong>Chemistry:</strong> Stoichiometry (Limiting Reagent), Atomic Structure (Bohr, Quantum Numbers).</li>
+                            </ul>
+                            <h4>Week 3: Work-Energy & Chemical Bonding</h4>
+                            <ul>
+                                <li><strong>Physics:</strong> Work, Energy & Power, Basic Thermodynamics (Zeroth & First Law).</li>
+                                <li><strong>Chemistry:</strong> Chemical Bonding (Ionic, Covalent, VSEPR Theory, Hybridization).</li>
+                            </ul>
+                            <h4>Week 4: Thermal Physics & Basic Algebra</h4>
+                            <ul>
+                                <li><strong>Physics:</strong> Thermodynamics (Heat, Temperature), Kinetic Theory of Gases.</li>
+                                <li><strong>Math:</strong> Quadratic Equations, Progressions (AP, GP, HP).</li>
+                                <li><strong>Math:</strong> Basic Trigonometry (Identities, Ratios).</li>
+                            </ul>`,
+                            `<li>NCERT Textbooks (Class 11 & 12) - Physics, Chemistry, Math (Essential for foundational clarity).</li>
+                            <li>Khan Academy (for concept clarity, visual learning, and practice exercises).</li>
+                            <li>H.C. Verma for Physics (Part 1) - selected basic problems for conceptual understanding.</li>
+                            <li>Arihant Objective NCERT at your Fingertips (for quick MCQ practice).</li>`,
+                            `3-4 hours daily. Focus on understanding concepts thoroughly before moving to problems. Allocate equal time to all three subjects. Solve all solved examples from NCERT.`
+                        );
+                    } else if (skillLevel >= '2' && skillLevel <= '3') {
+                        studyPlanHtml += generatePlanDetails(
+                            'JEE (Intermediate)',
+                            'Phase 2: Core & Advanced Topics (Weeks 5-12)',
+                            `<h4>Week 5: Electrostats & Chemical Equilibrium</h4>
+                            <ul>
+                                <li><strong>Physics:</strong> Electric Charges & Fields, Electrostatic Potential & Capacitance.</li>
+                                <li><strong>Chemistry:</strong> Chemical Equilibrium.</li>
+                                <li><strong>Math:</strong> Functions, Limits & Continuity.</li>
+                            </ul>
+                            <h4>Week 6: Current Electricity & Ionic Equilibrium</h4>
+                            <ul>
+                                <li><strong>Physics:</strong> Current Electricity.</li>
+                                <li><strong>Chemistry:</strong> Ionic Equilibrium.</li>
+                                <li><strong>Math:</strong> Differentiation.</li>
+                            </ul>
+                            <h4>Week 7: Magnetism & Organic Chemistry Basics</h4>
+                            <ul>
+                                <li><strong>Physics:</strong> Moving Charges & Magnetism, Magnetism & Matter.</li>
+                                <li><strong>Chemistry:</strong> General Organic Chemistry (GOC-I: IUPAC, Isomerism).</li>
+                                <li><strong>Math:</strong> Application of Derivatives (Tangents & Normals).</li>
+                            </ul>
+                            <h4>Week 8: EMI & Hydrocarbons</h4>
+                            <ul>
+                                <li><strong>Physics:</strong> Electromagnetic Induction (EMI), Alternating Current (AC).</li>
+                                <li><strong>Chemistry:</strong> GOC-II (Reaction Mechanisms, Hydrocarbons).</li>
+                                <li><strong>Math:</strong> Indefinite Integration.</li>
+                            </ul>
+                            <h4>Week 9: Optics & Solutions</h4>
+                            <ul>
+                                <li><strong>Physics:</strong> Ray Optics & Optical Instruments.</li>
+                                <li><strong>Chemistry:</strong> Solutions.</li>
+                                <li><strong>Math:</strong> Definite Integration, Area Under Curves.</li>
+                            </ul>
+                            <h4>Week 10: Wave Optics & Electrochemistry</h4>
+                            <ul>
+                                <li><strong>Physics:</strong> Wave Optics.</li>
+                                <li><strong>Chemistry:</strong> Electrochemistry.</li>
+                                <li><strong>Math:</strong> Differential Equations.</li>
+                            </ul>
+                            <h4>Week 11: Modern Physics & Chemical Kinetics</h4>
+                            <ul>
+                                <li><strong>Physics:</strong> Dual Nature of Radiation & Matter, Atoms, Nuclei.</li>
+                                <li><strong>Chemistry:</strong> Chemical Kinetics.</li>
+                                <li><strong>Math:</strong> Straight Lines, Circles (Coordinate Geometry).</li>
+                            </ul>
+                            <h4>Week 12: Communication Systems & Solid State</h4>
+                            <ul>
+                                <li><strong>Physics:</strong> Communication Systems, Semiconductors.</li>
+                                <li><strong>Chemistry:</strong> Solid State, Surface Chemistry, Coordination Compounds.</li>
+                                <li><strong>Math:</strong> Parabola, Ellipse, Hyperbola (Coordinate Geometry).</li>
+                                <li><strong>Math:</strong> Vectors & 3D Geometry basics.</li>
+                            </ul>`,
+                            `<li>I.E. Irodov (Problems in General Physics) - selected problems for advanced physics.</li>
+                            <li>O.P. Tandon (Physical Chemistry), M.S. Chauhan (Organic Chemistry), V.K. Jaiswal (Inorganic Chemistry) - for comprehensive coverage.</li>
+                            <li>Arihant series for JEE Advanced Math (e.g., S.L. Loney for Coordinate Geometry, Hall & Knight for Algebra).</li>
+                            <li>Online JEE platforms (e.g., Vedantu, Unacademy, Byju's) for mock tests and previous year papers.</li>`,
+                            `4-5 hours daily. Increase problem-solving intensity and start taking section-wise tests. Analyze weak areas and dedicate extra time to them. Regular revision of formulas and concepts.`
+                        );
+                    } else { // 4 or 5
+                        studyPlanHtml += generatePlanDetails(
+                            'JEE (Expert)',
+                            'Phase 3: Mastery & Mock Tests (Weeks 13+)',
+                            `<h4>Week 13-16: Advanced Problem Solving & Weak Area Focus</h4>
+                            <ul>
+                                <li><strong>Physics:</strong> Solve high-level problems from advanced texts (e.g., Krotov, P. V. Volkenstein for physics Olympiad style problems).</li>
+                                <li><strong>Chemistry:</strong> Focus on complex multi-concept questions, named reactions, reaction mechanisms, and intricate inorganic exceptions.</li>
+                                <li><strong>Math:</strong> Tackle challenging calculus, coordinate geometry, and modern math problems. Practice tricky case-based scenarios.</li>
+                                <li>Identify persistent weak areas from previous mock tests and dedicate specific study sessions to master them.</li>
+                            </ul>
+                            <h4>Week 17-20: Full-Length Mock Tests & Analysis</h4>
+                            <ul>
+                                <li>Take 2-3 full-length JEE Advanced mock tests per week under strict timed conditions.</li>
+                                <li>Dedicate substantial time (4-5 hours per mock) to detailed analysis of each test: identify incorrect answers, unattempted questions, and silly mistakes. Understand the conceptual gaps.</li>
+                                <li>Revise concepts related to common mistakes. Maintain an error log.</li>
+                            </ul>
+                            <h4>Week 21-24: Strategic Revision & Speed Enhancement</h4>
+                            <ul>
+                                <li>Comprehensive rapid revision of all topics. Prioritize high-weightage topics and frequently tested concepts.</li>
+                                <li>Work on speed and accuracy. Practice time management strategies for the actual exam.</li>
+                                <li>Solve previous 5-7 years of JEE Advanced papers again, focusing on minimizing errors and optimizing time.</li>
+                                <li>Focus on maintaining mental composure and confidence.</li>
+                            </ul>`,
+                            `<li>Previous Year JEE Advanced Question Papers (last 10-15 years) with detailed solutions.</li>
+                            <li>Reliable online test series platforms (e.g., Fiitjee, Aakash, Resonance, Allen) - crucial for exam simulation.</li>
+                            <li>Reference books for specific challenging topics (e.g., Resnick Halliday for advanced Physics, Solomon's & Fryhle for Organic Chemistry).</li>
+                            <li>JEE Mains & Advanced Official Mock Test platform.</li>`,
+                            `6-8 hours daily. Focus intensely on speed, accuracy, and detailed analysis of mock test performance. Identify and rectify minute errors. Prioritize strong areas and convert weak areas into moderate ones. Daily revision is key.`
+                        );
+                    }
+                    break;
+                case 'NEET':
+                    if (skillLevel === '1') {
+                        studyPlanHtml += generatePlanDetails(
+                            'NEET (Beginner)',
+                            'Phase 1: Core Biology & Chemistry (Weeks 1-4)',
+                            `<h4>Week 1: Biology & Physics Foundations</h4>
+                            <ul>
+                                <li><strong>Biology:</strong> The Living World, Biological Classification.</li>
+                                <li><strong>Physics:</strong> Units & Measurement, Motion in a Straight Line.</li>
+                                <li><strong>Chemistry:</strong> Basic Concepts of Chemistry (Mole Concept).</li>
+                            </ul>
+                            <h4>Week 2: Cell & Organic Chemistry Introduction</h4>
+                            <ul>
+                                <li><strong>Biology:</strong> Cell: The Unit of Life, Cell Cycle and Cell Division.</li>
+                                <li><strong>Physics:</strong> Motion in a Plane, Laws of Motion.</li>
+                                <li><strong>Chemistry:</strong> Organic Chemistry - Some Basic Principles and Techniques (Nomenclature, Isomerism).</li>
+                            </ul>
+                            <h4>Week 3: Human Physiology & Chemical Bonding</h4>
+                            <ul>
+                                <li><strong>Biology:</strong> Digestion and Absorption, Breathing and Exchange of Gases.</li>
+                                <li><strong>Physics:</strong> Work, Energy and Power.</li>
+                                <li><strong>Chemistry:</strong> Chemical Bonding and Molecular Structure.</li>
+                            </ul>
+                            <h4>Week 4: Genetics & Gravitation</h4>
+                            <ul>
+                                <li><strong>Biology:</strong> Principles of Inheritance and Variation (Mendelian Genetics).</li>
+                                <li><strong>Physics:</strong> Gravitation.</li>
+                                <li><strong>Chemistry:</strong> Atomic Structure, Periodicity.</li>
+                            </ul>`,
+                            `<li>NCERT Textbooks (Class 11 & 12) - Biology, Chemistry, Physics (Absolutely mandatory for NEET success).</li>
+                            <li>Online NEET Prep Courses (e.g., Unacademy, Byju's, Vedantu) for conceptual videos and visual learning.</li>
+                            <li>"Objective Biology" by Dinesh / "Trueman's Elementary Biology" (for additional practice and diagrams).</li>
+                            <li>Previous Year NEET/AIPMT Question Papers (at least last 5 years) for understanding basic patterns.</li>`,
+                            `3-4 hours daily, with emphasis on Biology and Chemistry. Focus on memorization of facts, definitions, and conceptual understanding. Read NCERT multiple times and make concise notes/flashcards.`
+                        );
+                    } else if (skillLevel >= '2' && skillLevel <= '3') {
+                        studyPlanHtml += generatePlanDetails(
+                            'NEET (Intermediate)',
+                            'Phase 2: Deep Dive & Practice (Weeks 5-12)',
+                            `<h4>Week 5: Plant Physiology & Electrostatics</h4>
+                            <ul>
+                                <li><strong>Biology:</strong> Photosynthesis in Higher Plants, Respiration in Plants.</li>
+                                <li><strong>Chemistry:</strong> States of Matter.</li>
+                                <li><strong>Physics:</strong> Electric Charges and Fields, Electrostatic Potential and Capacitance.</li>
+                            </ul>
+                            <h4>Week 6: Biotechnology & Current Electricity</h4>
+                            <ul>
+                                <li><strong>Biology:</strong> Biotechnology - Principles and Processes, Biotechnology and its Applications.</li>
+                                <li><strong>Chemistry:</strong> Thermodynamics.</li>
+                                <li><strong>Physics:</strong> Current Electricity.</li>
+                            </ul>
+                            <h4>Week 7: Ecology & Magnetism</h4>
+                            <ul>
+                                <li><strong>Biology:</strong> Organisms and Populations, Ecosystem.</li>
+                                <li><strong>Chemistry:</strong> Equilibrium (Chemical and Ionic).</li>
+                                <li><strong>Physics:</strong> Moving Charges and Magnetism, Magnetism and Matter.</li>
+                            </ul>
+                            <h4>Week 8: Human Reproduction & EMI/AC</h4>
+                            <ul>
+                                <li><strong>Biology:</strong> Human Reproduction, Reproductive Health.</li>
+                                <li><strong>Chemistry:</strong> Redox Reactions, Hydrogen.</li>
+                                <li><strong>Physics:</strong> Electromagnetic Induction (EMI), Alternating Current (AC).</li>
+                            </ul>
+                            <h4>Week 9: Evolution & Solutions</h4>
+                            <ul>
+                                <li><strong>Biology:</strong> Evolution.</li>
+                                <li><strong>Chemistry:</strong> Solutions.</li>
+                                <li><strong>Physics:</strong> Ray Optics and Optical Instruments.</li>
+                            </ul>
+                            <h4>Week 10: Human Health & Disease & Electrochemistry</h4>
+                            <ul>
+                                <li><strong>Biology:</strong> Human Health and Disease.</li>
+                                <li><strong>Chemistry:</strong> Electrochemistry.</li>
+                                <li><strong>Physics:</strong> Wave Optics.</li>
+                            </ul>
+                            <h4>Week 11: Microbes in Human Welfare & Chemical Kinetics</h4>
+                            <ul>
+                                <li><strong>Biology:</strong> Microbes in Human Welfare, Strategies for Enhancement in Food Production.</li>
+                                <li><strong>Chemistry:</strong> Chemical Kinetics.</li>
+                                <li><strong>Physics:</strong> Dual Nature of Radiation and Matter, Atoms, Nuclei.</li>
+                            </ul>
+                            <h4>Week 12: Biodiversity & Biomolecules</h4>
+                            <ul>
+                                <li><strong>Biology:</strong> Biodiversity and Conservation, Environmental Issues.</li>
+                                <li><strong>Chemistry:</strong> Biomolecules, Polymers, Chemistry in Everyday Life.</li>
+                                <li><strong>Physics:</strong> Semiconductor Electronics, Communication Systems.</li>
+                            </ul>`,
+                            `<li>M.T.G. Fingertips (for all subjects) - for extensive NEET MCQ practice based on NCERT.</li>
+                            <li>Previous Year NEET/AIPMT Question Papers (topic-wise and year-wise) for thorough understanding of question patterns.</li>
+                            <li>Concepts of Physics by H.C. Verma (Vol 1 & 2) for conceptual clarity in Physics (selected topics).</li>
+                            <li>Specific NEET online platforms for high-quality video lectures and doubt solving (e.g., Physics Wallah, Aakash Digital).</li>`,
+                            `4-5 hours daily. Increase MCQ practice and focus on time management per question. Regularly revise concepts, especially diagrams and examples from NCERT. Start taking sectional tests and analyze results.`
+                        );
+                    } else { // 4 or 5
+                        studyPlanHtml += generatePlanDetails(
+                            'NEET (Expert)',
+                            'Phase 3: Mock Tests & Revision (Weeks 13+)',
+                            `<h4>Week 13-16: Comprehensive Syllabus Revision & High-Yield Topics</h4>
+                            <ul>
+                                <li>Quick review of all chapters across Physics, Chemistry, and Biology. Focus on high-yield topics, frequently asked questions, and NCERT facts.</li>
+                                <li>Prioritize topics where you consistently make mistakes.</li>
+                                <li>Create short notes, mnemonics, and flowcharts for quick recall.</li>
+                            </ul>
+                            <h4>Week 17-20: Intensive MCQ Practice & Full-Length Mock Tests</h4>
+                            <ul>
+                                <li>Solve 150-200 MCQs daily from various sources. Focus on speed, accuracy, and avoiding negative marking.</li>
+                                <li>Take 2-3 full-length NEET mock tests per week under strict timed conditions (simulating exam environment).</li>
+                                <li>Thoroughly analyze each mock test to identify conceptual gaps, silly mistakes, and time management issues.</li>
+                                <li>Maintain an error analysis notebook to track mistakes and revise concepts accordingly.</li>
+                            </ul>
+                            <h4>Week 21-24: Final Polish & Strategic Approach</h4>
+                            <ul>
+                                <li>Intensive revision of last 10 years' NEET/AIPMT papers (at least 3-4 times), focusing on patterns and tricky questions.</li>
+                                <li>Practice OMR sheet filling to avoid errors.</li>
+                                <li>Focus on maintaining calm and positive mindset. Develop a personalized strategy for attempting the paper (e.g., Biology first, then Chemistry, then Physics).</li>
+                                <li>Short bursts of revision using flashcards and self-made notes.</li>
+                            </ul>`,
+                            `<li>Online NEET test series platforms (e.g., Aakash, Allen, Reso, PW) for exam simulation.</li>
+                            <li>Last 10-year NEET/AIPMT papers (essential for final preparation).</li>
+                            <li>Dedicated NCERT exemplar and workbook for Biology and Chemistry for tricky questions.</li>
+                            <li>High-quality question banks from reliable coaching institutes.</li>`,
+                            `6-8 hours daily. Prioritize accuracy, speed, and identifying conceptual gaps through mock test analysis. Focus on weak areas and perfect strong ones. Daily revision of all subjects is crucial.`
+                        );
+                    }
+                    break;
+                case 'CAT':
+                    if (skillLevel === '1') {
+                        studyPlanHtml += generatePlanDetails(
+                            'CAT (Beginner)',
+                            'Phase 1: Building Fundamentals (Weeks 1-4)',
+                            `<h4>Week 1: Quantitative Aptitude (QA) & Reading Comprehension (RC)</h4>
+                            <ul>
+                                <li><strong>QA:</strong> Number Systems (Divisibility rules, HCF, LCM, Factors, Remainders).</li>
+                                <li><strong>VA:</strong> Reading Comprehension (Basics: Identifying main idea, author's tone, inferencing on short passages). Read 2-3 editorials daily.</li>
+                            </ul>
+                            <h4>Week 2: Data Interpretation (DI) & Verbal Ability (VA) Basics</h4>
+                            <ul>
+                                <li><strong>QA:</strong> Percentages, Averages.</li>
+                                <li><strong>DI:</strong> Introduction to Tables & Bar Charts (simple interpretation).</li>
+                                <li><strong>VA:</strong> Sentence Correction (Basic grammar rules: Subject-Verb Agreement, Pronouns). Start vocabulary building (20 words daily).</li>
+                            </ul>
+                            <h4>Week 3: Logical Reasoning (LR) & Profit & Loss</h4>
+                            <ul>
+                                <li><strong>QA:</strong> Ratio & Proportion, Profit & Loss.</li>
+                                <li><strong>LR:</strong> Basic Puzzles (Linear & Circular Arrangements with few variables), Blood Relations.</li>
+                                <li><strong>VA:</strong> Para Jumbles (3-4 sentences with options), Para Completion (basics).</li>
+                            </ul>
+                            <h4>Week 4: Simple & Compound Interest & Basic DI/LR Sets</h4>
+                            <ul>
+                                <li><strong>QA:</strong> Simple & Compound Interest.</li>
+                                <li><strong>DI/LR:</strong> Practice mixed basic DI sets (Line & Pie Charts), Coding-Decoding.</li>
+                                <li><strong>VA:</strong> Continue RC practice with medium-length passages. Revise grammar rules and vocabulary.</li>
+                            </ul>`,
+                            `<li>"How to Prepare for Quantitative Aptitude for CAT" by Arun Sharma (for QA fundamentals).</li>
+                            <li>"How to Prepare for Verbal Ability and Reading Comprehension for CAT" by Arun Sharma (for VA/RC basics).</li>
+                            <li>Online CAT Coaching Platforms (e.g., TIME, Career Launcher) for structured lessons and initial practice exercises.</li>
+                            <li>Read daily newspaper editorials (e.g., The Hindu, Indian Express, Livemint) for RC improvement and general awareness.</li>`,
+                            `2-3 hours daily, dedicating time to each section. Focus on understanding question patterns and basic problem-solving techniques. Attempt section-wise quizzes regularly and analyze performance.`
+                        );
+                    } else if (skillLevel >= '2' && skillLevel <= '3') {
+                        studyPlanHtml += generatePlanDetails(
+                            'CAT (Intermediate)',
+                            'Phase 2: Advanced Concepts & Sectional Tests (Weeks 5-12)',
+                            `<h4>Week 5: Algebra I & Advanced RC</h4>
+                            <ul>
+                                <li><strong>QA:</strong> Algebra (Equations, Inequalities, Functions).</li>
+                                <li><strong>VA:</strong> Advanced RC passages (abstract, philosophical, economic). Focus on critical analysis.</li>
+                            </ul>
+                            <h4>Week 6: Algebra II & Critical Reasoning</h4>
+                            <ul>
+                                <li><strong>QA:</strong> Algebra (Logarithms, Progressions, Quadratic Equations - advanced problems).</li>
+                                <li><strong>VA:</strong> Critical Reasoning (Strengthen/Weaken arguments, Assumptions, Inference).</li>
+                            </ul>
+                            <h4>Week 7: Geometry I & Complex DI Sets</h4>
+                            <ul>
+                                <li><strong>QA:</strong> Geometry (Triangles, Quadrilaterals, Polygons).</li>
+                                <li><strong>DI:</strong> Complex DI sets (Caselets, Venn Diagrams with 3+ variables).</li>
+                            </ul>
+                            <h4>Week 8: Geometry II & Advanced LR Puzzles</h4>
+                            <ul>
+                                <li><strong>QA:</strong> Geometry (Circles, Mensuration - 2D & 3D).</li>
+                                <li><strong>LR:</strong> Advanced LR puzzles (Distributions, Syllogisms, Input-Output).</li>
+                            </ul>
+                            <h4>Week 9: Modern Math I & Para Jumbles (TITA)</h4>
+                            <ul>
+                                <li><strong>QA:</strong> Permutations & Combinations.</li>
+                                <li><strong>VA:</strong> Para Jumbles (with options and TITA - Type In The Answer).</li>
+                            </ul>
+                            <h4>Week 10: Modern Math II & Para Summary/Odd One Out</h4>
+                            <ul>
+                                <li><strong>QA:</strong> Probability, Set Theory.</li>
+                                <li><strong>VA:</strong> Para Summary, Odd One Out.</li>
+                            </ul>
+                            <h4>Week 11: QA Revision & Mixed DI/LR</h4>
+                            <ul>
+                                <li><strong>QA:</strong> Revision of all QA topics, focusing on shortcuts and different approaches.</li>
+                                <li><strong>DI/LR:</strong> Practice mixed sets of DI/LR, including Games & Tournaments.</li>
+                            </ul>
+                            <h4>Week 12: Sectional Mock Tests & Analysis</h4>
+                            <ul>
+                                <li>Take 3-4 sectional mock tests for each section (QA, VA-RC, DI-LR).</li>
+                                <li>Analyze performance thoroughly: identify weak areas within sections, time management issues, and common error types.</li>
+                                <li>Review challenging questions and alternative solutions.</li>
+                            </ul>`,
+                            `<li>Past CAT papers (sectional) - for understanding actual exam difficulty and question types.</li>
+                            <li>Online sectional tests from reputable coaching institutes (e.g., IMS, CL, TIME) - crucial for identifying weak areas.</li>
+                            <li>"The Pearson Guide to VA & RC" by Nishit Sinha (for advanced verbal preparation).</li>
+                            <li>Dedicated books or online resources for higher-level DI-LR (e.g., Logical Reasoning by Nishit Sinha, online puzzles).</li>`,
+                            `3-4 hours daily. Start taking sectional tests regularly. Analyze performance to identify weak areas within each section and work on improving them. Begin timing yourself for problem sets to build speed.`
+                        );
+                    } else { // 4 or 5
+                        studyPlanHtml += generatePlanDetails(
+                            'CAT (Expert)',
+                            'Phase 3: Mock Test Simulation & Analysis (Weeks 13+)',
+                            `<h4>Week 13-16: Intensive Full-Length Mock Tests</h4>
+                            <ul>
+                                <li>Take 2-3 full-length CAT mock tests per week. Strictly mimic actual CAT conditions (timed environment, no distractions).</li>
+                                <li>Focus on implementing test-taking strategies learned, e.g., section order, question selection, time allocation.</li>
+                            </ul>
+                            <h4>Week 17-20: Deep Mock Analysis & Strategy Refinement</h4>
+                            <ul>
+                                <li>Dedicate significant time (4-5 hours per mock) to detailed analysis of each solution. Identify incorrect attempts, unattempted questions, conceptual gaps, and time management pitfalls.</li>
+                                <li>Maintain a detailed error log for all mistakes.</li>
+                                <li>Refine your test-taking strategy: what type of questions to attempt first, when to skip, how to manage time within sections.</li>
+                            </ul>
+                            <h4>Week 21-24: Strategic Revision & Speed Optimization</h4>
+                            <ul>
+                                <li>Comprehensive revision of all fundamental concepts, formulas, and tricky areas.</li>
+                                <li>Practice targeted questions for identified weak areas from your error log.</li>
+                                <li>Work on optimizing time for each question type to improve overall speed.</li>
+                                <li>Solve CAT previous year question papers (last 5-7 years with detailed solutions) to get accustomed to the actual exam pattern and difficulty.</li>
+                                <li>Focus on maintaining mental strength and reducing exam anxiety.</li>
+                            </ul>`,
+                            `<li>Online CAT mock test series (highly recommended from top institutes like IMS, CL, TIME, Career Launcher) for variety and competition.</li>
+                            <li>CAT previous year question papers (last 5-7 years with detailed solutions) - essential for familiarity with actual exam pattern.</li>
+                            <li>Online forums and discussion groups (e.g., PagalGuy, InsideIIM) for challenging problems and peer learning.</li>
+                            <li>Self-made flashcards or summary notes for quick revision of formulas and concepts.</li>`,
+                            `5-6 hours daily. The majority of time should be spent on taking and analyzing mock tests. Focus on accuracy under timed pressure and strategic attempts. Fine-tune your test-taking strategy and mental approach.`
+                        );
+                    }
+                    break;
+                case 'UPSC':
+                    if (skillLevel === '1') {
+                        studyPlanHtml += generatePlanDetails(
+                            'UPSC CSE (Beginner)',
+                            'Phase 1: Syllabus & Foundational Reading (Weeks 1-8)',
+                            `<h4>Week 1: Understanding UPSC & Indian Polity Basics</h4>
+                            <ul>
+                                <li>Thoroughly study the UPSC CSE syllabus (Prelims & Mains) and exam pattern. Analyze previous year question papers (last 3-5 years).</li>
+                                <li><strong>Polity:</strong> Historical Background, Making of the Constitution, Salient Features. (M. Laxmikanth, NCERT Class 11).</li>
+                            </ul>
+                            <h4>Week 2: Indian Polity & Ancient History</h4>
+                            <ul>
+                                <li><strong>Polity:</strong> Preamble, Union & its Territory, Citizenship, Fundamental Rights. (M. Laxmikanth).</li>
+                                <li><strong>History:</strong> Ancient India (Indus Valley, Vedic Period, Mahajanapadas). (NCERT Class 6, Old NCERT R.S. Sharma).</li>
+                            </ul>
+                            <h4>Week 3: Indian Polity & Medieval History</h4>
+                            <ul>
+                                <li><strong>Polity:</strong> DPSP, Fundamental Duties, Amendment of the Constitution, Basic Structure. (M. Laxmikanth).</li>
+                                <li><strong>History:</strong> Medieval India (Delhi Sultanate, Mughal Empire - key rulers, administration). (NCERT Class 7, Old NCERT Satish Chandra).</li>
+                            </ul>
+                            <h4>Week 4: Indian Polity & Modern History (Early Phase)</h4>
+                            <ul>
+                                <li><strong>Polity:</strong> President, Vice-President, Prime Minister, Central Council of Ministers. (M. Laxmikanth).</li>
+                                <li><strong>History:</strong> Modern India (Advent of Europeans, British Expansion). (Spectrum Publication, NCERT Class 8).</li>
+                            </ul>
+                            <h4>Week 5: Indian Polity & Modern History (Freedom Struggle)</h4>
+                            <ul>
+                                <li><strong>Polity:</strong> Parliament, Supreme Court. (M. Laxmikanth).</li>
+                                <li><strong>History:</strong> Modern India (Revolt of 1857, Early Nationalists, Partition of Bengal). (Spectrum).</li>
+                            </ul>
+                            <h4>Week 6: Physical Geography & Indian Art & Culture</h4>
+                            <ul>
+                                <li><strong>Geography:</strong> Geomorphology (Origin of Earth, Interior, Plate Tectonics). (NCERT Class 11, G.C. Leong).</li>
+                                <li><strong>Culture:</strong> Indian Architecture, Sculpture, Paintings (Ancient to Medieval). (Nitin Singhania selected chapters).</li>
+                            </ul>
+                            <h4>Week 7: Indian Geography & Economics Basics</h4>
+                            <ul>
+                                <li><strong>Geography:</strong> India - Physical Environment (Physiography, Drainage, Climate). (NCERT Class 11).</li>
+                                <li><strong>Economics:</strong> Indian Economy (Basics of Macroeconomics, National Income, Planning). (NCERT Class 9-10, Sriram IAS/Vajiram notes).</li>
+                            </ul>
+                            <h4>Week 8: Current Affairs & Revision</h4>
+                            <ul>
+                                <li><strong>Current Affairs:</strong> Start daily newspaper reading (The Hindu/Indian Express). Begin reading one monthly current affairs magazine (e.g., Vision IAS/Insights IAS for last 1-2 months).</li>
+                                <li><strong>Revision:</strong> Quick revision of all covered static topics. Make concise notes from NCERTs.</li>
+                            </ul>`,
+                            `<li>NCERT Textbooks (Class 6-12) for History, Geography, Economics (Crucial foundation).</li>
+                            <li>M. Laxmikanth for Indian Polity (The Bible for Polity).</li>
+                            <li>"A Brief History of Modern India" by Spectrum Publication.</li>
+                            <li>G.C. Leong for Physical Geography (selected chapters).</li>
+                            <li>"Indian Art and Culture" by Nitin Singhania (selected chapters for culture).</li>
+                            <li>Daily National Newspaper (The Hindu/Indian Express).</li>`,
+                            `4-5 hours daily. Focus on building a strong conceptual foundation and making crisp, concise notes. Develop a habit of newspaper reading and connecting current events to syllabus topics. Avoid rushing, prioritize understanding.`
+                        );
+                    } else if (skillLevel >= '2' && skillLevel <= '3') {
+                        studyPlanHtml += generatePlanDetails(
+                            'UPSC CSE (Intermediate)',
+                            'Phase 2: Deep Dive & Answer Writing (Weeks 9-20)',
+                            `<h4>Week 9: Governance & Indian Economy (Growth)</h4>
+                            <ul>
+                                <li><strong>Polity:</strong> Local Governments, Constitutional Bodies, Non-Constitutional Bodies. (M. Laxmikanth).</li>
+                                <li><strong>Economy:</strong> Growth, Development, Employment (Ramesh Singh).</li>
+                            </ul>
+                            <h4>Week 10: Social Justice & Indian Economy (Inflation/Budget)</h4>
+                            <ul>
+                                <li><strong>GS-II:</strong> Social Justice (Welfare Schemes, Vulnerable Sections).</li>
+                                <li><strong>Economy:</strong> Inflation, Money & Banking, Union Budget (Basics). (Ramesh Singh, Economic Survey).</li>
+                            </ul>
+                            <h4>Week 11: International Relations & Environment (Biodiversity)</h4>
+                            <ul>
+                                <li><strong>GS-II:</strong> International Relations (India & its Neighborhood, Bilateral/Global Groupings).</li>
+                                <li><strong>Environment:</strong> Biodiversity, Conservation. (Shankar IAS Environment Book).</li>
+                            </ul>
+                            <h4>Week 12: Security & Environment (Climate Change)</h4>
+                            <ul>
+                                <li><strong>GS-III:</strong> Internal Security, Disaster Management.</li>
+                                <li><strong>Environment:</strong> Climate Change, Pollution. (Shankar IAS, current affairs).</li>
+                            </ul>
+                            <h4>Week 13: Science & Tech & Agriculture</h4>
+                            <ul>
+                                <li><strong>GS-III:</strong> Science & Technology (Biotechnology, Space, IT - focus on current affairs).</li>
+                                <li><strong>GS-III:</strong> Agriculture (Cropping Patterns, Irrigation, Food Processing).</li>
+                            </ul>
+                            <h4>Week 14: Answer Writing & Ethics Introduction</h4>
+                            <ul>
+                                <li><strong>Mains:</strong> Start daily answer writing for GS Paper 1 (History, Geography, Society) - 1-2 answers.</li>
+                                <li><strong>Ethics (GS-IV):</strong> Introduction to Ethics, Human Values. (Lexicon, Subba Rao).</li>
+                            </ul>
+                            <h4>Week 15: Ethics & Optional Subject I</h4>
+                            <ul>
+                                <li><strong>Ethics:</strong> Aptitude and Foundational Values, Emotional Intelligence.</li>
+                                <li><strong>Optional:</strong> Begin studying your chosen Optional Subject - Paper 1 (Part 1).</li>
+                            </ul>
+                            <h4>Week 16: Ethics & Optional Subject II</h4>
+                            <ul>
+                                <li><strong>Ethics:</strong> Public Administration Ethics, Probity in Governance.</li>
+                                <li><strong>Optional:</strong> Optional Subject - Paper 1 (Part 2).</li>
+                            </ul>
+                            <h4>Week 17: GS-I Answer Writing & Optional Subject III</h4>
+                            <ul>
+                                <li><strong>Mains:</strong> Daily answer writing for GS Paper 2 (Polity, Governance, IR).</li>
+                                <li><strong>Optional:</strong> Optional Subject - Paper 2 (Part 1).</li>
+                            </ul>
+                            <h4>Week 18: GS-II Answer Writing & Optional Subject IV</h4>
+                            <ul>
+                                <li><strong>Mains:</strong> Daily answer writing for GS Paper 3 (Economy, Env, S&T, Security).</li>
+                                <li><strong>Optional:</strong> Optional Subject - Paper 2 (Part 2).</li>
+                            </ul>
+                            <h4>Week 19: CSAT Practice & Essay Writing</h4>
+                            <ul>
+                                <li><strong>CSAT:</strong> Practice Comprehension, Basic Numeracy, Logical Reasoning. (Previous year papers, R.S. Aggarwal).</li>
+                                <li><strong>Essay:</strong> Practice writing 1-2 essays. Focus on structure, content, and arguments.</li>
+                            </ul>
+                            <h4>Week 20: Current Affairs & Revision</h4>
+                            <ul>
+                                <li><strong>Current Affairs:</strong> Intensive reading of last 6-8 months' current affairs magazines/compilations.</li>
+                                <li><strong>Revision:</strong> Revise all static subjects covered, focusing on integration with current affairs.</li>
+                            </ul>`,
+                            `<li>Ramesh Singh for Indian Economy.</li>
+                            <li>Shankar IAS for Environment & Ecology.</li>
+                            <li>Insights IAS/Vision IAS compilations for Current Affairs (monthly/yearly).</li>
+                            <li>Previous year Mains question papers for answer writing practice.</li>
+                            <li>Reliable material for your chosen optional subject (Standard books, coaching notes).</li>
+                            <li>Lexicon for Ethics (GS Paper IV).</li>
+                            <li>CSAT practice books/materials.</li>`,
+                            `6-7 hours daily. Focus on comprehensive study of all GS papers, integrating current affairs. Dedicate significant time to optional subject and daily answer writing practice. Analyze model answers for improvement.`
+                        );
+                    } else { // 4 or 5
+                        studyPlanHtml += generatePlanDetails(
+                            'UPSC CSE (Expert)',
+                            'Phase 3: Mock Tests, Revision & Refinement (Weeks 21+)',
+                            `<h4>Week 21-24: Full-Length Prelims Mock Tests & Analysis</h4>
+                            <ul>
+                                <li>Take 2-3 full-length Prelims (GS Paper 1 & CSAT) mock tests per week. Analyze performance thoroughly to identify weak spots in subjects/topics, and revise accordingly.</li>
+                                <li>Focus on accuracy and time management in both GS and CSAT papers.</li>
+                                <li>Intensive revision of 1.5 - 2 years of current affairs, focusing on static linkage.</li>
+                            </ul>
+                            <h4>Week 25-28: Full-Length Mains Mock Tests & Answer Writing Refinement</h4>
+                            <ul>
+                                <li>Practice timed writing for all GS Papers (1-4) and Optional papers.</li>
+                                <li>Focus on improving speed, quality, presentation of answers, and adhering to word limits.</li>
+                                <li>Get answers reviewed by mentors or peer groups.</li>
+                                <li>Dedicated practice for Essay paper and G.S. Paper IV (Ethics) case studies.</li>
+                            </ul>
+                            <h4>Week 29-32: Comprehensive Revision & Strategic Optimization</h4>
+                            <ul>
+                                <li>Multiple rapid revisions of all subjects (Prelims & Mains) using your own concise notes and highlighted books.</li>
+                                <li>Focus on high-yield topics, common pitfalls, and inter-topic linkages.</li>
+                                <li>Revisit previous year Mains solved papers to understand examiner expectations.</li>
+                                <li>Develop a robust exam-day strategy for both Prelims and Mains.</li>
+                                <li>Maintain physical and mental well-being.</li>
+                            </ul>`,
+                            `<li>Reliable test series for Prelims and Mains (e.g., Vision IAS, ForumIAS, Vajiram & Ravi, Insights IAS) - highly recommended.</li>
+                            <li>Economic Survey & Budget summaries (latest editions).</li>
+                            <li>India Year Book (selected chapters for facts).</li>
+                            <li>Multiple revisions of your own concise, self-made notes.</li>
+                            <li>Previous year Mains solved papers (especially for answer structure).</li>
+                            <li>Online resources for current events and analysis (e.g., PRS India, PIB).</li>`,
+                            `8-10 hours daily. This phase is crucial for intense revision, rigorous mock test practice, and refining your strategy for both Prelims and Mains. Focus on current affairs integration and inter-topic linkage for all subjects.`
+                        );
+                    }
+                    break;
+                case 'Other':
+                    if (skillLevel === '1') {
+                        studyPlanHtml += generatePlanDetails(
+                            'Your Specific Exam (Beginner)',
+                            'Phase 1: Identifying Core & Foundational Study (Weeks 1-4)',
+                            `<h4>Week 1: Syllabus Deep Dive & Basic Concepts</h4>
+                            <ul>
+                                <li>Thoroughly read and understand the official exam syllabus. Identify key subjects and their weightage.</li>
+                                <li>Begin with foundational concepts in your most crucial subject.</li>
+                                <li>Analyze 1-2 previous year papers to understand question formats.</li>
+                            </ul>
+                            <h4>Week 2: Core Subject 1 & Basic Practice</h4>
+                            <ul>
+                                <li>Continue with core subject 1, ensuring deep conceptual understanding.</li>
+                                <li>Solve basic, conceptual problems related to covered topics.</li>
+                                <li>Start making short, crisp notes for quick revision.</li>
+                            </ul>
+                            <h4>Week 3: Core Subject 2 & Introduction to Applied Questions</h4>
+                            <ul>
+                                <li>Introduce the second core subject, focusing on its fundamentals.</li>
+                                <li>Attempt simple application-based questions or case studies if applicable to your exam.</li>
+                                <li>Consolidate notes from both subjects.</li>
+                            </ul>
+                            <h4>Week 4: Review & Weak Area Identification</h4>
+                            <ul>
+                                <li>Review all topics covered in the first three weeks.</li>
+                                <li>Identify any areas of confusion or weakness through self-assessment or short quizzes.</li>
+                                <li>Plan to revisit challenging concepts in the next phase.</li>
+                            </ul>`,
+                            `<li>Official Exam Study Guides or recommended textbooks for your specific exam.</li>
+                            <li>Online platforms specific to your exam (e.g., Coursera, edX, or exam-specific coaching websites if available).</li>
+                            <li>Basic introductory books for each core subject.</li>
+                            <li>Reliable websites/forums for basic practice questions.</li>`,
+                            `2-3 hours daily. Focus on active learning, concept mapping, and solving basic practice problems to solidify understanding. Prioritize understanding over speed at this stage.`
+                        );
+                    } else if (skillLevel >= '2' && skillLevel <= '3') {
+                        studyPlanHtml += generatePlanDetails(
+                            'Your Specific Exam (Intermediate)',
+                            'Phase 2: In-depth Study & Varied Practice (Weeks 5-12)',
+                            `<h4>Week 5-6: Advanced Topics in Core Subject 1</h4>
+                            <ul>
+                                <li>Dive deeper into advanced topics and challenging areas within your primary core subject.</li>
+                                <li>Practice complex problem types and multi-concept questions.</li>
+                            </ul>
+                            <h4>Week 7-8: In-depth Study of Core Subject 2 & 3</h4>
+                            <ul>
+                                <li>Cover all remaining topics in core subject 2 and introduce core subject 3 if applicable.</li>
+                                <li>Focus on inter-linking concepts between subjects.</li>
+                            </ul>
+                            <h4>Week 9-10: Sectional/Topic-wise Tests & Analysis</h4>
+                            <ul>
+                                <li>Start taking sectional or topic-wise tests to assess progress and identify specific weak points within subjects.</li>
+                                <li>Analyze results to understand common mistakes (conceptual, silly) and time management issues.</li>
+                            </ul>
+                            <h4>Week 11-12: Revision & Varied Practice</h4>
+                            <ul>
+                                <li>Consolidate all notes and begin regular short revision cycles for covered topics.</li>
+                                <li>Practice a wide range of problem types, including application-based questions, case studies, or analytical problems relevant to your exam pattern.</li>
+                                <li>Review previous year's sectional questions.</li>
+                            </ul>`,
+                            `<li>Advanced textbooks or specialized guides for your exam.</li>
+                            <li>Online practice question banks or previous year question compilations for your exam.</li>
+                            <li>Discussion forums or study groups for peer learning and doubt solving.</li>
+                            <li>Reputable online courses specifically designed for your exam.</li>
+                            <li>Paid resources for higher-level practice if available.</li>`,
+                            `3-4 hours daily. Increase the complexity of problems you tackle and actively work on improving your speed and accuracy in specific sections. Focus on conceptual application and strategic problem-solving.`
+                        );
+                    } else { // 4 or 5
+                        studyPlanHtml += generatePlanDetails(
+                            'Your Specific Exam (Expert)',
+                            'Phase 3: Mock Tests & Performance Optimization (Weeks 13+)',
+                            `<h4>Week 13-16: Full-Length Mock Tests & Deep Analysis</h4>
+                            <ul>
+                                <li>Simulate exam conditions by taking regular full-length mock tests (2-3 per week).</li>
+                                <li>Crucially, analyze each mock test meticulously to understand mistakes (conceptual, silly, time management), refine your overall strategy, and improve time allocation.</li>
+                            </ul>
+                            <h4>Week 17-20: Comprehensive Revision & Weak Area Targeting</h4>
+                            <ul>
+                                <li>Thoroughly revise all syllabus topics, focusing on conceptual clarity, high-weightage areas, and common pitfalls identified in mocks.</li>
+                                <li>Dedicate specific time slots to address persistent weak areas. Convert weaknesses into strengths.</li>
+                                <li>Practice questions targeting your weakest topics.</li>
+                            </ul>
+                            <h4>Week 21-24: Speed, Accuracy & Exam Strategy Refinement</h4>
+                            <ul>
+                                <li>Focus on improving speed and accuracy under timed pressure.</li>
+                                <li>Solve multiple sets of previous year's question papers to master the exam pattern and question types.</li>
+                                <li>Develop a personalized exam strategy, including order of attempting sections, time distribution, and handling difficult questions.</li>
+                                <li>Practice relaxation techniques to manage exam anxiety.</li>
+                            </ul>`,
+                            `<li>Official mock tests provided by exam bodies or reputable coaching institutes.</li>
+                            <li>Previous year's question papers with detailed solutions (essential for pattern recognition and practice).</li>
+                            <li>Flashcards, self-made revision notes, or summary sheets for quick review.</li>
+                            <li>Advanced problem-solving books or highly challenging question sets for mastery.</li>
+                            <li>Online test series that provide performance analytics.</li>`,
+                            `4-6 hours daily. The primary focus should be on rigorous mock test practice and meticulous analysis to optimize your performance and boost confidence. Fine-tune your exam-day strategy and ensure all concepts are crystal clear.`
+                        );
+                    }
+                    break;
+            }
+
+            // Add the disclaimer
+            studyPlanHtml += `<p style="margin-top: 25px; font-style: normal; color: #555;"><strong>Disclaimer:</strong> This study plan is a general suggestion. Please adapt it based on your individual strengths, weaknesses, learning style, and specific exam requirements. Regular self-assessment and flexibility are key!</p>`;
+
+
+            messageDiv.innerHTML = studyPlanHtml;
+            messageDiv.style.display = 'block'; // Show the message div
+
+            // Show and fill progress bar
+            progressBarContainer.style.display = 'block';
+            // Use a slight delay to ensure display:block is rendered before transition starts
+            setTimeout(() => {
+                progressBarFill.style.width = '100%';
+            }, 50);
+
+            console.log('Companion Form Submitted:', { exam, skillLevel });
+        });
+
+        // Stopwatch Logic
+        let timerInterval;
+        let startTime = 0;
+        let elapsedTime = 0;
+        let isRunning = false;
+
+        const stopwatchDisplay = document.getElementById('stopwatchDisplay');
+        const startStopwatchBtn = document.getElementById('startStopwatch');
+        const pauseStopwatchBtn = document.getElementById('pauseStopwatch');
+        const resetStopwatchBtn = document.getElementById('resetStopwatch');
+
+        function formatTime(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+
+            return [hours, minutes, seconds]
+                .map(unit => unit < 10 ? '0' + unit : unit)
+                .join(':');
+        }
+
+        function updateStopwatchDisplay() {
+            const currentTime = Date.now();
+            elapsedTime = currentTime - startTime;
+            stopwatchDisplay.textContent = formatTime(elapsedTime);
+        }
+
+        startStopwatchBtn.addEventListener('click', () => {
+            if (!isRunning) {
+                startTime = Date.now() - elapsedTime;
+                timerInterval = setInterval(updateStopwatchDisplay, 1000);
+                isRunning = true;
+                startStopwatchBtn.disabled = true;
+                pauseStopwatchBtn.disabled = false;
+                console.log('Stopwatch: Started.');
+            }
+        });
+
+        pauseStopwatchBtn.addEventListener('click', () => {
+            if (isRunning) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                startStopwatchBtn.disabled = false;
+                pauseStopwatchBtn.disabled = true;
+                console.log('Stopwatch: Paused at', formatTime(elapsedTime));
+            }
+        });
+
+        resetStopwatchBtn.addEventListener('click', () => {
+            clearInterval(timerInterval);
+            isRunning = false;
+            elapsedTime = 0;
+            stopwatchDisplay.textContent = '00:00:00';
+            startStopwatchBtn.disabled = false;
+            pauseStopwatchBtn.disabled = true;
+            console.log('Stopwatch: Reset.');
+        });
+
+        // Initialize button states
+        pauseStopwatchBtn.disabled = true;
+
+        // Diagnostic Check Logic
+        const runDiagnosticsBtn = document.getElementById('runDiagnostics');
+        const diagnosticOutputDiv = document.getElementById('diagnosticOutput');
+
+        runDiagnosticsBtn.addEventListener('click', async () => {
+            diagnosticOutputDiv.style.display = 'block';
+            diagnosticOutputDiv.innerHTML = '<p>Running diagnostic checks... Please wait.</p>';
+            diagnosticOutputDiv.classList.remove('error');
+            let hasErrors = false;
+            let outputMessages = [];
+
+            function logAndDisplay(message, isError = false) {
+                outputMessages.push(message);
+                if (isError) {
+                    hasErrors = true;
+                    console.error(message);
+                } else {
+                    console.log(message);
+                }
+            }
+
+            logAndDisplay('--- Starting Application Diagnostic Check ---');
+
+            // 1. Check for basic browser API availability
+            logAndDisplay('Checking browser API availability...');
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    logAndDisplay('✔️ localStorage API is available.');
+                } else {
+                    logAndDisplay('⚠️ localStorage API is NOT available. Data persistence might be affected.', true);
+                }
+
+                if (typeof fetch !== 'undefined') {
+                    logAndDisplay('✔️ Fetch API is available.');
+                } else {
+                    logAndDisplay('⚠️ Fetch API is NOT available. Network requests might not work as expected.', true);
+                }
+
+                if (typeof Array.prototype.map !== 'undefined') {
+                    logAndDisplay('✔️ Core JavaScript array methods (e.g., map) are available.');
+                } else {
+                    logAndDisplay('❌ Basic JavaScript functionality might be compromised.', true);
+                }
+            } catch (e) {
+                logAndDisplay(`❌ Error during basic API check: ${e.message}`, true);
+            }
+
+            // 2. Check for presence of key DOM elements
+            logAndDisplay('Checking presence of key UI elements...');
+            const elementsToCheck = {
+                'companionForm': 'Study Plan Form',
+                'examSelect': 'Exam Select dropdown',
+                'skillSelect': 'Skill Level Select dropdown',
+                'messageDiv': 'Study Plan Output area',
+                'stopwatchDisplay': 'Stopwatch Display',
+                'startStopwatch': 'Stopwatch Start button',
+                'lofiPlayer': 'Lo-fi Player iframe'
+            };
+
+            for (const id in elementsToCheck) {
+                if (document.getElementById(id)) {
+                    logAndDisplay(`✔️ ${elementsToCheck[id]} element (${id}) found.`);
+                } else {
+                    logAndDisplay(`❌ ${elementsToCheck[id]} element (${id}) NOT found. UI may be broken.`, true);
+                }
+            }
+
+            // 3. Simulate external resource check (e.g., a dummy fetch request)
+            // This attempts to simulate a network error without a real backend.
+            logAndDisplay('Simulating a network request...');
+            try {
+                const response = await fetch('https://nonexistent-domain-for-test.com/dummy.json', { method: 'GET', mode: 'no-cors' });
+                // In 'no-cors' mode, network errors won't throw, but response.ok will be false for HTTP errors (though fetch to nonexistent domain behaves differently)
+                // The true test here is if the fetch call itself executes without a JS error.
+                logAndDisplay(`⚠️ Simulated network request completed, but status cannot be fully verified due to 'no-cors' mode. Check console for network tab errors if applicable.`);
+            } catch (error) {
+                logAndDisplay(`❌ Simulated network request FAILED (expected for a non-existent domain): ${error.message}. This indicates network requests are being attempted.`, true);
+            }
+
+            // 4. Check for YouTube iframe status (limited due to cross-origin)
+            logAndDisplay('Checking Lo-fi Player (YouTube iframe) status...');
+            const lofiPlayer = document.getElementById('lofiPlayer');
+            if (lofiPlayer && lofiPlayer.src) {
+                logAndDisplay(`✔️ Lo-fi Player iframe is present and has a source: ${lofiPlayer.src.substring(0, 50)}...`);
+                // We cannot truly check if the YouTube video is playing or loaded due to cross-origin security.
+                // However, the browser's console will show any related errors (e.g., CSP issues).
+                logAndDisplay('Note: Full YouTube player functionality cannot be directly verified from JavaScript due to browser security policies. Check browser console for related errors.');
+            } else {
+                logAndDisplay('❌ Lo-fi Player iframe not found or has no source. Music functionality may be unavailable.', true);
+            }
+
+            // 5. Address specific user request about server status (new addition)
+            logAndDisplay('Attempting to check external server status (e.g., on port 9001)...');
+            logAndDisplay('--------------------------------------------------------------');
+            logAndDisplay('IMPORTANT: As a client-side single-file HTML application, this page CANNOT directly:');
+            logAndDisplay('  - Check if a server process is running on a specific port (like 9001) on your machine.');
+            logAndDisplay('  - Attempt to "restart" any external application or server process.');
+            logAndDisplay('These actions require server-side code or direct operating system access, which are blocked by browser security models for user safety.');
+            logAndDisplay('To check server status or restart, you would typically use command-line tools (e.g., `netstat`, `tasklist`) or server management interfaces directly on the server host.');
+            logAndDisplay('--------------------------------------------------------------');
+            logAndDisplay('This diagnostic can only verify that the browser is capable of making network requests, not the state of external servers.');
+
+            logAndDisplay('--- Diagnostic Check Complete ---');
+            if (hasErrors) {
+                diagnosticOutputDiv.classList.add('error');
+                diagnosticOutputDiv.innerHTML = '<p><strong>Diagnostic Summary: Critical issues detected!</strong></p>' + outputMessages.map(msg => `<p>${msg}</p>`).join('');
+                logAndDisplay('Application diagnostic completed with ERRORS. Please review the console for details.');
+            } else {
+                diagnosticOutputDiv.innerHTML = '<p><strong>Diagnostic Summary: All primary checks passed successfully.</strong></p>' + outputMessages.map(msg => `<p>${msg}</p>`).join('');
+                logAndDisplay('Application diagnostic completed without critical issues.');
+            }
+        });
+    </script>
+</body>
+</html>

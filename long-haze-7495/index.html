@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nature Photo Slideshow</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #222;
+            color: #eee;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        #slideshow-container {
+            position: relative;
+            width: 90%;
+            max-width: 1000px;
+            aspect-ratio: 16 / 9; /* Common aspect ratio for photos */
+            background-color: #333;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        #slideshow-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+            opacity: 0;
+            transition: opacity 0.7s ease-in-out;
+        }
+
+        #loading-spinner {
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid #fff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            display: block; /* Initially visible */
+            position: absolute;
+            z-index: 10;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 5;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #4CAF50; /* Green */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 0;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            min-width: 90px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button:active {
+            background-color: #3e8e41;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+        }
+
+        button:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+            opacity: 0.7;
+            box-shadow: none;
+        }
+
+        #error-message {
+            color: #f44336;
+            background-color: rgba(255, 0, 0, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #f44336;
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: center;
+            max-width: 80%;
+            display: none; /* Initially hidden */
+        }
+    </style>
+</head>
+<body>
+    <div id="slideshow-container">
+        <img id="slideshow-image" src="" alt="Nature Photo">
+        <div id="loading-spinner"></div>
+        <div id="controls">
+            <button id="prev-btn" disabled>Previous</button>
+            <button id="play-pause-btn" disabled>Pause</button>
+            <button id="next-btn" disabled>Next</button>
+        </div>
+    </div>
+    <div id="error-message"></div>
+    <script>
+        // !!! IMPORTANT: Replace 'YOUR_UNSPLASH_ACCESS_KEY' with your actual Unsplash Access Key.
+        // You can get one by creating an app at https://unsplash.com/developers
+        const UNSPLASH_ACCESS_KEY = 'YOUR_UNSPLASH_ACCESS_KEY';
+
+        const slideshowImage = document.getElementById('slideshow-image');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const errorMessageDiv = document.getElementById('error-message');
+
+        let images = [];
+        let currentIndex = 0;
+        let intervalId = null;
+        let isPaused = false;
+        const SLIDE_DURATION = 5000; // 5 seconds
+
+        async function fetchImages() {
+            loadingSpinner.style.display = 'block';
+            slideshowImage.style.opacity = 0;
+            slideshowImage.style.display = 'none';
+            errorMessageDiv.style.display = 'none';
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
+            playPauseBtn.disabled = true;
+
+            if (UNSPLASH_ACCESS_KEY === 'YOUR_UNSPLASH_ACCESS_KEY' || !UNSPLASH_ACCESS_KEY) {
+                displayError("Please replace 'YOUR_UNSPLASH_ACCESS_KEY' in the script with your actual Unsplash API key.");
+                loadingSpinner.style.display = 'none';
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://api.unsplash.com/photos/random?count=10&query=nature&orientation=landscape`, {
+                    headers: {
+                        Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}`
+                    }
+                });
+
+                if (!response.ok) {
+                    let errorText = `HTTP error! status: ${response.status}`;
+                    if (response.status === 401) {
+                        errorText = "Unauthorized: Invalid Unsplash Access Key. Please check your key.";
+                    } else if (response.status === 403) {
+                         errorText = "Forbidden: API rate limit exceeded or permissions issue. Try again later.";
+                    } else {
+                        try {
+                            const errorData = await response.json();
+                            errorText = errorData.errors ? errorData.errors.join(", ") : errorText;
+                        } catch (e) {
+                            // Response was not JSON, use default error text
+                        }
+                    }
+                    throw new Error(errorText);
+                }
+
+                const data = await response.json();
+                images = data.map(img => img.urls.regular);
+
+                if (images.length === 0) {
+                    displayError("No nature images found. Please try a different query or check API status.");
+                    loadingSpinner.style.display = 'none';
+                    return;
+                }
+
+                // Preload images
+                images.forEach(url => {
+                    const img = new Image();
+                    img.src = url;
+                });
+
+                currentIndex = 0;
+                displayImage(currentIndex);
+                startSlideshow();
+
+                prevBtn.disabled = false;
+                nextBtn.disabled = false;
+                playPauseBtn.disabled = false;
+
+            } catch (error) {
+                console.error("Error fetching images:", error);
+                displayError(`Failed to fetch images: ${error.message}. Please check your internet connection or API key.`);
+            } finally {
+                loadingSpinner.style.display = 'none';
+            }
+        }
+
+        function displayImage(index) {
+            if (images.length === 0) return;
+
+            // Ensure index wraps around for continuous loop
+            currentIndex = (index + images.length) % images.length;
+
+            const imageUrl = images[currentIndex];
+            
+            // Fade out current image, then load new one and fade in
+            slideshowImage.style.opacity = 0;
+            
+            // Use a short delay or onload to ensure transition is visible
+            setTimeout(() => {
+                slideshowImage.src = imageUrl;
+                slideshowImage.style.display = 'block';
+                slideshowImage.onload = () => {
+                    slideshowImage.style.opacity = 1;
+                };
+                // In case image is cached and onload doesn't fire consistently
+                if (slideshowImage.complete && slideshowImage.naturalHeight !== 0) {
+                    slideshowImage.style.opacity = 1;
+                }
+            }, 100); // Small delay to allow opacity 0 to render for transition
+        }
+
+        function nextImage() {
+            stopSlideshow(); // Stop current auto-slide before manual change
+            displayImage(currentIndex + 1);
+            if (!isPaused) { // If not paused, restart auto-slide
+                startSlideshow();
+            }
+        }
+
+        function prevImage() {
+            stopSlideshow(); // Stop current auto-slide before manual change
+            displayImage(currentIndex - 1);
+            if (!isPaused) { // If not paused, restart auto-slide
+                startSlideshow();
+            }
+        }
+
+        function startSlideshow() {
+            stopSlideshow(); // Clear any existing interval
+            intervalId = setInterval(() => {
+                displayImage(currentIndex + 1);
+            }, SLIDE_DURATION);
+            playPauseBtn.textContent = 'Pause';
+            isPaused = false;
+        }
+
+        function stopSlideshow() {
+            clearInterval(intervalId);
+            intervalId = null;
+        }
+
+        function togglePlayPause() {
+            if (isPaused) {
+                startSlideshow();
+            } else {
+                stopSlideshow();
+                playPauseBtn.textContent = 'Play';
+                isPaused = true;
+            }
+        }
+
+        function displayError(message) {
+            errorMessageDiv.textContent = message;
+            errorMessageDiv.style.display = 'block';
+            slideshowImage.style.display = 'none';
+        }
+
+        // Event Listeners
+        prevBtn.addEventListener('click', prevImage);
+        nextBtn.addEventListener('click', nextImage);
+        playPauseBtn.addEventListener('click', togglePlayPause);
+
+        // Initialize the slideshow
+        document.addEventListener('DOMContentLoaded', fetchImages);
+    </script>
+</body>
+</html>

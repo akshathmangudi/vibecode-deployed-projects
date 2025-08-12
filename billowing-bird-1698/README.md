@@ -1,0 +1,4 @@
+# billowing-bird-1698
+
+Prompt:
+> Creates a single-file web application with a homepage introducing its use and a 'Get Started' button. The 'Get Started' button redirects to a page with 'Hide' and 'Seek' buttons against a cool background with a dark theme. Clicking 'Hide' redirects to a page where the user can enter text and upload an image. The text is hidden within the image using steganography. Clicking 'Seek' redirects to a page where the user can upload an image and retrieve any hidden message. The app should have dynamic navigation between all pages, including a 'Home' and 'Contact Us' page, allowing users to navigate back from hide/seek pages to the home page. The website should be built using React, Tailwind CSS, and be fully responsive.

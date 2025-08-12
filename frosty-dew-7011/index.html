@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Web App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f7fa;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2.2em;
+        }
+
+        p {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        .time-display {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #3498db;
+            margin-top: 20px;
+            padding: 10px 0;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 22px); /* Account for padding and border */
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #3498db;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to My Simple App!</h1>
+        <p id="greetingMessage">Hello, World!</p>
+
+        <input type="text" id="nameInput" placeholder="Enter your name or a new message">
+        <button id="updateButton">Update Greeting</button>
+
+        <div class="time-display" id="currentTime"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const greetingMessage = document.getElementById('greetingMessage');
+            const nameInput = document.getElementById('nameInput');
+            const updateButton = document.getElementById('updateButton');
+            const currentTimeDisplay = document.getElementById('currentTime');
+
+            updateButton.addEventListener('click', () => {
+                const newName = nameInput.value.trim();
+                if (newName) {
+                    greetingMessage.textContent = `Hello, ${newName}!`;
+                    nameInput.value = ''; // Clear the input field
+                } else {
+                    greetingMessage.textContent = `Hello, World!`;
+                }
+            });
+
+            function updateTime() {
+                const now = new Date();
+                const options = {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                };
+                currentTimeDisplay.textContent = now.toLocaleDateString('en-US', options);
+            }
+
+            // Initial time update
+            updateTime();
+
+            // Update time every second
+            setInterval(updateTime, 1000);
+
+            // Allow updating greeting with Enter key
+            nameInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    updateButton.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

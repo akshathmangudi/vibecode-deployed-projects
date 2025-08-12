@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Counter App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #e0f2f7; /* Light blue background */
+            color: #333;
+            line-height: 1.6;
+        }
+
+        #app {
+            background-color: #ffffff;
+            padding: 35px 45px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 320px;
+            box-sizing: border-box;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        #app:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            color: #007bff; /* Blue for title */
+            margin-bottom: 25px;
+            font-size: 2.3em;
+            font-weight: 600;
+        }
+
+        #counter-display {
+            font-size: 5em;
+            font-weight: 700;
+            margin-bottom: 35px;
+            color: #28a745; /* Green for display */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px; /* Space between buttons */
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+        }
+
+        .controls button {
+            padding: 14px 28px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+            outline: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #decrement {
+            background-color: #dc3545; /* Red */
+            color: white;
+        }
+
+        #decrement:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        #reset {
+            background-color: #ffc107; /* Yellow */
+            color: #333;
+        }
+
+        #reset:hover {
+            background-color: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        #increment {
+            background-color: #007bff; /* Blue */
+            color: white;
+        }
+
+        #increment:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        @media (max-width: 480px) {
+            #app {
+                width: 90%;
+                padding: 25px 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            #counter-display {
+                font-size: 4em;
+            }
+
+            .controls button {
+                padding: 10px 20px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Simple Counter</h1>
+        <div id="counter-display">0</div>
+        <div class="controls">
+            <button id="decrement">Decrement</button>
+            <button id="reset">Reset</button>
+            <button id="increment">Increment</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let count = 0;
+            const counterDisplay = document.getElementById('counter-display');
+            const decrementButton = document.getElementById('decrement');
+            const incrementButton = document.getElementById('increment');
+            const resetButton = document.getElementById('reset');
+
+            function updateDisplay() {
+                counterDisplay.textContent = count;
+            }
+
+            decrementButton.addEventListener('click', () => {
+                count--;
+                updateDisplay();
+            });
+
+            incrementButton.addEventListener('click', () => {
+                count++;
+                updateDisplay();
+            });
+
+            resetButton.addEventListener('click', () => {
+                count = 0;
+                updateDisplay();
+            });
+
+            // Initial display update
+            updateDisplay();
+        });
+    </script>
+</body>
+</html>

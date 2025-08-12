@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greeting Page</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid #e0e0e0;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 2.2em;
+            letter-spacing: -0.5px;
+        }
+
+        #greetingMessage {
+            font-size: 1.8em;
+            color: #3498db;
+            margin-bottom: 30px;
+            font-weight: 600;
+            min-height: 1.8em; /* Reserve space to prevent layout shift */
+        }
+
+        input[type="text"] {
+            width: calc(100% - 24px);
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1.1em;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            outline: none;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            background-color: #216a94;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome!</h1>
+        <p id="greetingMessage">Hello there!</p>
+        <input type="text" id="nameInput" placeholder="Enter your name">
+        <button id="greetButton">Greet Me</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const nameInput = document.getElementById('nameInput');
+            const greetButton = document.getElementById('greetButton');
+            const greetingMessage = document.getElementById('greetingMessage');
+
+            const updateGreeting = () => {
+                let name = nameInput.value.trim();
+                if (name === '') {
+                    name = 'Guest';
+                }
+                greetingMessage.textContent = `Hello, ${name}!`;
+                
+                // Store the name in localStorage if it's not the default "Guest"
+                if (name !== 'Guest') {
+                    localStorage.setItem('userName', name);
+                } else {
+                    localStorage.removeItem('userName');
+                }
+            };
+
+            // Load name from localStorage on initial page load
+            const storedName = localStorage.getItem('userName');
+            if (storedName) {
+                nameInput.value = storedName;
+            }
+            updateGreeting(); // Set initial greeting based on stored or default name
+
+            // Event listener for the button
+            greetButton.addEventListener('click', updateGreeting);
+
+            // Event listener for Enter key in the input field
+            nameInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    updateGreeting();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

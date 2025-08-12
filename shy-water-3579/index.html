@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aman's Personalized Greeting App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        #app {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+            box-sizing: border-box;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+            font-size: 2.8em;
+            letter-spacing: -0.5px;
+            animation: slideIn 1s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        p {
+            font-size: 1.15em;
+            margin-bottom: 30px;
+            color: #555;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            outline: none;
+        }
+
+        button:hover {
+            background-color: #218838;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+        }
+
+        button:active {
+            background-color: #1e7e34;
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Hello, Aman!</h1>
+        <p id="message">Welcome to your personal greeting application. Click the button to get a special message!</p>
+        <button id="greetButton">Greet Me!</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const greetButton = document.getElementById('greetButton');
+            const messageParagraph = document.getElementById('message');
+
+            let clickCount = 0;
+            const messages = [
+                "It's great to see you, Aman!",
+                "Hope you're having a wonderful day, Aman!",
+                "Hello again from your personalized app, Aman!",
+                "You clicked me again, Aman! Keep it up!",
+                "Aman, you're awesome!",
+                "Another special greeting for you, Aman!",
+                "Howdy, Aman!",
+                "Greetings from your friendly app, Aman!",
+                "Aman, your presence brightens this page!",
+                "Sending good vibes your way, Aman!"
+            ];
+
+            greetButton.addEventListener('click', () => {
+                const currentMessageIndex = clickCount % messages.length;
+                messageParagraph.textContent = messages[currentMessageIndex];
+                clickCount++;
+            });
+        });
+    </script>
+</body>
+</html>

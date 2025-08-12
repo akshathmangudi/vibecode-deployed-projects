@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agency Project Manager</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        #app {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+
+        main {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+            overflow: hidden;
+        }
+
+        #projects-sidebar,
+        #project-details-area {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #projects-sidebar {
+            flex: 0 0 320px;
+            overflow-y: auto;
+            min-height: 0; /* Important for flex items with overflow */
+        }
+
+        #project-details-area {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0; /* Important for flex items with overflow */
+        }
+
+        h2, h3, h4 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        textarea,
+        select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+            box-sizing: border-box; /* Ensure padding doesn't increase total width */
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .project-card {
+            background-color: #ecf0f1;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .project-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .project-card:hover {
+            background-color: #e0e6e7;
+            transform: translateY(-2px);
+        }
+
+        .project-card.active {
+            border-color: #3498db;
+            background-color: #eaf6fc;
+            box-shadow: 0 0 0 2px #3498db40;
+        }
+
+        .project-card h4 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            color: #34495e;
+            font-size: 1.1em;
+        }
+
+        .project-card p {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .project-card .status {
+            font-weight: bold;
+            font-size: 0.85em;
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .project-status-NotStarted { background-color: #f39c12; color: white; }
+        .project-status-InProgress { background-color: #3498db; color: white; }
+        .project-status-Completed { background-color: #27ae60; color: white; }
+        .project-status-OnHold { background-color: #e74c3c; color: white; }
+
+        #project-details-card {
+            min-height: 100px;
+            margin-bottom: 20px;
+        }
+
+        #project-details-card h2 {
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        #project-details-card p {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        #project-details-card strong {
+            color: #2c3e50;
+        }
+
+        .task-item {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .task-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .task-item-info {
+            flex-grow: 1;
+            min-width: 150px; /* Ensure info doesn't get too squished */
+        }
+
+        .task-item-info strong {
+            display: block;
+            font-size: 1em;
+            color: #34495e;
+            margin-bottom: 3px;
+        }
+
+        .task-item-info span {
+            font-size: 0.85em;
+            color: #777;
+        }
+
+        .status-select {
+            padding: 5px 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background-color: white;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+
+        .placeholder-text {
+            text-align: center;
+            color: #777;
+            padding: 20px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            main {
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            #projects-sidebar {
+                flex: none;
+                width: auto;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Agency Project Manager</h1>
+        </header>
+
+        <main>
+            <section id="projects-sidebar">
+                <h2>Projects</h2>
+                <form id="add-project-form">
+                    <h3>Add New Project</h3>
+                    <input type="text" id="new-project-name" placeholder="Project Name" required>
+                    <textarea id="new-project-description" placeholder="Description (optional)"></textarea>
+                    <input type="date" id="new-project-due-date" required>
+                    <input type="text" id="new-project-client" placeholder="Client Name" required>
+                    <button type="submit">Add Project</button>
+                </form>
+                <div id="projects-list">
+                    <p class="placeholder-text">Loading projects...</p>
+                </div>
+            </section>
+
+            <section id="project-details-area">
+                <div id="project-details-card">
+                    <p class="placeholder-text">Select a project from the left, or add a new one.</p>
+                </div>
+                <div id="project-tasks">
+                    <h3>Tasks</h3>
+                    <form id="add-task-form" style="display: none;">
+                        <h4>Add New Task</h4>
+                        <input type="text" id="new-task-description" placeholder="Task Description" required>
+                        <input type="date" id="new-task-due-date" required>
+                        <input type="text" id="new-task-assigned-to" placeholder="Assigned To" required>
+                        <button type="submit">Add Task</button>
+                    </form>
+                    <div id="tasks-list">
+                        <p class="placeholder-text">Tasks will appear here after selecting a project.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'agencyPMData';
+        let projectsData = [];
+        let currentProjectId = null;
+
+        const projectsListEl = document.getElementById('projects-list');
+        const projectDetailsCardEl = document.getElementById('project-details-card');
+        const tasksListEl = document.getElementById('tasks-list');
+        const addProjectFormEl = document.getElementById('add-project-form');
+        const newProjectNameEl = document.getElementById('new-project-name');
+        const newProjectDescriptionEl = document.getElementById('new-project-description');
+        const newProjectDueDateEl = document.getElementById('new-project-due-date');
+        const newProjectClientEl = document.getElementById('new-project-client');
+        const addTaskFormEl = document.getElementById('add-task-form');
+        const newTaskDescriptionEl = document.getElementById('new-task-description');
+        const newTaskDueDateEl = document.getElementById('new-task-due-date');
+        const newTaskAssignedToEl = document.getElementById('new-task-assigned-to');
+
+        function generateUniqueId() {
+            return 'id-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function loadData() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            projectsData = data ? JSON.parse(data) : [];
+            const lastSelectedId = localStorage.getItem(STORAGE_KEY + '_lastSelectedProject');
+            if (lastSelectedId && projectsData.some(p => p.id === lastSelectedId)) {
+                currentProjectId = lastSelectedId;
+            } else if (projectsData.length > 0) {
+                currentProjectId = projectsData[0].id;
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(projectsData));
+            localStorage.setItem(STORAGE_KEY + '_lastSelectedProject', currentProjectId);
+        }
+
+        function renderProjects() {
+            projectsListEl.innerHTML = '';
+            if (projectsData.length === 0) {
+                projectsListEl.innerHTML = '<p class="placeholder-text">No projects yet. Add one above!</p>';
+                projectDetailsCardEl.innerHTML = '<p class="placeholder-text">Select a project from the left, or add a new one.</p>';
+                tasksListEl.innerHTML = '<p class="placeholder-text">Tasks will appear here after selecting a project.</p>';
+                addTaskFormEl.style.display = 'none';
+                currentProjectId = null;
+                saveData();
+                return;
+            }
+
+            projectsData.forEach(project => {
+                const projectCard = document.createElement('div');
+                projectCard.className = `project-card ${project.id === currentProjectId ? 'active' : ''}`;
+                projectCard.dataset.projectId = project.id;
+                projectCard.innerHTML = `
+                    <h4>${project.name}</h4>
+                    <p>Client: ${project.client}</p>
+                    <p>Due: ${project.dueDate}</p>
+                    <span class="status project-status-${project.status.replace(/\s/g, '')}">${project.status}</span>
+                `;
+                projectCard.addEventListener('click', () => selectProject(project.id));
+                projectsListEl.appendChild(projectCard);
+            });
+
+            const selectedProject = projectsData.find(p => p.id === currentProjectId);
+            if (selectedProject) {
+                renderProjectDetails(selectedProject);
+                renderTasks(selectedProject.tasks);
+                addTaskFormEl.style.display = 'flex';
+            } else {
+                // If currentProjectId is invalid (e.g., project was deleted), select the first one
+                currentProjectId = projectsData[0].id;
+                renderProjects(); // Re-render to highlight the new active project
+            }
+        }
+
+        function selectProject(projectId) {
+            currentProjectId = projectId;
+            saveData();
+            renderProjects();
+        }
+
+        function renderProjectDetails(project) {
+            if (!project) {
+                projectDetailsCardEl.innerHTML = '<p class="placeholder-text">No project selected.</p>';
+                return;
+            }
+
+            const projectStatusOptions = ['Not Started', 'In Progress', 'Completed', 'On Hold'];
+            const statusSelectHtml = `
+                <select class="status-select" data-type="project-status" data-project-id="${project.id}">
+                    ${projectStatusOptions.map(opt => `<option value="${opt}" ${project.status === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                </select>
+            `;
+
+            projectDetailsCardEl.innerHTML = `
+                <h2>${project.name}</h2>
+                <p><strong>Client:</strong> ${project.client}</p>
+                <p><strong>Description:</strong> ${project.description || 'No description provided.'}</p>
+                <p><strong>Due Date:</strong> ${project.dueDate}</p>
+                <p><strong>Status:</strong> ${statusSelectHtml}</p>
+            `;
+        }
+
+        function renderTasks(tasks) {
+            tasksListEl.innerHTML = '';
+            if (!tasks || tasks.length === 0) {
+                tasksListEl.innerHTML = '<p class="placeholder-text">No tasks for this project yet. Add one below!</p>';
+                return;
+            }
+
+            const taskStatusOptions = ['To Do', 'In Progress', 'Done'];
+
+            tasks.forEach(task => {
+                const taskItem = document.createElement('div');
+                taskItem.className = 'task-item';
+                taskItem.dataset.taskId = task.id;
+                taskItem.innerHTML = `
+                    <div class="task-item-info">
+                        <strong>${task.description}</strong>
+                        <span>Assigned to: ${task.assignedTo} | Due: ${task.dueDate}</span>
+                    </div>
+                    <select class="status-select" data-type="task-status" data-task-id="${task.id}" data-project-id="${currentProjectId}">
+                        ${taskStatusOptions.map(opt => `<option value="${opt}" ${task.status === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                    </select>
+                `;
+                tasksListEl.appendChild(taskItem);
+            });
+        }
+
+        addProjectFormEl.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newProject = {
+                id: generateUniqueId(),
+                name: newProjectNameEl.value.trim(),
+                description: newProjectDescriptionEl.value.trim(),
+                dueDate: newProjectDueDateEl.value,
+                client: newProjectClientEl.value.trim(),
+                status: 'Not Started',
+                tasks: []
+            };
+
+            if (newProject.name && newProject.dueDate && newProject.client) {
+                projectsData.unshift(newProject);
+                currentProjectId = newProject.id;
+                saveData();
+                newProjectNameEl.value = '';
+                newProjectDescriptionEl.value = '';
+                newProjectDueDateEl.value = '';
+                newProjectClientEl.value = '';
+                renderProjects();
+            } else {
+                alert('Please fill in all required project fields: Name, Due Date, and Client.');
+            }
+        });
+
+        addTaskFormEl.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!currentProjectId) {
+                alert('Please select a project first!');
+                return;
+            }
+
+            const newTask = {
+                id: generateUniqueId(),
+                description: newTaskDescriptionEl.value.trim(),
+                dueDate: newTaskDueDateEl.value,
+                assignedTo: newTaskAssignedToEl.value.trim(),
+                status: 'To Do'
+            };
+
+            if (newTask.description && newTask.dueDate && newTask.assignedTo) {
+                const project = projectsData.find(p => p.id === currentProjectId);
+                if (project) {
+                    project.tasks.push(newTask);
+                    saveData();
+                    newTaskDescriptionEl.value = '';
+                    newTaskDueDateEl.value = '';
+                    newTaskAssignedToEl.value = '';
+                    renderTasks(project.tasks);
+                }
+            } else {
+                alert('Please fill in all required task fields: Description, Due Date, and Assigned To.');
+            }
+        });
+
+        projectDetailsCardEl.addEventListener('change', (e) => {
+            if (e.target.classList.contains('status-select') && e.target.dataset.type === 'project-status') {
+                const projectId = e.target.dataset.projectId;
+                const newStatus = e.target.value;
+                const project = projectsData.find(p => p.id === projectId);
+                if (project) {
+                    project.status = newStatus;
+                    saveData();
+                    renderProjects();
+                }
+            }
+        });
+
+        tasksListEl.addEventListener('change', (e) => {
+            if (e.target.classList.contains('status-select') && e.target.dataset.type === 'task-status') {
+                const projectId = e.target.dataset.projectId;
+                const taskId = e.target.dataset.taskId;
+                const newStatus = e.target.value;
+
+                const project = projectsData.find(p => p.id === projectId);
+                if (project) {
+                    const task = project.tasks.find(t => t.id === taskId);
+                    if (task) {
+                        task.status = newStatus;
+                        saveData();
+                        renderTasks(project.tasks);
+                    }
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            renderProjects();
+        });
+    </script>
+</body>
+</html>

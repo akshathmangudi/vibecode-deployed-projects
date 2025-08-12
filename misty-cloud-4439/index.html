@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocal Pitch Guide</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        #app {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+
+        .control-group label {
+            font-weight: 600;
+            white-space: nowrap;
+            color: #555;
+        }
+
+        select, input[type="range"] {
+            flex-grow: 1;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            background-color: #f8f8f8;
+            color: #333;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            box-sizing: border-box;
+            min-width: 80px; /* Ensure selects don't become too small */
+        }
+
+        select:focus, input[type="range"]:focus, button:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        input[type="range"] {
+            height: 8px;
+            background: #e0e0e0;
+            cursor: pointer;
+            border: none;
+            padding: 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+            margin-top: -6px; /* Center thumb on track */
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+        }
+
+        #tempoValue {
+            min-width: 30px;
+            text-align: right;
+            font-weight: 600;
+            color: #007bff;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        button#playBtn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        button#playBtn:hover:not(:disabled) {
+            background-color: #218838;
+            transform: translateY(-1px);
+        }
+
+        button#stopBtn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        button#stopBtn:hover:not(:disabled) {
+            background-color: #c82333;
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #currentNoteDisplay {
+            background-color: #e9ecef;
+            padding: 25px;
+            border-radius: 12px;
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #007bff;
+            min-height: 1.5em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Vocal Pitch Guide</h1>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="rootNote">Start Note:</label>
+                <select id="rootNote"></select>
+                <select id="octave"></select>
+            </div>
+
+            <div class="control-group">
+                <label for="sequenceType">Sequence:</label>
+                <select id="sequenceType">
+                    <option value="majorScale">Major Scale (Asc.)</option>
+                    <option value="minorScale">Minor Scale (Asc.)</option>
+                    <option value="majorArpeggio">Major Arpeggio (Asc.)</option>
+                    <option value="minorArpeggio">Minor Arpeggio (Asc.)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="tempo">Tempo (BPM):</label>
+                <input type="range" id="tempo" min="30" max="240" value="120">
+                <span id="tempoValue">120</span>
+            </div>
+
+            <div class="control-group">
+                <button id="playBtn">Play Sequence</button>
+                <button id="stopBtn" disabled>Stop</button>
+            </div>
+        </div>
+
+        <div id="currentNoteDisplay">
+            <span>---</span>
+        </div>
+    </div>
+
+    <script>
+        let audioContext = null;
+        let oscillator = null;
+        let gainNode = null;
+        let isPlaying = false;
+        let currentSequence = [];
+        let sequenceIndex = 0;
+        let intervalId = null;
+
+        const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        const rootNoteSemitones = {
+            'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5, 'F#': 6,
+            'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11
+        };
+
+        const sequenceIntervals = {
+            majorScale: [0, 2, 4, 5, 7, 9, 11, 12], // C, D, E, F, G, A, B, C
+            minorScale: [0, 2, 3, 5, 7, 8, 10, 12], // C, D, Eb, F, G, Ab, Bb, C
+            majorArpeggio: [0, 4, 7, 12],          // C, E, G, C
+            minorArpeggio: [0, 3, 7, 12]           // C, Eb, G, C
+        };
+
+        // UI Elements
+        const rootNoteSelect = document.getElementById('rootNote');
+        const octaveSelect = document.getElementById('octave');
+        const sequenceTypeSelect = document.getElementById('sequenceType');
+        const tempoInput = document.getElementById('tempo');
+        const tempoValueSpan = document.getElementById('tempoValue');
+        const playBtn = document.getElementById('playBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const currentNoteDisplay = document.getElementById('currentNoteDisplay');
+
+        // Utility Functions
+        function midiToFreq(midiNote) {
+            return 440 * Math.pow(2, (midiNote - 69) / 12);
+        }
+
+        function getNoteName(midiNote) {
+            const octave = Math.floor(midiNote / 12) - 1;
+            const noteIndex = midiNote % 12;
+            return noteNames[noteIndex] + octave;
+        }
+
+        function getMidiNote(rootNoteStr, octave) {
+            const semitonesFromC = rootNoteSemitones[rootNoteStr];
+            return (octave + 1) * 12 + semitonesFromC;
+        }
+
+        // Audio Functions
+        function initAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function startNote(frequency) {
+            stopNote(); // Stop any currently playing note
+            oscillator = audioContext.createOscillator();
+            gainNode = audioContext.createGain();
+
+            oscillator.type = 'sine'; // Sine wave is good for warm-ups
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime); // Set volume
+
+            oscillator.connect(gainNode).connect(audioContext.destination);
+            oscillator.start();
+        }
+
+        function stopNote() {
+            if (oscillator) {
+                oscillator.stop();
+                oscillator.disconnect();
+                oscillator = null;
+            }
+            if (gainNode) {
+                gainNode.disconnect();
+                gainNode = null;
+            }
+        }
+
+        // Sequence Generation
+        function generateSequence() {
+            const rootNoteStr = rootNoteSelect.value;
+            const octave = parseInt(octaveSelect.value);
+            const type = sequenceTypeSelect.value;
+
+            const rootMidiNote = getMidiNote(rootNoteStr, octave);
+            const intervals = sequenceIntervals[type];
+
+            currentSequence = intervals.map(interval => rootMidiNote + interval);
+        }
+
+        // Playback Control
+        function playSequence() {
+            initAudioContext(); // Initialize AudioContext on user interaction
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+
+            if (isPlaying) return;
+
+            generateSequence();
+            sequenceIndex = 0;
+            isPlaying = true;
+
+            playBtn.disabled = true;
+            stopBtn.disabled = false;
+
+            const msPerBeat = 60000 / parseInt(tempoInput.value);
+            // Assuming each note is a beat. For scales, it could be faster.
+            // Let's make it 0.5 beat per note, so 120 bpm means 2 notes per second.
+            const noteDurationMs = msPerBeat / 1; // Play one note per beat
+
+            intervalId = setInterval(playNextNote, noteDurationMs);
+            playNextNote(); // Play the first note immediately
+        }
+
+        function playNextNote() {
+            if (sequenceIndex < currentSequence.length) {
+                const midiNote = currentSequence[sequenceIndex];
+                startNote(midiToFreq(midiNote));
+                currentNoteDisplay.textContent = getNoteName(midiNote);
+                sequenceIndex++;
+            } else {
+                stopSequence(); // Sequence finished
+            }
+        }
+
+        function stopSequence() {
+            clearInterval(intervalId);
+            stopNote();
+            isPlaying = false;
+            currentNoteDisplay.textContent = '---';
+            playBtn.disabled = false;
+            stopBtn.disabled = true;
+        }
+
+        // UI Population & Event Listeners
+        function populateRootNotes() {
+            rootNoteNames = Object.keys(rootNoteSemitones);
+            rootNoteNames.forEach(note => {
+                const option = document.createElement('option');
+                option.value = note;
+                option.textContent = note;
+                rootNoteSelect.appendChild(option);
+            });
+            rootNoteSelect.value = 'C'; // Default to C
+        }
+
+        function populateOctaves() {
+            for (let i = 3; i <= 6; i++) { // Common vocal range octaves
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                octaveSelect.appendChild(option);
+            }
+            octaveSelect.value = '4'; // Default to Octave 4
+        }
+
+        function updateTempoDisplay() {
+            tempoValueSpan.textContent = tempoInput.value;
+            // If playing, restart interval with new tempo
+            if (isPlaying) {
+                stopSequence();
+                playSequence();
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            populateRootNotes();
+            populateOctaves();
+
+            playBtn.addEventListener('click', playSequence);
+            stopBtn.addEventListener('click', stopSequence);
+            tempoInput.addEventListener('input', updateTempoDisplay);
+            
+            // Allow changing settings to update sequence if playing
+            rootNoteSelect.addEventListener('change', () => { if (isPlaying) playSequence(); });
+            octaveSelect.addEventListener('change', () => { if (isPlaying) playSequence(); });
+            sequenceTypeSelect.addEventListener('change', () => { if (isPlaying) playSequence(); });
+        });
+    </script>
+</body>
+</html>

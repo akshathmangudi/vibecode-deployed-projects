@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+            color: #333;
+        }
+
+        #calculator {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 320px;
+            background-color: #fff;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #display {
+            background-color: #222;
+            color: #0f0; /* Green LED-like text */
+            font-size: 2.5em;
+            padding: 15px;
+            text-align: right;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: clip;
+            font-family: 'Consolas', 'Monaco', monospace; /* Monospaced font for display */
+            min-height: 1.5em; /* Ensures consistent height even if content is small */
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        #buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .button {
+            background-color: #e0e0e0;
+            border: none;
+            padding: 20px;
+            font-size: 1.5em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 60px; /* Ensure buttons have consistent height */
+        }
+
+        .button:hover {
+            background-color: #d0d0d0;
+        }
+
+        .button:active {
+            background-color: #c0c0c0;
+            transform: scale(0.98);
+        }
+
+        .operator {
+            background-color: #ff9500;
+            color: white;
+        }
+
+        .operator:hover {
+            background-color: #e08500;
+        }
+
+        .operator:active {
+            background-color: #c07500;
+        }
+
+        .equals {
+            background-color: #007aff;
+            color: white;
+            grid-column: span 2; /* Make equals button span two columns */
+        }
+
+        .equals:hover {
+            background-color: #006ae6;
+        }
+
+        .equals:active {
+            background-color: #005bc7;
+        }
+
+        .clear {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .clear:hover {
+            background-color: #c82333;
+        }
+
+        .clear:active {
+            background-color: #bd2130;
+        }
+        /* Style for the 0 button to span two columns */
+        .zero {
+            grid-column: span 2;
+        }
+    </style>
+</head>
+<body>
+    <div id="calculator">
+        <div id="display">0</div>
+        <div id="buttons">
+            <button class="button clear">C</button>
+            <button class="button operator">/</button>
+            <button class="button operator">*</button>
+            <button class="button operator">-</button>
+            <button class="button">7</button>
+            <button class="button">8</button>
+            <button class="button">9</button>
+            <button class="button operator">+</button>
+            <button class="button">4</button>
+            <button class="button">5</button>
+            <button class="button">6</button>
+            <button class="button">1</button>
+            <button class="button">2</button>
+            <button class="button">3</button>
+            <button class="button equals">=</button>
+            <button class="button zero">0</button>
+            <button class="button decimal">.</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+        const buttons = document.getElementById('buttons');
+
+        let displayValue = '0';
+        let firstOperand = null;
+        let operator = null;
+        let waitingForSecondOperand = false;
+
+        function updateDisplay() {
+            display.textContent = displayValue;
+        }
+
+        function clearAll() {
+            displayValue = '0';
+            firstOperand = null;
+            operator = null;
+            waitingForSecondOperand = false;
+            updateDisplay();
+        }
+
+        function inputDigit(digit) {
+            if (waitingForSecondOperand) {
+                displayValue = digit;
+                waitingForSecondOperand = false;
+            } else {
+                displayValue = displayValue === '0' ? digit : displayValue + digit;
+            }
+            updateDisplay();
+        }
+
+        function inputDecimal(dot) {
+            if (waitingForSecondOperand) {
+                displayValue = '0.';
+                waitingForSecondOperand = false;
+                updateDisplay();
+                return;
+            }
+            if (!displayValue.includes(dot)) {
+                displayValue += dot;
+            }
+            updateDisplay();
+        }
+
+        function handleOperator(nextOperator) {
+            const inputValue = parseFloat(displayValue);
+
+            // Allow chaining operators (e.g., 5 + * 3 should be 5 * 3)
+            // If an operator is already set and we just pressed another operator without
+            // entering a second number, simply update the operator.
+            if (operator && waitingForSecondOperand) {
+                operator = nextOperator;
+                return;
+            }
+
+            if (firstOperand === null) {
+                firstOperand = inputValue;
+            } else if (operator) {
+                // If there's a first operand and an operator, calculate the result
+                const result = operate(firstOperand, inputValue, operator);
+                
+                // Handle potential errors like division by zero
+                if (typeof result === 'string' && result.includes('Error')) {
+                    displayValue = result; // Display the error message
+                    clearAll(); // Reset calculator state
+                    updateDisplay();
+                    return;
+                }
+
+                firstOperand = result; // Store result as the new first operand
+                // Format the result for display to avoid long decimal numbers
+                if (typeof result === 'number' && !Number.isInteger(result) && String(result).length > 10) {
+                    displayValue = String(parseFloat(result.toFixed(8))); // Limit to 8 decimal places
+                } else {
+                    displayValue = String(result);
+                }
+            }
+
+            waitingForSecondOperand = true; // Next digit input will be the start of a new number
+            operator = nextOperator;
+            updateDisplay();
+        }
+
+        function operate(num1, num2, op) {
+            const n1 = parseFloat(num1);
+            const n2 = parseFloat(num2);
+
+            // Basic check for valid numbers
+            if (isNaN(n1) || isNaN(n2)) return 'Error';
+
+            switch (op) {
+                case '+':
+                    return n1 + n2;
+                case '-':
+                    return n1 - n2;
+                case '*':
+                    return n1 * n2;
+                case '/':
+                    if (n2 === 0) return 'Error: Div by Zero';
+                    return n1 / n2;
+                default:
+                    return 'Error: Invalid Operator'; // Should not happen with current buttons
+            }
+        }
+
+        buttons.addEventListener('click', (event) => {
+            const { target } = event;
+
+            // Ensure a button was clicked
+            if (!target.matches('button')) {
+                return;
+            }
+
+            if (target.classList.contains('operator')) {
+                handleOperator(target.textContent);
+                return;
+            }
+
+            if (target.classList.contains('decimal')) {
+                inputDecimal(target.textContent);
+                return;
+            }
+
+            if (target.classList.contains('clear')) {
+                clearAll();
+                return;
+            }
+
+            if (target.classList.contains('equals')) {
+                // Only calculate if there's a first operand and an operator set
+                if (firstOperand === null || operator === null) {
+                    return;
+                }
+                
+                const result = operate(firstOperand, parseFloat(displayValue), operator);
+
+                // Handle potential errors from operate function
+                if (typeof result === 'string' && result.includes('Error')) {
+                    displayValue = result;
+                    clearAll();
+                    updateDisplay();
+                    return;
+                }
+
+                // Format result for display
+                if (typeof result === 'number' && !Number.isInteger(result) && String(result).length > 10) {
+                    displayValue = String(parseFloat(result.toFixed(8)));
+                } else {
+                    displayValue = String(result);
+                }
+                
+                updateDisplay();
+                
+                // Reset state for a new calculation, but keep result on display
+                firstOperand = null;
+                operator = null;
+                waitingForSecondOperand = true; // Next digit will start a new number
+                return;
+            }
+
+            // Default case for number buttons
+            inputDigit(target.textContent);
+        });
+
+        // Initial display update when the page loads
+        updateDisplay();
+    </script>
+</body>
+</html>

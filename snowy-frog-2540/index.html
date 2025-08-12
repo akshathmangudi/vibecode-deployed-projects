@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f7f6;
+            padding-top: 50px;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 28px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 12px 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 18px;
+            box-sizing: border-box;
+            -moz-appearance: textfield;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Temperature Converter</h1>
+
+        <div class="input-group">
+            <label for="celsius">Celsius (°C):</label>
+            <input type="number" id="celsius" oninput="convertTemperature('celsius')">
+        </div>
+
+        <div class="input-group">
+            <label for="fahrenheit">Fahrenheit (°F):</label>
+            <input type="number" id="fahrenheit" oninput="convertTemperature('fahrenheit')">
+        </div>
+
+        <div class="input-group">
+            <label for="kelvin">Kelvin (K):</label>
+            <input type="number" id="kelvin" oninput="convertTemperature('kelvin')">
+        </div>
+    </div>
+
+    <script>
+        function convertTemperature(sourceUnit) {
+            const celsiusInput = document.getElementById('celsius');
+            const fahrenheitInput = document.getElementById('fahrenheit');
+            const kelvinInput = document.getElementById('kelvin');
+
+            let value;
+
+            switch (sourceUnit) {
+                case 'celsius':
+                    value = parseFloat(celsiusInput.value);
+                    if (isNaN(value)) {
+                        fahrenheitInput.value = '';
+                        kelvinInput.value = '';
+                        return;
+                    }
+                    fahrenheitInput.value = (value * 9/5 + 32).toFixed(2);
+                    kelvinInput.value = (value + 273.15).toFixed(2);
+                    break;
+
+                case 'fahrenheit':
+                    value = parseFloat(fahrenheitInput.value);
+                    if (isNaN(value)) {
+                        celsiusInput.value = '';
+                        kelvinInput.value = '';
+                        return;
+                    }
+                    celsiusInput.value = ((value - 32) * 5/9).toFixed(2);
+                    kelvinInput.value = ((value - 32) * 5/9 + 273.15).toFixed(2);
+                    break;
+
+                case 'kelvin':
+                    value = parseFloat(kelvinInput.value);
+                    if (isNaN(value)) {
+                        celsiusInput.value = '';
+                        fahrenheitInput.value = '';
+                        return;
+                    }
+                    celsiusInput.value = (value - 273.15).toFixed(2);
+                    fahrenheitInput.value = ((value - 273.15) * 9/5 + 32).toFixed(2);
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>

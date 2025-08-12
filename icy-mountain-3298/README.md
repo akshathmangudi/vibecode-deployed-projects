@@ -1,0 +1,4 @@
+# icy-mountain-3298
+
+Prompt:
+> Create a simple HTML webpage that displays a dynamic math quiz for 8th-grade students. The quiz should have 5 multiple-choice questions with a single correct answer. The questions should cover topics like algebra, geometry, and basic arithmetic. Include a 'Submit' button. After submission, display the score. Use JavaScript for the dynamic functionality. Ensure it's visually appealing and easy to understand. The questions should be randomly selected from a predefined question bank. The question bank should include at least 10 questions per topic (algebra, geometry, arithmetic).

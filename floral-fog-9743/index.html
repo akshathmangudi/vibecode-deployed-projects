@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desk Improvement Suggestions</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: #333;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2.2em;
+        }
+
+        p {
+            color: #555;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            font-size: 1.1em;
+        }
+
+        .action-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-bottom: 30px;
+        }
+
+        .action-button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .action-button:active {
+            transform: translateY(0);
+        }
+
+        #suggestions-output {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: left;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.5s ease-out, max-height 0.7s ease-out;
+            visibility: hidden;
+        }
+
+        #suggestions-output.visible {
+            opacity: 1;
+            max-height: 1000px; /* Arbitrarily large enough to show content */
+            visibility: visible;
+        }
+
+        #suggestions-output h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        #suggestions-output ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        #suggestions-output li {
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            padding: 15px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-start;
+            font-size: 1.05em;
+            line-height: 1.5;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+
+        #suggestions-output li:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        #suggestions-output li::before {
+            content: '✓';
+            color: #4CAF50;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 1.3em;
+            line-height: 1;
+        }
+
+        @media (min-width: 600px) {
+            #suggestions-output ul {
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            p {
+                font-size: 1em;
+            }
+
+            .action-button {
+                padding: 12px 20px;
+                font-size: 1.1em;
+            }
+
+            #suggestions-output h2 {
+                font-size: 1.5em;
+            }
+
+            #suggestions-output li {
+                font-size: 0.95em;
+                padding: 12px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Desk Setup Improvement Suggestions</h1>
+        <p>
+            Is your desk a battlefield of cables, peripherals, and miscellaneous items? 
+            Let's transform your cluttered space into a haven of productivity and aesthetic pleasure. 
+            Click the button below to get actionable tips for organizing and beautifying your workstation.
+        </p>
+        <button class="action-button" id="getSuggestionsBtn">Get Improvement Tips</button>
+
+        <div id="suggestions-output">
+            <h2>Our Top Recommendations</h2>
+            <ul id="suggestions-list">
+                <!-- Suggestions will be populated here by JavaScript -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const getSuggestionsBtn = document.getElementById('getSuggestionsBtn');
+            const suggestionsOutput = document.getElementById('suggestions-output');
+            const suggestionsList = document.getElementById('suggestions-list');
+
+            const suggestions = [
+                "**Cable Management:** Use cable ties, sleeves, or cable management boxes/trays to hide and organize power and data cables, keeping them off the desk surface.",
+                "**Monitor Arm/Riser:** Elevate your monitors to eye level using a VESA-compatible arm or a sturdy riser. This frees up significant desk space underneath.",
+                "**Vertical Organizers:** Utilize stackable trays, pen holders, or small multi-tier shelves for stationery, documents, and small electronics like hard drives or charging docks.",
+                "**Drawer Dividers:** Keep your drawers tidy and functional with dividers for pens, USB sticks, chargers, small tools, and other components, preventing them from mixing.",
+                "**Regular Decluttering:** Make it a habit to remove items that don't belong or aren't used daily. A 'less is more' philosophy greatly reduces visual noise.",
+                "**Designated Spots:** Assign a specific, easily accessible spot for every item (e.g., keyboard under monitor, mouse pad on right, headphones on a stand).",
+                "**Consistent Color Scheme:** Choose a primary and an accent color for your desk accessories, peripherals, and decor to create a cohesive and harmonious look.",
+                "**Thoughtful Lighting:** Add a desk lamp for task lighting or an LED strip behind your monitor for ambient bias lighting to reduce eye strain and enhance aesthetics.",
+                "**Personalize Wisely:** Incorporate a small plant, a framed photo, or a piece of art. Avoid excessive decorative items that add to clutter.",
+                "**Clean Surfaces:** Regularly dust and wipe down your desk surface, keyboard, monitor, and other equipment. A clean surface instantly improves the overall feel.",
+                "**Minimalist Peripherals:** Opt for sleek, simple designs for your keyboard, mouse, and speakers if you're looking for a cleaner, modern aesthetic.",
+                "**Hidden Storage:** Utilize decorative boxes, closed storage units, or opaque containers to hide items that don't need to be visible but are still necessary."
+            ];
+
+            getSuggestionsBtn.addEventListener('click', () => {
+                // Clear existing suggestions
+                suggestionsList.innerHTML = ''; 
+
+                // Populate suggestions
+                suggestions.forEach(tip => {
+                    const listItem = document.createElement('li');
+                    
+                    // Basic Markdown-like bolding for readability
+                    const parts = tip.split('**');
+                    if (parts.length > 2) {
+                        const boldText = document.createElement('strong');
+                        boldText.textContent = parts[1];
+                        listItem.appendChild(boldText);
+                        listItem.appendChild(document.createTextNode(parts[2]));
+                    } else {
+                        listItem.textContent = tip;
+                    }
+                    
+                    suggestionsList.appendChild(listItem);
+                });
+
+                // Show the suggestions area with a transition
+                suggestionsOutput.classList.add('visible');
+                getSuggestionsBtn.style.display = 'none'; // Optionally hide button after showing tips
+            });
+        });
+    </script>
+</body>
+</html>

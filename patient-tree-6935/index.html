@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impossible Click Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #282c34;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            user-select: none; /* Prevent text selection */
+            cursor: default;
+        }
+
+        #game-container {
+            position: relative;
+            width: 90vw;
+            height: 90vh;
+            max-width: 1000px;
+            max-height: 700px;
+            border: 3px dashed #61dafb;
+            border-radius: 15px;
+            background-color: #1a1a1a;
+            box-shadow: 0 0 20px rgba(97, 218, 251, 0.5);
+            overflow: hidden; /* Keep confetti and button inside */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px; /* Space for the title */
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #61dafb;
+            font-size: 2.5em;
+            margin-bottom: 50px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        #impossible-button {
+            position: absolute;
+            padding: 18px 35px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #e0f7fa;
+            color: #282c34;
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s ease-out; /* Smooth movement transition */
+            will-change: transform; /* Hint to browser for animation optimization */
+            white-space: nowrap;
+        }
+
+        #impossible-button:hover {
+            transform: scale(1.05); /* Slight hover effect, though it'll move */
+        }
+
+        .confetti {
+            position: absolute;
+            opacity: 1;
+            animation: confetti-fall 2s forwards;
+            pointer-events: none; /* Ensure confetti doesn't block clicks */
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--x-move), var(--y-move)) rotate(var(--rot));
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>Impossible Click Game</h1>
+        <button id="impossible-button">Click Here</button>
+    </div>
+
+    <script>
+        const gameContainer = document.getElementById('game-container');
+        const impossibleButton = document.getElementById('impossible-button');
+        const h1Element = document.querySelector('h1');
+
+        let gameRect; // Stores the dimensions and position of the game container
+
+        function updateGameRect() {
+            gameRect = gameContainer.getBoundingClientRect();
+        }
+
+        // Call initially and on window resize
+        updateGameRect();
+        window.addEventListener('resize', updateGameRect);
+
+        function setButtonPosition(x, y) {
+            impossibleButton.style.left = `${x}px`;
+            impossibleButton.style.top = `${y}px`;
+        }
+
+        function getRandomPosition() {
+            const buttonRect = impossibleButton.getBoundingClientRect();
+            const h1Height = h1Element.offsetHeight;
+            const padding = 20; // Padding from game container edges
+
+            const maxX = gameRect.width - buttonRect.width - padding;
+            const maxY = gameRect.height - buttonRect.height - padding;
+
+            // Ensure button stays within container and below the H1
+            let newX = Math.random() * (maxX - padding) + padding;
+            let newY = Math.random() * (maxY - h1Height - padding) + h1Height + padding;
+
+            // Clamp values to ensure they are within bounds
+            newX = Math.max(padding, Math.min(newX, maxX));
+            newY = Math.max(h1Height + padding, Math.min(newY, maxY));
+
+            return { x: newX, y: newY };
+        }
+
+        function moveButtonRandomly() {
+            const newPos = getRandomPosition();
+            setButtonPosition(newPos.x, newPos.y);
+        }
+
+        // Initial button placement
+        moveButtonRandomly();
+
+        // Button movement on mouseover
+        impossibleButton.addEventListener('mouseover', () => {
+            moveButtonRandomly();
+        });
+
+        // Confetti on click
+        impossibleButton.addEventListener('click', (e) => {
+            createConfetti(e.clientX, e.clientY);
+            h1Element.textContent = "YOU DID IT!";
+            h1Element.style.color = '#ffcc00'; // Change color on success
+            impossibleButton.style.display = 'none'; // Hide button after success
+        });
+
+        function createConfetti(clickX, clickY) {
+            const confettiCount = 60;
+            const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#F1B22E'];
+
+            // Calculate click position relative to game container
+            const relativeClickX = clickX - gameRect.left;
+            const relativeClickY = clickY - gameRect.top;
+
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = `${Math.random() * 10 + 5}px`; // 5-15px
+                confetti.style.height = confetti.style.width;
+                confetti.style.borderRadius = `${Math.random() > 0.5 ? 50 : 0}%`; // Mix circles and squares
+
+                // Initial position of confetti relative to gameContainer
+                confetti.style.left = `${relativeClickX}px`;
+                confetti.style.top = `${relativeClickY}px`;
+
+                // Apply animation variables (relative to its starting position for transform)
+                const angle = Math.random() * Math.PI * 2; // Full circle for initial scatter direction
+                const initialScatterDistance = Math.random() * 60; // Scatter from center (0-60px)
+                const startX = Math.cos(angle) * initialScatterDistance;
+                const startY = Math.sin(angle) * initialScatterDistance;
+
+                const fallDistance = Math.random() * 250 + 150; // How far down it falls (150-400px)
+                const horizontalDrift = Math.random() * 200 - 100; // Drift left/right (-100 to 100px)
+
+                confetti.style.setProperty('--x-move', `${startX + horizontalDrift}px`);
+                confetti.style.setProperty('--y-move', `${startY + fallDistance}px`);
+                confetti.style.setProperty('--rot', `${Math.random() * 720 - 360}deg`); // Rotation (-360 to 360 degrees)
+
+                confetti.style.animationDelay = `${i * 0.01}s`; // Stagger animation start
+                confetti.style.animationDuration = `${Math.random() * 1 + 1.5}s`; // Vary animation duration
+
+                gameContainer.appendChild(confetti);
+
+                // Remove confetti after its animation ends to clean up DOM
+                confetti.addEventListener('animationend', () => {
+                    confetti.remove();
+                });
+            }
+        }
+    </script>
+</body>
+</html>
+EOT;
+}
+
+?>

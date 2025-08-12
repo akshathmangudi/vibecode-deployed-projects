@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grapes Galore!</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='-5' y='90' font-size='90'%3E%F0%9F%8D%87%3C/text%3E%3C/svg%3E" type="image/svg+xml">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8f0;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #6a004b;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2.8em;
+            letter-spacing: -0.5px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: #8c006b;
+            border-radius: 2px;
+        }
+
+        h2 {
+            color: #8c006b;
+            font-size: 1.8em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+
+        ul li {
+            background-color: #f9f9f9;
+            margin-bottom: 8px;
+            padding: 10px 15px;
+            border-left: 5px solid #a3007f;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .interactive-section {
+            background-color: #e6ffe6;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 30px;
+            text-align: center;
+            box-shadow: inset 0 0 10px rgba(0, 128, 0, 0.1);
+        }
+
+        #grapeFact {
+            font-size: 1.2em;
+            font-style: italic;
+            color: #2c5f2c;
+            min-height: 40px; /* Ensure space for fact */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        #factButton {
+            background-color: #8c006b;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            outline: none;
+        }
+
+        #factButton:hover {
+            background-color: #a3007f;
+            transform: translateY(-2px);
+        }
+
+        #factButton:active {
+            background-color: #6a004b;
+            transform: translateY(0);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #777;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍇 Grapes Galore! 🍇</h1>
+        <p>Grapes are a truly fascinating fruit, enjoyed by cultures around the globe for thousands of years. Whether fresh, dried as raisins, or fermented into wine, these juicy berries are a versatile and delicious treat, growing in beautiful clusters on vines.</p>
+
+        <section class="info-section">
+            <h2>Types of Grapes</h2>
+            <ul>
+                <li><strong>Table Grapes:</strong> These are varieties grown to be eaten fresh, known for their crisp texture and sweet flavor. Popular examples include Thompson Seedless, Concord, and Crimson Seedless.</li>
+                <li><strong>Wine Grapes:</strong> With hundreds of unique varieties, wine grapes are cultivated specifically for winemaking. Famous types include Chardonnay, Merlot, Pinot Noir, and Cabernet Sauvignon, each contributing distinct characteristics to wines.</li>
+                <li><strong>Raisin Grapes:</strong> Often seedless varieties like Thompson Seedless are carefully dried under the sun or by mechanical means to produce plump, sweet raisins, a popular snack and baking ingredient.</li>
+            </ul>
+        </section>
+
+        <section class="info-section">
+            <h2>Health Benefits</h2>
+            <p>Beyond their delicious taste, grapes are packed with essential nutrients! They are a good source of Vitamin C and K, and rich in powerful antioxidants, particularly resveratrol, which has been linked to various health benefits, including supporting heart health and combating oxidative stress.</p>
+        </section>
+
+        <section class="interactive-section">
+            <h2>Did You Know?</h2>
+            <p id="grapeFact">Click the button below to discover a surprising fact about grapes!</p>
+            <button id="factButton">Show Me a Fact!</button>
+        </section>
+
+        <footer>
+            <p>&copy; 2023 Grapes Galore! All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const factButton = document.getElementById('factButton');
+            const grapeFactParagraph = document.getElementById('grapeFact');
+
+            const grapeFacts = [
+                "There are over 8,000 varieties of grapes cultivated worldwide!",
+                "The word 'grape' comes from an Old French word 'grape', meaning a bunch of grapes.",
+                "Grapes are technically berries and grow on woody perennial vines.",
+                "Grape seeds can be pressed to produce grapeseed oil, used in cooking and cosmetics.",
+                "A 'viticulturist' is a person who studies or practices the science of grape production.",
+                "The oldest known grape vine, 'The Old Vine' in Maribor, Slovenia, is over 400 years old and still bears fruit!",
+                "It takes approximately 2.5 pounds of grapes to make one bottle of wine.",
+                "California produces about 90% of all grapes grown in the United States.",
+                "Grapes were first cultivated by humans around 6,000-8,000 years ago in the Near East."
+            ];
+
+            let lastFactIndex = -1;
+
+            factButton.addEventListener('click', () => {
+                let newIndex;
+                do {
+                    newIndex = Math.floor(Math.random() * grapeFacts.length);
+                } while (newIndex === lastFactIndex && grapeFacts.length > 1); // Avoid immediate repeats if possible
+
+                grapeFactParagraph.textContent = grapeFacts[newIndex];
+                lastFactIndex = newIndex;
+            });
+
+            // Initial fact display on load for the first click experience
+            grapeFactParagraph.textContent = "Click the button below to discover a surprising fact about grapes!";
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Page</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            text-align: center;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px 60px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+        }
+
+        h1 {
+            color: #4CAF50;
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            transition: color 0.5s ease-in-out;
+        }
+
+        p {
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hello Page!</h1>
+        <p>This is a simple single-file web application.</p>
+        <p>It's fully self-contained with HTML, CSS, and JavaScript.</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Hello Page loaded successfully!');
+            const greetingElement = document.querySelector('h1');
+
+            function toggleColor() {
+                if (greetingElement.style.color === 'rgb(76, 175, 80)') { /* #4CAF50 */
+                    greetingElement.style.color = '#2196F3'; /* Blue */
+                } else {
+                    greetingElement.style.color = '#4CAF50'; /* Green */
+                }
+            }
+
+            if (greetingElement) {
+                // Change color every 2 seconds for a simple animation
+                setInterval(toggleColor, 2000);
+            }
+        });
+    </script>
+</body>
+</html>

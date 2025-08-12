@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>बिलिंग सारांश</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .invoice-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        .invoice-details {
+            text-align: right;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .invoice-details strong {
+            color: #555;
+        }
+
+        #welcome-message {
+            background-color: #eaf6ff; /* Light blue */
+            color: #0056b3; /* Darker blue text */
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin-bottom: 30px; /* Space it out from the next section */
+            font-size: 1.1em;
+            text-align: center;
+            border: 1px solid #cceeff;
+        }
+
+        .quote-of-the-day-section {
+            background-color: #f0fdf4; /* Light green */
+            color: #28a745; /* Darker green text */
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            border: 1px solid #d4edda;
+        }
+
+        .quote-of-the-day-section h2 {
+            color: #28a745; /* Match text color */
+            border-bottom: 1px solid #d4edda;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        #quote-of-the-day {
+            font-style: italic;
+            font-size: 1.1em;
+            text-align: center;
+            margin: 10px 0;
+            padding: 0;
+            border-left: 5px solid #28a745;
+            padding-left: 15px;
+        }
+
+        /* New Movie Section Styles */
+        .movie-of-the-day-section {
+            background-color: #fcf4ff; /* Light purple */
+            color: #8a2be2; /* Darker purple text */
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            border: 1px solid #e7d8ed;
+        }
+
+        .movie-of-the-day-section h2 {
+            color: #8a2be2; /* Match text color */
+            border-bottom: 1px solid #e7d8ed;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        #movie-of-the-day-content {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        #movie-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #6a0dad; /* Even darker purple */
+            margin-bottom: 5px;
+        }
+
+        #movie-genre, #movie-year {
+            font-size: 0.95em;
+            color: #555;
+            margin-bottom: 3px;
+        }
+
+        /* New Hero Section Styles */
+        .hero-of-the-day-section {
+            background-color: #fff0f0; /* Light reddish/pink */
+            color: #d64a4a; /* Darker red */
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            border: 1px solid #ffcccc;
+        }
+
+        .hero-of-the-day-section h2 {
+            color: #d64a4a; /* Match text color */
+            border-bottom: 1px solid #ffcccc;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        #hero-of-the-day-content {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        #hero-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #a72d2d; /* Even darker red */
+            margin-bottom: 5px;
+        }
+
+        #hero-description, #hero-powers {
+            font-size: 0.95em;
+            color: #555;
+            margin-bottom: 3px;
+        }
+
+        section {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #34495e;
+            font-size: 1.6em;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+
+        .billed-to address {
+            font-style: normal;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .line-items table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .line-items th,
+        .line-items td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9em;
+        }
+
+        .line-items thead th {
+            background-color: #f0f4f7;
+            color: #4a6a8a;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .line-items tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .summary {
+            float: right;
+            width: 45%;
+            margin-top: 20px;
+            clear: both; /* Ensures it's below the table */
+            padding-top: 10px;
+        }
+
+        .summary-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 1em;
+            color: #555;
+        }
+
+        .summary-line.total-line {
+            font-weight: bold;
+            font-size: 1.3em;
+            color: #2c3e50;
+            border-top: 2px solid #eee;
+            padding-top: 15px;
+            margin-top: 10px;
+        }
+
+        .currency-converter {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            clear: both; /* Ensure it starts on a new line after summary */
+        }
+
+        .converter-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .converter-controls label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .converter-controls select {
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: white;
+            transition: border-color 0.3s ease;
+        }
+
+        .converter-controls select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .payment-info {
+            clear: both; /* Ensures it's below the summary and converter */
+            margin-top: 40px;
+            line-height: 1.7;
+            color: #555;
+        }
+
+        .payment-info p {
+            margin-bottom: 8px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        #payment-status {
+            margin-top: 20px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #e6ffe6;
+            color: #28a745;
+            font-weight: bold;
+            border: 1px solid #c3e6cb;
+            display: none;
+        }
+
+        /* New Chat Section Styles */
+        .chat-section {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #fcfcfc;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .chat-section h2 {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        #chat-window {
+            height: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 15px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-message {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            line-height: 1.4;
+            font-size: 0.95em;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: #e0f2f7; /* Light blue */
+            color: #333;
+            border-bottom-right-radius: 4px;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background-color: #f0f0f0; /* Light gray */
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+
+        #chat-input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        #chat-input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        #chat-input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        #send-chat-button {
+            padding: 12px 20px;
+            white-space: nowrap; /* Prevent button text from wrapping */
+            margin-top: 0; /* Override default button margin */
+        }
+
+        /* New Donate/Collect Section Styles */
+        .donate-collect-section {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f9fdfc; /* Very light blue-green */
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            text-align: center;
+        }
+
+        .donate-collect-section h2 {
+            border-bottom: 1px solid #e2f0f0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: #2c7a7b; /* Dark teal */
+        }
+
+        .donate-collect-controls {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        #amount-input {
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            width: 150px; /* Fixed width for input */
+            text-align: right;
+        }
+
+        .donate-collect-buttons button {
+            margin: 0 5px; /* Adjust button spacing */
+            margin-top: 0; /* Override default button margin */
+        }
+
+        #donate-button {
+            background-color: #e74c3c; /* Red for donating (money leaving) */
+        }
+
+        #donate-button:hover {
+            background-color: #c0392b;
+        }
+
+        #collect-button {
+            background-color: #2ecc71; /* Green for collecting (money coming in) */
+        }
+
+        #collect-button:hover {
+            background-color: #27ae60;
+        }
+
+        #transaction-status {
+            margin-top: 20px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: none; /* Hidden by default */
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        #transaction-status.success {
+            background-color: #e6ffe6;
+            color: #28a745;
+            border: 1px solid #c3e6cb;
+        }
+
+        #transaction-status.error {
+            background-color: #ffe6e6;
+            color: #d64a4a;
+            border: 1px solid #ffcccc;
+        }
+
+        #transaction-status.processing {
+            background-color: #eaf6ff;
+            color: #0056b3;
+            border: 1px solid #cceeff;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #888;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <header>
+            <h1>चालान</h1>
+            <div class="invoice-details">
+                <div><strong>चालान आईडी:</strong> <span id="invoice-id">#INV-2023-001</span></div>
+                <div><strong>दिनांक:</strong> <span id="invoice-date">2023-10-27</span></div>
+                <div><strong>देय तिथि:</strong> <span id="due-date">2023-11-27</span></div>
+            </div>
+        </header>
+
+        <p id="welcome-message">meow meow</p>
+
+        <section class="quote-of-the-day-section">
+            <h2>आज का सुविचार</h2>
+            <blockquote id="quote-of-the-day">
+                <!-- Quote will be inserted here by JavaScript -->
+            </blockquote>
+        </section>
+
+        <!-- New Movie of the Day Section -->
+        <section class="movie-of-the-day-section">
+            <h2>आज की मूवी</h2>
+            <div id="movie-of-the-day-content">
+                <h3 id="movie-title"></h3>
+                <p id="movie-genre"></p>
+                <p id="movie-year"></p>
+            </div>
+        </section>
+
+        <!-- New Hero of the Day Section -->
+        <section class="hero-of-the-day-section">
+            <h2>आज का नायक</h2>
+            <div id="hero-of-the-day-content">
+                <h3 id="hero-name"></h3>
+                <p id="hero-description"></p>
+                <p id="hero-powers"></p>
+            </div>
+        </section>
+
+        <section class="billed-to">
+            <h2>बिल भेजा गया:</h2>
+            <address>
+                <strong id="customer-name">John Doe</strong><br>
+                <span id="customer-address-line1">123 Main St</span><br>
+                <span id="customer-address-line2">Anytown, USA 12345</span><br>
+                <span id="customer-email">john.doe@example.com</span>
+            </address>
+        </section>
+
+        <section class="line-items">
+            <h2>वस्तुएं</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>विवरण</th>
+                        <th>मात्रा</th>
+                        <th>इकाई मूल्य</th>
+                        <th>कुल</th>
+                    </tr>
+                </thead>
+                <tbody id="line-items-body">
+                    <!-- Items will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </section>
+
+        <section class="summary">
+            <div class="summary-line">
+                <span>उपयोग:</span>
+                <span id="subtotal">₹0.00</span>
+            </div>
+            <div class="summary-line">
+                <span>कर (8%):</span>
+                <span id="tax">₹0.00</span>
+            </div>
+            <div class="summary-line total-line">
+                <span>कुल देय:</span>
+                <span id="grand-total">₹0.00</span>
+            </div>
+        </section>
+
+        <section class="currency-converter">
+            <h2>मुद्रा परिवर्तक</h2>
+            <div class="converter-controls">
+                <label for="currency-select">इनवॉइस मुद्रा में देखें:</label>
+                <select id="currency-select">
+                    <option value="INR" selected>भारतीय रुपया (₹)</option>
+                    <option value="USD">अमेरिकी डॉलर ($)</option>
+                    <option value="EUR">यूरो (€)</option>
+                    <option value="GBP">ब्रिटिश पाउंड (£)</option>
+                    <option value="JPY">जापानी येन (¥)</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="payment-info">
+            <h2>भुगतान जानकारी</h2>
+            <p>कृपया हमारे बैंक खाते में भुगतान करें या "अभी भुगतान करें" बटन का उपयोग करें:</p>
+            <p><strong>बैंक का नाम:</strong> Example Bank</p>
+            <p><strong>खाता नाम:</strong> Your Company LLC</p>
+            <p><strong>खाता संख्या:</strong> 1234567890</p>
+            <p><strong>स्विफ्ट/बीआईसी:</strong> EXAMPLBANK</p>
+            <button id="pay-now-button">अभी भुगतान करें</button>
+            <div id="payment-status" style="display: none;"></div>
+        </section>
+
+        <section class="help-section">
+            <h2>सहायता केंद्र</h2>
+            <p>इस बिल के संबंध में आपके किसी भी प्रश्न के लिए, कृपया हमसे संपर्क करें।</p>
+            <p>आपकी सुविधा के लिए, बिल में दी गई सभी राशि भारतीय रुपये (INR) में हैं। आप मुद्रा परिवर्तक का उपयोग करके इसे अन्य मुद्राओं में देख सकते हैं।</p>
+            <p>यदि आपको भुगतान में कोई समस्या आती है या विवरण में कोई विसंगति मिलती है, तो तुरंत हमसे संपर्क करें।</p>
+            <p><strong>संपर्क ईमेल:</strong> <a href="mailto:support@example.com">support@example.com</a></p>
+            <p><strong>संपर्क फोन:</strong> +91-1234567890</p>
+        </section>
+
+        <!-- New AI Chat Section -->
+        <section class="chat-section">
+            <h2>AI सहायक से चैट करें</h2>
+            <div id="chat-window">
+                <div class="ai-message chat-message">नमस्ते! मैं एक AI सहायक हूँ। मैं आपकी कैसे मदद कर सकता हूँ?</div>
+            </div>
+            <div id="chat-input-container">
+                <input type="text" id="chat-input" placeholder="यहां अपना संदेश टाइप करें..." aria-label="Chat input">
+                <button id="send-chat-button">भेजें</button>
+            </div>
+        </section>
+
+        <!-- New Donate/Collect Section -->
+        <section class="donate-collect-section">
+            <h2>धनराशि प्रबंधित करें</h2>
+            <p>एक राशि दर्ज करें और उसे दान करने या एकत्र करने का विकल्प चुनें।</p>
+            <div class="donate-collect-controls">
+                <span>राशि (₹):</span>
+                <input type="number" id="amount-input" value="100.00" min="0.01" step="0.01" aria-label="Amount for donation or collection">
+                <div class="donate-collect-buttons">
+                    <button id="donate-button">दान करें</button>
+                    <button id="collect-button">एकत्र करें</button>
+                </div>
+            </div>
+            <div id="transaction-status" class="processing"></div>
+        </section>
+
+        <footer>
+            <p>आपके व्यवसाय के लिए धन्यवाद! हम आपके शीघ्र भुगतान की सराहना करते हैं।</p>
+        </footer>
+    </div>
+
+    <script>
+        // Global variables to store base amounts
+        let baseSubtotal = 0;
+        let baseTax = 0;
+        let baseGrandTotal = 0;
+        let currentDisplayCurrency = 'INR'; // Default currency
+
+        const items = [
+            { description: 'Premium Hosting Service (Oct 2023)', qty: 1, unitPrice: 50.00 },
+            { description: 'Domain Registration (example.com)', qty: 1, unitPrice: 15.00 },
+            { description: 'SSL Certificate Renewal', qty: 1, unitPrice: 25.00 },
+            { description: 'Technical Support (3 hrs)', qty: 3, unitPrice: 40.00 }
+        ];
+        const taxRate = 0.08; // 8%
+
+        const exchangeRates = {
+            'INR': 1.0, // Base currency (Indian Rupee)
+            'USD': 0.012, // 1 INR = 0.012 USD (illustrative rate)
+            'EUR': 0.011, // 1 INR = 0.011 EUR (illustrative rate)
+            'GBP': 0.0095, // 1 INR = 0.0095 GBP (illustrative rate)
+            'JPY': 1.8,    // 1 INR = 1.8 JPY (illustrative rate)
+        };
+
+        const currencySymbols = {
+            'INR': '₹',
+            'USD': '$',
+            'EUR': '€',
+            'GBP': '£',
+            'JPY': '¥',
+        };
+
+        const quotes = [
+            "कर्म ही पूजा है।", // Work is worship.
+            "ज्ञान ही शक्ति है।", // Knowledge is power.
+            "स्वास्थ्य ही धन है।", // Health is wealth.
+            "सत्यमेव जयते।", // Truth alone triumphs.
+            "मन के हारे हार है, मन के जीते जीत।" // If you lose from mind, you lose; if you win from mind, you win.
+        ];
+
+        const movies = [
+            { title: "शोले", genre: "एक्शन, एडवेंचर", year: "1975" }, // Sholay
+            { title: "दिलवाले दुल्हनिया ले जाएंगे", genre: "रोमांस, ड्रामा", year: "1995" }, // Dilwale Dulhania Le Jayenge
+            { title: "लगान", genre: "ड्रामा, स्पोर्ट", year: "2001" }, // Lagaan
+            { title: "3 इडियट्स", genre: "कॉमेडी, ड्रामा", year: "2009" }, // 3 Idiots
+            { title: "पीके", genre: "कॉमेडी, फैंटेसी", year: "2014" }, // PK
+            { title: "दंगल", genre: "बायोग्राफी, स्पोर्ट, ड्रामा", year: "2016" } // Dangal
+        ];
+
+        const heroes = [
+            { name: "महात्मा गांधी", description: "भारत के स्वतंत्रता आंदोलन के प्रमुख नेता और अहिंसक प्रतिरोध के प्रणेता।", powers: "अहिंसा, सत्याग्रह" },
+            { name: "कल्पना चावला", description: "भारतीय मूल की पहली महिला अंतरिक्ष यात्री।", powers: "अंतरिक्ष अन्वेषण, इंजीनियरिंग" },
+            { name: "डॉ. ए. पी. जे. अब्दुल कलाम", description: "भारत के पूर्व राष्ट्रपति और एक प्रख्यात वैज्ञानिक।", powers: "मिसाइल प्रौद्योगिकी, शिक्षा" },
+            { name: "मदर टेरेसा", description: "नोबेल शांति पुरस्कार विजेता और गरीबों व बीमारों की सेवा के लिए समर्पित।", powers: "करुणा, निःस्वार्थ सेवा" },
+            { name: "सरदार वल्लभभाई पटेल", description: "भारत के लौह पुरुष, जिन्होंने रियासतों के एकीकरण में महत्वपूर्ण भूमिका निभाई।", powers: "नेतृत्व, एकीकरण" },
+            { name: "लक्ष्मीबाई", description: "झांसी की रानी, 1857 के भारतीय विद्रोह की एक प्रमुख हस्ती।", powers: "वीरता, साहस" }
+        ];
+
+        const lineItemsBody = document.getElementById('line-items-body');
+        const subtotalSpan = document.getElementById('subtotal');
+        const taxSpan = document.getElementById('tax');
+        const grandTotalSpan = document.getElementById('grand-total');
+        const payNowButton = document.getElementById('pay-now-button');
+        const paymentStatusDiv = document.getElementById('payment-status');
+        const currencySelect = document.getElementById('currency-select');
+        const quoteOfTheDayElement = document.getElementById('quote-of-the-day');
+
+        // Movie of the Day elements
+        const movieTitleElement = document.getElementById('movie-title');
+        const movieGenreElement = document.getElementById('movie-genre');
+        const movieYearElement = document.getElementById('movie-year');
+
+        // Hero of the Day elements
+        const heroNameElement = document.getElementById('hero-name');
+        const heroDescriptionElement = document.getElementById('hero-description');
+        const heroPowersElement = document.getElementById('hero-powers');
+
+        // AI Chat elements
+        const chatWindow = document.getElementById('chat-window');
+        const chatInput = document.getElementById('chat-input');
+        const sendChatButton = document.getElementById('send-chat-button');
+
+        // Donate/Collect elements
+        const amountInput = document.getElementById('amount-input');
+        const donateButton = document.getElementById('donate-button');
+        const collectButton = document.getElementById('collect-button');
+        const transactionStatusDiv = document.getElementById('transaction-status');
+
+
+        function formatCurrency(amount, currencyCode = currentDisplayCurrency) {
+            const symbol = currencySymbols[currencyCode] || '';
+            return `${symbol}${amount.toFixed(2)}`;
+        }
+
+        // Calculates totals in the base currency (INR) and stores them
+        function calculateBaseTotals() {
+            let tempSubtotal = 0;
+            items.forEach(item => {
+                const itemTotal = item.qty * item.unitPrice;
+                tempSubtotal += itemTotal;
+            });
+
+            baseSubtotal = tempSubtotal;
+            baseTax = baseSubtotal * taxRate;
+            baseGrandTotal = baseSubtotal + baseTax;
+        }
+
+        // Renders all monetary values in the specified currency
+        function renderInvoiceDisplay(currencyCode) {
+            lineItemsBody.innerHTML = ''; // Clear existing rows
+
+            const rate = exchangeRates[currencyCode] || 1.0; // Fallback to 1.0 if currency not found
+
+            items.forEach(item => {
+                const itemTotalInBase = item.qty * item.unitPrice;
+                const convertedUnitPrice = item.unitPrice * rate;
+                const convertedItemTotal = itemTotalInBase * rate;
+
+                const row = lineItemsBody.insertRow();
+                row.insertCell().textContent = item.description;
+                row.insertCell().textContent = item.qty;
+                row.insertCell().textContent = formatCurrency(convertedUnitPrice, currencyCode);
+                row.insertCell().textContent = formatCurrency(convertedItemTotal, currencyCode);
+            });
+
+            subtotalSpan.textContent = formatCurrency(baseSubtotal * rate, currencyCode);
+            taxSpan.textContent = formatCurrency(baseTax * rate, currencyCode);
+            grandTotalSpan.textContent = formatCurrency(baseGrandTotal * rate, currencyCode);
+
+            currentDisplayCurrency = currencyCode; // Update global state
+        }
+
+        function displayQuoteOfTheDay() {
+            if (quoteOfTheDayElement) {
+                const randomIndex = Math.floor(Math.random() * quotes.length);
+                quoteOfTheDayElement.textContent = quotes[randomIndex];
+            }
+        }
+
+        function displayMovieOfTheDay() {
+            if (movieTitleElement && movieGenreElement && movieYearElement) {
+                const randomIndex = Math.floor(Math.random() * movies.length);
+                const movie = movies[randomIndex];
+                movieTitleElement.textContent = movie.title;
+                movieGenreElement.textContent = `शैली: ${movie.genre}`;
+                movieYearElement.textContent = `वर्ष: ${movie.year}`;
+            }
+        }
+
+        function displayHeroOfTheDay() {
+            if (heroNameElement && heroDescriptionElement && heroPowersElement) {
+                const randomIndex = Math.floor(Math.random() * heroes.length);
+                const hero = heroes[randomIndex];
+                heroNameElement.textContent = hero.name;
+                heroDescriptionElement.textContent = hero.description;
+                heroPowersElement.textContent = `विशेषता: ${hero.powers}`;
+            }
+        }
+
+        // AI Chat Functions
+        function appendMessage(sender, message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message');
+            messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
+            messageDiv.textContent = message;
+            chatWindow.appendChild(messageDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight; // Auto-scroll to the latest message
+        }
+
+        function getAiResponse(userMessage) {
+            const lowerCaseMessage = userMessage.toLowerCase();
+            if (lowerCaseMessage.includes('नमस्ते') || lowerCaseMessage.includes('hello') || lowerCaseMessage.includes('hi')) {
+                return "नमस्ते! मैं आपकी कैसे मदद कर सकता हूँ?";
+            } else if (lowerCaseMessage.includes('चालान') || lowerCaseMessage.includes('बिल') || lowerCaseMessage.includes('invoice') || lowerCaseMessage.includes('bill')) {
+                return "आप चालान या बिल के बारे में क्या जानना चाहते हैं? क्या आपको राशि, देय तिथि, या वस्तुओं के बारे में जानकारी चाहिए?";
+            } else if (lowerCaseMessage.includes('भुगतान') || lowerCaseMessage.includes('pay') || lowerCaseMessage.includes('payment')) {
+                return "भुगतान जानकारी 'भुगतान जानकारी' अनुभाग में दी गई है। आप 'अभी भुगतान करें' बटन का उपयोग भी कर सकते हैं।";
+            } else if (lowerCaseMessage.includes('धन्यवाद') || lowerCaseMessage.includes('thank you')) {
+                return "खुशी हुई कि मैं मदद कर सका! आपके कोई और प्रश्न हों तो बेझिझक पूछें।";
+            } else if (lowerCaseMessage.includes('मुद्रा') || lowerCaseMessage.includes('currency')) {
+                return "आप ऊपर दिए गए 'मुद्रा परिवर्तक' का उपयोग करके चालान को विभिन्न मुद्राओं में देख सकते हैं।";
+            } else if (lowerCaseMessage.includes('संपर्क') || lowerCaseMessage.includes('contact')) {
+                return "'सहायता केंद्र' अनुभाग में हमारी संपर्क जानकारी है। आप हमें ईमेल या फोन कर सकते हैं।";
+            } else if (lowerCaseMessage.includes('दान') || lowerCaseMessage.includes('donate')) {
+                return "आप दान अनुभाग का उपयोग करके राशि दान कर सकते हैं। बस राशि दर्ज करें और 'दान करें' पर क्लिक करें।";
+            } else if (lowerCaseMessage.includes('एकत्र') || lowerCaseMessage.includes('collect')) {
+                return "आप 'एकत्र करें' बटन का उपयोग करके किसी राशि को प्राप्त के रूप में दर्ज कर सकते हैं।";
+            }
+            else {
+                return "माफ़ कीजिए, मैं आपकी बात समझ नहीं पा रहा हूँ। क्या आप इसे और स्पष्ट कर सकते हैं या कोई और प्रश्न पूछ सकते हैं?";
+            }
+        }
+
+        function sendMessage() {
+            const userMessage = chatInput.value.trim();
+            if (userMessage === '') return;
+
+            appendMessage('user', userMessage);
+            chatInput.value = ''; // Clear input
+
+            // Simulate AI typing/thinking
+            setTimeout(() => {
+                const aiResponse = getAiResponse(userMessage);
+                appendMessage('ai', aiResponse);
+            }, 1000); // Respond after 1 second
+        }
+
+        // Donate/Collect Functions
+        function processTransaction(type) {
+            const amount = parseFloat(amountInput.value);
+
+            // Clear previous classes and hide
+            transactionStatusDiv.className = '';
+            transactionStatusDiv.style.display = 'none';
+
+            if (isNaN(amount) || amount <= 0) {
+                transactionStatusDiv.textContent = 'कृपया एक मान्य, धनात्मक राशि दर्ज करें।'; // Please enter a valid, positive amount.
+                transactionStatusDiv.classList.add('error');
+                transactionStatusDiv.style.display = 'block';
+                return;
+            }
+
+            // Disable buttons during processing
+            donateButton.disabled = true;
+            collectButton.disabled = true;
+            amountInput.disabled = true;
+
+            transactionStatusDiv.textContent = `राशि ${formatCurrency(amount, 'INR')} ${type === 'donate' ? 'दान' : 'एकत्र'} की जा रही है...`; // Amount is being donated/collected...
+            transactionStatusDiv.classList.add('processing');
+            transactionStatusDiv.style.display = 'block';
+
+            setTimeout(() => {
+                // Simulate success or failure
+                const success = Math.random() > 0.1; // 90% success rate
+
+                if (success) {
+                    transactionStatusDiv.textContent = `राशि ${formatCurrency(amount, 'INR')} सफलतापूर्वक ${type === 'donate' ? 'दान' : 'एकत्र'} की गई!`; // Amount successfully donated/collected!
+                    transactionStatusDiv.classList.add('success');
+                } else {
+                    transactionStatusDiv.textContent = `राशि ${formatCurrency(amount, 'INR')} ${type === 'donate' ? 'दान' : 'एकत्र'} करने में त्रुटि। कृपया पुनः प्रयास करें।`; // Error donating/collecting amount. Please try again.
+                    transactionStatusDiv.classList.add('error');
+                }
+
+                // Re-enable buttons and input
+                donateButton.disabled = false;
+                collectButton.disabled = false;
+                amountInput.disabled = false;
+
+                // Hide status after a few seconds
+                setTimeout(() => {
+                    transactionStatusDiv.style.display = 'none';
+                }, 5000);
+
+            }, 2000); // Simulate 2-second processing time
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            calculateBaseTotals(); // Calculate totals in base currency (INR) first
+            renderInvoiceDisplay(currentDisplayCurrency); // Render initially in INR
+            displayQuoteOfTheDay(); // Display a random quote
+            displayMovieOfTheDay(); // Display a random movie
+            displayHeroOfTheDay(); // Display a random hero
+
+            currencySelect.addEventListener('change', (event) => {
+                renderInvoiceDisplay(event.target.value);
+            });
+
+            payNowButton.addEventListener('click', () => {
+                payNowButton.disabled = true;
+                paymentStatusDiv.style.display = 'block';
+                paymentStatusDiv.textContent = 'भुगतान संसाधित हो रहा है... कृपया प्रतीक्षा करें।';
+                paymentStatusDiv.style.backgroundColor = '#f0f4f7';
+                paymentStatusDiv.style.color = '#34495e';
+                paymentStatusDiv.style.border = '1px solid #c9d8e5';
+
+                setTimeout(() => {
+                    paymentStatusDiv.textContent = 'भुगतान सफल रहा! आपके भुगतान के लिए धन्यवाद।';
+                    paymentStatusDiv.style.backgroundColor = '#e6ffe6';
+                    paymentStatusDiv.style.color = '#28a745';
+                    paymentStatusDiv.style.border = '1px solid #c3e6cb';
+                }, 2000);
+            });
+
+            // AI Chat Event Listeners
+            sendChatButton.addEventListener('click', sendMessage);
+            chatInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // Donate/Collect Event Listeners
+            donateButton.addEventListener('click', () => processTransaction('donate'));
+            collectButton.addEventListener('click', () => processTransaction('collect'));
+        });
+    </script>
+</body>
+</html>

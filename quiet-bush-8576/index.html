@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Booking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        #app {
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin: 0;
+        }
+        h2 {
+            color: #34495e;
+            font-size: 1.8em;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="date"],
+        .form-group input[type="time"],
+        .form-group select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+            width: calc(100% - 22px);
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.2s ease;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button + button {
+            margin-left: 10px;
+        }
+        .error-message {
+            color: #dc3545;
+            margin-top: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+        #vehicle-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .vehicle-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background-color: #fdfdfd;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .vehicle-card img {
+            max-width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .vehicle-card h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.4em;
+        }
+        .vehicle-card p {
+            margin: 5px 0;
+            font-size: 0.95em;
+            color: #666;
+        }
+        .vehicle-card .estimated-price {
+            font-weight: bold;
+            color: #28a745;
+            font-size: 1.2em;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+        .vehicle-card .book-btn {
+            background-color: #28a745;
+            width: 100%;
+        }
+        .vehicle-card .book-btn:hover {
+            background-color: #218838;
+        }
+        #booking-summary p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        #booking-summary p:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Vehicle Booking</h1>
+        </header>
+
+        <section id="search-section">
+            <h2>Find Your Ride</h2>
+            <div class="form-group">
+                <label for="vehicle-type">Vehicle Type:</label>
+                <select id="vehicle-type">
+                    <option value="any">Any</option>
+                    <option value="Car">Car</option>
+                    <option value="Van">Van</option>
+                    <option value="SUV">SUV</option>
+                    <option value="Motorcycle">Motorcycle</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="pickup-location">Pickup Location:</label>
+                <input type="text" id="pickup-location" value="Airport Terminal 1">
+            </div>
+            <div class="form-group">
+                <label for="dropoff-location">Dropoff Location:</label>
+                <input type="text" id="dropoff-location" value="Downtown Hotel">
+            </div>
+            <div class="form-group">
+                <label for="pickup-date">Pickup Date:</label>
+                <input type="date" id="pickup-date">
+            </div>
+            <div class="form-group">
+                <label for="pickup-time">Pickup Time:</label>
+                <input type="time" id="pickup-time">
+            </div>
+            <div class="form-group">
+                <label for="dropoff-date">Dropoff Date:</label>
+                <input type="date" id="dropoff-date">
+            </div>
+            <div class="form-group">
+                <label for="dropoff-time">Dropoff Time:</label>
+                <input type="time" id="dropoff-time">
+            </div>
+            <button id="search-btn">Search Vehicles</button>
+            <div id="search-error" class="error-message"></div>
+        </section>
+
+        <section id="results-section" style="display: none;">
+            <h2>Available Vehicles</h2>
+            <div id="vehicle-list">
+            </div>
+            <button id="back-to-search-from-results">Back to Search</button>
+        </section>
+
+        <section id="confirmation-section" style="display: none;">
+            <h2>Booking Confirmation</h2>
+            <div id="booking-summary">
+                <p><strong>Vehicle:</strong> <span id="conf-vehicle-name"></span> (<span id="conf-vehicle-type"></span>)</p>
+                <p><strong>Price per day:</strong> $<span id="conf-vehicle-price-per-day"></span></p>
+                <p><strong>Pickup:</strong> <span id="conf-pickup-location"></span> on <span id="conf-pickup-datetime"></span></p>
+                <p><strong>Dropoff:</strong> <span id="conf-dropoff-location"></span> on <span id="conf-dropoff-datetime"></span></p>
+                <p><strong>Duration:</strong> <span id="conf-duration"></span> day(s)</p>
+                <p><strong>Total Price:</strong> $<span id="conf-total-price"></span></p>
+            </div>
+            <button id="confirm-booking-btn">Confirm Booking</button>
+            <button id="back-to-results-from-confirm">Back to Results</button>
+        </section>
+    </div>
+
+    <script>
+        const vehicles = [
+            { id: 1, name: "Toyota Corolla", type: "Car", pricePerDay: 50, imageUrl: "https://via.placeholder.com/200x150/FF5733/FFFFFF?text=Car" },
+            { id: 2, name: "Honda CRV", type: "SUV", pricePerDay: 70, imageUrl: "https://via.placeholder.com/200x150/33FF57/FFFFFF?text=SUV" },
+            { id: 3, name: "Ford Transit", type: "Van", pricePerDay: 90, imageUrl: "https://via.placeholder.com/200x150/3357FF/FFFFFF?text=Van" },
+            { id: 4, name: "BMW 3 Series", type: "Car", pricePerDay: 80, imageUrl: "https://via.placeholder.com/200x150/F5A623/FFFFFF?text=Luxury+Car" },
+            { id: 5, name: "Harley Davidson", type: "Motorcycle", pricePerDay: 60, imageUrl: "https://via.placeholder.com/200x150/8A2BE2/FFFFFF?text=Motorcycle" },
+            { id: 6, name: "Nissan Qashqai", type: "SUV", pricePerDay: 65, imageUrl: "https://via.placeholder.com/200x150/20B2AA/FFFFFF?text=Compact+SUV" }
+        ];
+
+        const searchSection = document.getElementById('search-section');
+        const resultsSection = document.getElementById('results-section');
+        const confirmationSection = document.getElementById('confirmation-section');
+
+        const vehicleTypeSelect = document.getElementById('vehicle-type');
+        const pickupLocationInput = document.getElementById('pickup-location');
+        const dropoffLocationInput = document.getElementById('dropoff-location');
+        const pickupDateInput = document.getElementById('pickup-date');
+        const pickupTimeInput = document.getElementById('pickup-time');
+        const dropoffDateInput = document.getElementById('dropoff-date');
+        const dropoffTimeInput = document.getElementById('dropoff-time');
+        const searchButton = document.getElementById('search-btn');
+        const searchErrorDiv = document.getElementById('search-error');
+
+        const vehicleListDiv = document.getElementById('vehicle-list');
+        const backToSearchFromResultsBtn = document.getElementById('back-to-search-from-results');
+
+        const confVehicleName = document.getElementById('conf-vehicle-name');
+        const confVehicleType = document.getElementById('conf-vehicle-type');
+        const confVehiclePricePerDay = document.getElementById('conf-vehicle-price-per-day');
+        const confPickupLocation = document.getElementById('conf-pickup-location');
+        const confPickupDatetime = document.getElementById('conf-pickup-datetime');
+        const confDropoffLocation = document.getElementById('conf-dropoff-location');
+        const confDropoffDatetime = document.getElementById('conf-dropoff-datetime');
+        const confDuration = document.getElementById('conf-duration');
+        const confTotalPrice = document.getElementById('conf-total-price');
+        const confirmBookingBtn = document.getElementById('confirm-booking-btn');
+        const backToResultsFromConfirmBtn = document.getElementById('back-to-results-from-confirm');
+
+        let currentBookingDetails = {};
+
+        function showSection(sectionId) {
+            searchSection.style.display = 'none';
+            resultsSection.style.display = 'none';
+            confirmationSection.style.display = 'none';
+            document.getElementById(sectionId).style.display = 'block';
+        }
+
+        function calculateDuration(start, end) {
+            const diffTime = Math.abs(end.getTime() - start.getTime());
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays;
+        }
+
+        function renderVehicleList(filteredVehicles, durationDays) {
+            vehicleListDiv.innerHTML = '';
+            if (filteredVehicles.length === 0) {
+                vehicleListDiv.innerHTML = '<p style="text-align: center;">No vehicles found matching your criteria.</p>';
+                return;
+            }
+
+            filteredVehicles.forEach(vehicle => {
+                const totalEstimatedPrice = vehicle.pricePerDay * durationDays;
+                const vehicleCard = document.createElement('div');
+                vehicleCard.classList.add('vehicle-card');
+                vehicleCard.innerHTML = `
+                    <img src="${vehicle.imageUrl}" alt="${vehicle.name}">
+                    <h3>${vehicle.name}</h3>
+                    <p>Type: ${vehicle.type}</p>
+                    <p>Price per day: $${vehicle.pricePerDay}</p>
+                    <p class="estimated-price">Estimated Total: $${totalEstimatedPrice}</p>
+                    <button class="book-btn" data-vehicle-id="${vehicle.id}">Book This Vehicle</button>
+                `;
+                vehicleListDiv.appendChild(vehicleCard);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showSection('search-section');
+
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+
+            const formatDate = (date) => date.toISOString().split('T')[0];
+            const formatTime = (date) => date.toTimeString().split(' ')[0].substring(0, 5);
+
+            pickupDateInput.value = formatDate(today);
+            pickupTimeInput.value = formatTime(today);
+            dropoffDateInput.value = formatDate(tomorrow);
+            dropoffTimeInput.value = formatTime(tomorrow);
+        });
+
+        searchButton.addEventListener('click', () => {
+            const pickupDate = pickupDateInput.value;
+            const pickupTime = pickupTimeInput.value;
+            const dropoffDate = dropoffDateInput.value;
+            const dropoffTime = dropoffTimeInput.value;
+            const vehicleType = vehicleTypeSelect.value;
+            const pickupLocation = pickupLocationInput.value.trim();
+            const dropoffLocation = dropoffLocationInput.value.trim();
+
+            searchErrorDiv.textContent = '';
+
+            if (!pickupDate || !pickupTime || !dropoffDate || !dropoffTime || !pickupLocation || !dropoffLocation) {
+                searchErrorDiv.textContent = 'All fields are required.';
+                return;
+            }
+
+            const pickupDateTime = new Date(`${pickupDate}T${pickupTime}`);
+            const dropoffDateTime = new Date(`${dropoffDate}T${dropoffTime}`);
+
+            if (isNaN(pickupDateTime.getTime()) || isNaN(dropoffDateTime.getTime())) {
+                searchErrorDiv.textContent = 'Invalid date or time format.';
+                return;
+            }
+
+            if (pickupDateTime >= dropoffDateTime) {
+                searchErrorDiv.textContent = 'Dropoff date/time must be after pickup date/time.';
+                return;
+            }
+
+            const durationDays = calculateDuration(pickupDateTime, dropoffDateTime);
+
+            currentBookingDetails = {
+                pickupLocation,
+                dropoffLocation,
+                pickupDateTime,
+                dropoffDateTime,
+                durationDays
+            };
+
+            const filteredVehicles = vehicleType === 'any'
+                ? vehicles
+                : vehicles.filter(v => v.type === vehicleType);
+
+            renderVehicleList(filteredVehicles, durationDays);
+            showSection('results-section');
+        });
+
+        vehicleListDiv.addEventListener('click', (event) => {
+            if (event.target.classList.contains('book-btn')) {
+                const vehicleId = parseInt(event.target.dataset.vehicleId);
+                const selectedVehicle = vehicles.find(v => v.id === vehicleId);
+
+                if (selectedVehicle) {
+                    currentBookingDetails.vehicle = selectedVehicle;
+                    currentBookingDetails.totalPrice = selectedVehicle.pricePerDay * currentBookingDetails.durationDays;
+
+                    confVehicleName.textContent = selectedVehicle.name;
+                    confVehicleType.textContent = selectedVehicle.type;
+                    confVehiclePricePerDay.textContent = selectedVehicle.pricePerDay;
+                    confPickupLocation.textContent = currentBookingDetails.pickupLocation;
+                    confPickupDatetime.textContent = currentBookingDetails.pickupDateTime.toLocaleString();
+                    confDropoffLocation.textContent = currentBookingDetails.dropoffLocation;
+                    confDropoffDatetime.textContent = currentBookingDetails.dropoffDateTime.toLocaleString();
+                    confDuration.textContent = currentBookingDetails.durationDays;
+                    confTotalPrice.textContent = currentBookingDetails.totalPrice;
+
+                    showSection('confirmation-section');
+                }
+            }
+        });
+
+        backToSearchFromResultsBtn.addEventListener('click', () => showSection('search-section'));
+        backToResultsFromConfirmBtn.addEventListener('click', () => showSection('results-section'));
+
+        confirmBookingBtn.addEventListener('click', () => {
+            alert('Booking Confirmed! Thank you for your reservation.');
+            showSection('search-section');
+            // Optionally clear form inputs after booking
+            pickupDateInput.value = '';
+            pickupTimeInput.value = '';
+            dropoffDateInput.value = '';
+            dropoffTimeInput.value = '';
+            pickupLocationInput.value = '';
+            dropoffLocationInput.value = '';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flipkart जैसी वेबसाइट</title>
+    <style>
+        :root {
+            --primary-color: #2874f0; /* Flipkart blue */
+            --secondary-color: #fff;
+            --text-color: #212121;
+            --light-text-color: #878787;
+            --border-color: #f0f0f0;
+            --shadow-color: rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--border-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            box-shadow: 0 2px 4px var(--shadow-color);
+        }
+
+        .header-logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--secondary-color);
+            text-decoration: none;
+        }
+
+        .search-bar {
+            flex-grow: 1;
+            max-width: 600px;
+            display: flex;
+        }
+
+        .search-bar input {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 2px 0 0 2px;
+            font-size: 16px;
+        }
+
+        .search-bar button {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 0 2px 2px 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+        }
+
+        .search-bar button:hover {
+            background-color: #f0f0f0;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        nav ul li a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            transition: opacity 0.2s ease;
+        }
+
+        nav ul li a:hover {
+            opacity: 0.8;
+        }
+
+        .cart-icon {
+            position: relative;
+            display: inline-block;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #ff6161; /* Red for count */
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 50%;
+            padding: 2px 6px;
+            min-width: 20px;
+            text-align: center;
+            line-height: 1;
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: var(--secondary-color);
+            border-radius: 4px;
+            box-shadow: 0 1px 4px var(--shadow-color);
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 24px;
+            color: var(--text-color);
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .product-item {
+            background-color: var(--secondary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 15px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 1px 2px var(--shadow-color);
+            transition: transform 0.2s ease;
+        }
+
+        .product-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px var(--shadow-color);
+        }
+
+        .product-item img {
+            max-width: 100%;
+            height: 200px; /* Fixed height for uniformity */
+            object-fit: contain; /* Ensures entire image is visible */
+            margin-bottom: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .product-item h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--text-color);
+            height: 45px; /* Fixed height for title */
+            overflow: hidden; /* Hide overflow for long titles */
+            text-overflow: ellipsis;
+        }
+
+        .product-item .price {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+
+        .product-item button {
+            background-color: #fb641b; /* Flipkart orange */
+            color: var(--secondary-color);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+            width: 100%;
+        }
+
+        .product-item button:hover {
+            background-color: #e05510;
+        }
+
+        .product-item button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        footer {
+            background-color: var(--light-text-color);
+            color: var(--secondary-color);
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 -2px 4px var(--shadow-color);
+        }
+
+        /* Basic Responsiveness */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 10px 15px;
+            }
+
+            .search-bar {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            nav ul {
+                margin-top: 10px;
+                width: 100%;
+                justify-content: space-around;
+            }
+
+            main {
+                padding: 10px;
+                margin: 10px auto;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
+
+            .product-item img {
+                height: 150px;
+            }
+
+            .product-item h3 {
+                font-size: 16px;
+                height: auto; /* Allow more lines on small screens */
+            }
+        }
+
+        @media (max-width: 480px) {
+             .header-logo {
+                font-size: 24px;
+            }
+
+            .search-bar input, .search-bar button {
+                font-size: 14px;
+                padding: 8px 10px;
+            }
+
+            nav ul li a {
+                font-size: 14px;
+            }
+
+            .product-grid {
+                grid-template-columns: 1fr; /* Single column on very small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="#" class="header-logo">Flipkart<span style="font-size: 16px; display: block; line-height: 1; margin-top: -5px;">Explore Plus</span></a>
+        <div class="search-bar">
+            <input type="text" placeholder="उत्पाद, ब्रांड और बहुत कुछ खोजें...">
+            <button>खोजें</button>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#">लॉगिन</a></li>
+                <li><a href="#">विक्रेता बनें</a></li>
+                <li>
+                    <a href="#" class="cart-icon">कार्ट <span class="cart-count" id="cartCount">0</span></a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>लोकप्रिय उत्पाद</h2>
+        <div class="product-grid">
+            <div class="product-item">
+                <img src="https://via.placeholder.com/200x200?text=स्मार्टफोन" alt="स्मार्टफोन">
+                <h3>नया 5G स्मार्टफोन (128GB, 6GB RAM)</h3>
+                <p class="price">₹14,999</p>
+                <button class="add-to-cart">कार्ट में जोड़ें</button>
+            </div>
+            <div class="product-item">
+                <img src="https://via.placeholder.com/200x200?text=लैपटॉप" alt="लैपटॉप">
+                <h3>अल्ट्रा स्लिम लैपटॉप (कोर i5, 8GB RAM, 512GB SSD)</h3>
+                <p class="price">₹49,999</p>
+                <button class="add-to-cart">कार्ट में जोड़ें</button>
+            </div>
+            <div class="product-item">
+                <img src="https://via.placeholder.com/200x200?text=स्मार्टवॉच" alt="स्मार्टवॉच">
+                <h3>स्मार्टवॉच प्रो (ब्लूटूथ कॉलिंग, हार्ट रेट मॉनिटर)</h3>
+                <p class="price">₹2,999</p>
+                <button class="add-to-cart">कार्ट में जोड़ें</button>
+            </div>
+            <div class="product-item">
+                <img src="https://via.placeholder.com/200x200?text=हेडफ़ोन" alt="हेडफ़ोन">
+                <h3>वायरलेस हेडफ़ोन (नॉइज़ कैंसलिंग, 30 घंटे बैटरी)</h3>
+                <p class="price">₹1,799</p>
+                <button class="add-to-cart">कार्ट में जोड़ें</button>
+            </div>
+            <div class="product-item">
+                <img src="https://via.placeholder.com/200x200?text=कैमरा" alt="कैमरा">
+                <h3>DSLR कैमरा (24MP, 4K रिकॉर्डिंग)</h3>
+                <p class="price">₹35,499</p>
+                <button class="add-to-cart">कार्ट में जोड़ें</button>
+            </div>
+            <div class="product-item">
+                <img src="https://via.placeholder.com/200x200?text=टी_शर्ट" alt="टी-शर्ट">
+                <h3>पुरुषों की कॉटन टी-शर्ट (लार्ज साइज़)</h3>
+                <p class="price">₹499</p>
+                <button class="add-to-cart">कार्ट में जोड़ें</button>
+            </div>
+             <div class="product-item">
+                <img src="https://via.placeholder.com/200x200?text=जूते" alt="जूते">
+                <h3>पुरुषों के स्पोर्ट्स शूज़ (साइज 9)</h3>
+                <p class="price">₹1,299</p>
+                <button class="add-to-cart">कार्ट में जोड़ें</button>
+            </div>
+            <div class="product-item">
+                <img src="https://via.placeholder.com/200x200?text=किताब" alt="किताब">
+                <h3>बेस्टसेलिंग फिक्शन नॉवेल</h3>
+                <p class="price">₹349</p>
+                <button class="add-to-cart">कार्ट में जोड़ें</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Flipkart जैसी वेबसाइट। सभी अधिकार सुरक्षित।</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let cartCount = 0;
+            const cartCountElement = document.getElementById('cartCount');
+            const addToCartButtons = document.querySelectorAll('.add-to-cart');
+
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    cartCount++;
+                    cartCountElement.textContent = cartCount;
+                    
+                    const originalText = button.textContent;
+                    button.textContent = 'जोड़ा गया!';
+                    button.disabled = true;
+                    button.style.backgroundColor = '#4CAF50'; 
+                    
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.disabled = false;
+                        button.style.backgroundColor = '#fb641b'; 
+                    }, 1500); 
+                });
+            });
+        });
+    </script>
+</body>
+</html>

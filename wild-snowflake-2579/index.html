@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impossible Click Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden; /* Prevent scrollbars from confetti */
+            user-select: none; /* Prevent text selection */
+            -webkit-user-select: none; /* For Safari */
+            -moz-user-select: none; /* For Firefox */
+            -ms-user-select: none; /* For IE/Edge */
+        }
+
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            background-color: #fff;
+            border: 2px solid #333;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            overflow: hidden; /* Keep button inside */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #moving-button {
+            position: absolute;
+            width: 180px;
+            height: 70px;
+            font-size: 2em;
+            font-weight: bold;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 35px; /* Pill shape */
+            cursor: pointer;
+            outline: none; /* Remove focus outline */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            will-change: transform, left, top; /* Optimize animations */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        #moving-button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        #win-message {
+            position: absolute;
+            font-size: 4em;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            display: none; /* Hidden by default */
+            z-index: 10;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%; /* Circles for confetti */
+            opacity: 1;
+            pointer-events: none; /* Don't block mouse events */
+            z-index: 9999;
+            will-change: transform, opacity; /* Optimize animations */
+            transform-origin: center center; /* For rotations */
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <button id="moving-button">Click Me!</button>
+        <div id="win-message">You Got Me! 🎉</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const gameContainer = document.getElementById('game-container');
+            const movingButton = document.getElementById('moving-button');
+            const winMessage = document.getElementById('win-message');
+            let isGameActive = true;
+
+            function setButtonPosition(x, y) {
+                movingButton.style.left = `${x}px`;
+                movingButton.style.top = `${y}px`;
+            }
+
+            function getRandomPosition() {
+                const containerWidth = gameContainer.offsetWidth;
+                const containerHeight = gameContainer.offsetHeight;
+                const buttonWidth = movingButton.offsetWidth;
+                const buttonHeight = movingButton.offsetHeight;
+
+                const maxX = containerWidth - buttonWidth;
+                const maxY = containerHeight - buttonHeight;
+
+                const newX = Math.random() * maxX;
+                const newY = Math.random() * maxY;
+
+                return { x: newX, y: newY };
+            }
+
+            function moveButton() {
+                if (!isGameActive) return;
+                const newPos = getRandomPosition();
+                setButtonPosition(newPos.x, newPos.y);
+            }
+
+            function handleWin() {
+                if (!isGameActive) return;
+                isGameActive = false;
+
+                movingButton.style.display = 'none'; // Hide the button
+                winMessage.style.display = 'block'; // Show win message
+
+                // Get button's final position for confetti origin
+                const rect = movingButton.getBoundingClientRect();
+                const btnCenterX = rect.left + rect.width / 2;
+                const btnCenterY = rect.top + rect.height / 2;
+
+                // Create confetti
+                for (let i = 0; i < 150; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    // Random bright color
+                    confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 80%, 70%)`; 
+
+                    // Set initial position of confetti piece to the center of the clicked button
+                    confetti.style.left = `${btnCenterX}px`;
+                    confetti.style.top = `${btnCenterY}px`;
+                    confetti.style.opacity = '1';
+
+                    // Random target position (spread out and fall)
+                    const angle = Math.random() * Math.PI * 2; // Full circle
+                    const distance = Math.random() * 300 + 100; // Distance to spread from origin
+                    const targetX = btnCenterX + Math.cos(angle) * distance;
+                    const targetY = btnCenterY + Math.sin(angle) * distance + Math.random() * 200; // Add downward bias
+
+                    const duration = Math.random() * 2 + 1; // 1 to 3 seconds for animation
+                    const delay = Math.random() * 0.5; // Staggered start delay
+
+                    // Apply CSS transition properties
+                    confetti.style.transition = `transform ${duration}s ease-out ${delay}s, opacity ${duration}s ease-out ${delay}s`;
+                    document.body.appendChild(confetti);
+
+                    // Trigger the transition after a minimal delay to allow initial styles to render
+                    setTimeout(() => {
+                        // Calculate translation from initial (btnCenterX, btnCenterY) to target (targetX, targetY)
+                        confetti.style.transform = `translate(${targetX - btnCenterX}px, ${targetY - btnCenterY}px) rotate(${Math.random() * 720}deg)`;
+                        confetti.style.opacity = '0'; // Fade out
+                        
+                        // Remove element after animation completes to clean up DOM
+                        setTimeout(() => confetti.remove(), (duration + delay) * 1000);
+                    }, 50); // Short delay (e.g., 50ms)
+                }
+            }
+
+            // Initial position for the button when the page loads
+            moveButton();
+
+            // Event listener for button movement on mouseover
+            movingButton.addEventListener('mouseover', moveButton);
+
+            // Event listener for button click (win condition)
+            movingButton.addEventListener('click', handleWin);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature Converter</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #f0f2f5 0%, #e0e5ec 100%);
+            color: #333;
+        }
+
+        .converter-container {
+            background-color: #ffffff;
+            padding: 35px 45px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 450px;
+            box-sizing: border-box;
+            border: 1px solid #e0e0e0;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2em;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+            font-size: 1.05em;
+        }
+
+        .input-group input {
+            width: calc(100% - 24px); /* Account for padding */
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1.1em;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .input-group input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .converter-container {
+                margin: 20px;
+                padding: 25px 30px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 25px;
+            }
+
+            .input-group input {
+                font-size: 1em;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="converter-container">
+        <h1>Temperature Converter</h1>
+
+        <div class="input-group">
+            <label for="celsius">Celsius (°C)</label>
+            <input type="number" id="celsius" placeholder="Enter Celsius">
+        </div>
+
+        <div class="input-group">
+            <label for="fahrenheit">Fahrenheit (°F)</label>
+            <input type="number" id="fahrenheit" placeholder="Enter Fahrenheit">
+        </div>
+
+        <div class="input-group">
+            <label for="kelvin">Kelvin (K)</label>
+            <input type="number" id="kelvin" placeholder="Enter Kelvin">
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const celsiusInput = document.getElementById('celsius');
+            const fahrenheitInput = document.getElementById('fahrenheit');
+            const kelvinInput = document.getElementById('kelvin');
+
+            function convertTemperature(sourceUnit) {
+                let celsius, fahrenheit, kelvin;
+
+                if (sourceUnit === 'celsius') {
+                    const val = parseFloat(celsiusInput.value);
+                    if (isNaN(val) || celsiusInput.value.trim() === '') {
+                        fahrenheitInput.value = '';
+                        kelvinInput.value = '';
+                        return;
+                    }
+                    celsius = val;
+                    fahrenheit = (celsius * 9/5) + 32;
+                    kelvin = celsius + 273.15;
+                } else if (sourceUnit === 'fahrenheit') {
+                    const val = parseFloat(fahrenheitInput.value);
+                    if (isNaN(val) || fahrenheitInput.value.trim() === '') {
+                        celsiusInput.value = '';
+                        kelvinInput.value = '';
+                        return;
+                    }
+                    fahrenheit = val;
+                    celsius = (fahrenheit - 32) * 5/9;
+                    kelvin = (fahrenheit - 32) * 5/9 + 273.15;
+                } else if (sourceUnit === 'kelvin') {
+                    const val = parseFloat(kelvinInput.value);
+                    if (isNaN(val) || kelvinInput.value.trim() === '') {
+                        celsiusInput.value = '';
+                        fahrenheitInput.value = '';
+                        return;
+                    }
+                    kelvin = val;
+                    celsius = kelvin - 273.15;
+                    fahrenheit = (kelvin - 273.15) * 9/5 + 32;
+                }
+
+                if (sourceUnit !== 'celsius') celsiusInput.value = celsius.toFixed(2);
+                if (sourceUnit !== 'fahrenheit') fahrenheitInput.value = fahrenheit.toFixed(2);
+                if (sourceUnit !== 'kelvin') kelvinInput.value = kelvin.toFixed(2);
+            }
+
+            celsiusInput.addEventListener('input', () => convertTemperature('celsius'));
+            fahrenheitInput.addEventListener('input', () => convertTemperature('fahrenheit'));
+            kelvinInput.addEventListener('input', () => convertTemperature('kelvin'));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sai Jewel Online - Exquisite Jewellery</title>
+    <style>
+        :root {
+            --primary-gold: #c29958;
+            --secondary-gold: #e2c08d;
+            --dark-text: #333;
+            --light-text: #f0f0f0;
+            --white-bg: #ffffff;
+            --light-bg: #f9f9f9;
+            --border-color: #eee;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-text);
+            background-color: var(--light-bg);
+            scroll-behavior: smooth;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .header {
+            background-color: var(--white-bg);
+            padding: 15px 30px;
+            box-shadow: 0 2px 5px var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-gold);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .nav ul {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav a {
+            color: var(--dark-text);
+            font-weight: 500;
+            font-size: 16px;
+            transition: color 0.3s ease;
+            position: relative;
+            padding-bottom: 5px;
+        }
+
+        .nav a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-gold);
+            transition: width 0.3s ease;
+        }
+
+        .nav a:hover::after,
+        .nav a.active::after {
+            width: 100%;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--dark-text);
+            position: relative;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--primary-gold);
+            color: white;
+            font-size: 12px;
+            border-radius: 50%;
+            padding: 2px 6px;
+            min-width: 20px;
+            text-align: center;
+            box-shadow: 0 1px 3px var(--shadow);
+        }
+
+        .hero {
+            position: relative;
+            height: 500px;
+            overflow: hidden;
+            background-color: var(--dark-text);
+        }
+
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: var(--light-text);
+        }
+
+        .hero-slide.active {
+            opacity: 1;
+        }
+
+        .hero-slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 20px;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+        }
+
+        .hero-content p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background-color: var(--primary-gold);
+            color: var(--white-bg);
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-gold);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 50px;
+            color: var(--dark-text);
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-gold);
+        }
+
+        .category-grid, .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .category-card, .product-card {
+            background-color: var(--white-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+            position: relative;
+        }
+
+        .category-card:hover, .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .category-card img, .product-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .category-card h3 {
+            padding: 20px;
+            font-size: 1.4em;
+            color: var(--primary-gold);
+        }
+
+        .product-card-content {
+            padding: 20px;
+        }
+
+        .product-card h3 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: var(--dark-text);
+        }
+
+        .product-card .price {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--primary-gold);
+            margin-bottom: 15px;
+        }
+
+        .add-to-cart-btn {
+            background-color: var(--primary-gold);
+            color: var(--white-bg);
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: var(--secondary-gold);
+        }
+
+        .about-section, .testimonial-section {
+            background-color: var(--white-bg);
+            padding: 60px 40px;
+            margin-top: 60px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px var(--shadow);
+            text-align: center;
+        }
+
+        .about-section p, .testimonial-item p {
+            font-size: 1.1em;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        .testimonial-item {
+            margin-bottom: 30px;
+        }
+
+        .testimonial-item h4 {
+            color: var(--primary-gold);
+            margin-top: 10px;
+            font-size: 1.1em;
+        }
+
+        .footer {
+            background-color: var(--dark-text);
+            color: var(--light-text);
+            padding: 40px 20px;
+            margin-top: 60px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .footer-links ul {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .footer-links a {
+            color: var(--light-text);
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-gold);
+        }
+
+        .social-icons {
+            margin-top: 20px;
+        }
+
+        .social-icons a {
+            font-size: 24px;
+            margin: 0 10px;
+            color: var(--light-text);
+            transition: color 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: var(--primary-gold);
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--white-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px var(--shadow);
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            animation: fadeInScale 0.3s ease-out forwards;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--dark-text);
+        }
+
+        .modal-body {
+            text-align: center;
+        }
+
+        .modal-body h2 {
+            font-size: 2em;
+            color: var(--primary-gold);
+            margin-bottom: 20px;
+        }
+
+        .modal-body p {
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .product-detail-modal-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .product-detail-modal-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+
+        .product-detail-info {
+            text-align: left;
+            width: 100%;
+        }
+
+        .product-detail-info h2 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        .product-detail-info .price {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary-gold);
+            margin-bottom: 15px;
+        }
+
+        .product-detail-info p {
+            font-size: 1.05em;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 992px) {
+            .header {
+                padding: 10px 20px;
+            }
+            .nav ul {
+                gap: 15px;
+            }
+            .hero {
+                height: 400px;
+            }
+            .hero-content h1 {
+                font-size: 2.8em;
+            }
+            .hero-content p {
+                font-size: 1em;
+            }
+            .section-title {
+                font-size: 2em;
+                margin-bottom: 40px;
+            }
+            .category-grid, .product-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 15px;
+            }
+            .nav {
+                margin-top: 15px;
+                width: 100%;
+            }
+            .nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px 15px;
+            }
+            .header-icons {
+                align-self: flex-end;
+                margin-top: -30px;
+            }
+            .hero {
+                height: 350px;
+            }
+            .hero-content h1 {
+                font-size: 2.2em;
+            }
+            .hero-content p {
+                font-size: 0.9em;
+            }
+            .container {
+                margin: 30px auto;
+                padding: 0 15px;
+            }
+            .section-title {
+                font-size: 1.8em;
+                margin-bottom: 30px;
+            }
+            .category-grid, .product-grid {
+                grid-template-columns: 1fr;
+            }
+            .footer-links ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .product-detail-modal-content {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 24px;
+            }
+            .nav a {
+                font-size: 14px;
+            }
+            .hero {
+                height: 300px;
+            }
+            .hero-content h1 {
+                font-size: 1.8em;
+            }
+            .hero-content p {
+                font-size: 0.8em;
+            }
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9em;
+            }
+            .section-title {
+                font-size: 1.5em;
+            }
+            .category-card img, .product-card img {
+                height: 200px;
+            }
+            .product-detail-info h2 {
+                font-size: 1.8em;
+            }
+            .product-detail-info .price {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="#" class="logo">Sai Jewel</a>
+        <nav class="nav">
+            <ul>
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#categories">Shop by Category</a></li>
+                <li><a href="#products">New Arrivals</a></li>
+                <li><a href="#about">About Us</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="header-icons">
+            <button class="icon-btn" aria-label="Search"><i class="fas fa-search"></i></button>
+            <button class="icon-btn" aria-label="Cart">
+                <i class="fas fa-shopping-bag"></i>
+                <span class="cart-count" id="cartCount">0</span>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero" id="home">
+            <div class="hero-slide active" style="background-image: url('https://picsum.photos/seed/jewel1/1600/600');">
+                <div class="hero-content">
+                    <h1>Exquisite Craftsmanship, Timeless Beauty</h1>
+                    <p>Discover our unique collection of fine jewellery, meticulously crafted to perfection.</p>
+                    <a href="#products" class="btn">Shop Now</a>
+                </div>
+            </div>
+            <div class="hero-slide" style="background-image: url('https://picsum.photos/seed/jewel2/1600/600');">
+                <div class="hero-content">
+                    <h1>Elegance for Every Occasion</h1>
+                    <p>From dazzling diamonds to radiant gold, find your perfect piece.</p>
+                    <a href="#categories" class="btn">Explore Categories</a>
+                </div>
+            </div>
+            <div class="hero-slide" style="background-image: url('https://picsum.photos/seed/jewel3/1600/600');">
+                <div class="hero-content">
+                    <h1>Celebrate Life's Precious Moments</h1>
+                    <p>Create unforgettable memories with a gift that truly shines.</p>
+                    <a href="#contact" class="btn">Contact Us</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="categories" class="container">
+            <h2 class="section-title">Shop by Category</h2>
+            <div class="category-grid">
+                <div class="category-card">
+                    <img src="https://picsum.photos/seed/category1/400/250" alt="Rings">
+                    <h3>Rings</h3>
+                </div>
+                <div class="category-card">
+                    <img src="https://picsum.photos/seed/category2/400/250" alt="Necklaces">
+                    <h3>Necklaces</h3>
+                </div>
+                <div class="category-card">
+                    <img src="https://picsum.photos/seed/category3/400/250" alt="Earrings">
+                    <h3>Earrings</h3>
+                </div>
+                <div class="category-card">
+                    <img src="https://picsum.photos/seed/category4/400/250" alt="Bracelets">
+                    <h3>Bracelets</h3>
+                </div>
+            </div>
+        </section>
+
+        <section id="products" class="container">
+            <h2 class="section-title">New Arrivals</h2>
+            <div class="product-grid" id="productGrid">
+            </div>
+        </section>
+
+        <section id="about" class="container">
+            <div class="about-section">
+                <h2 class="section-title">About Sai Jewel</h2>
+                <p>At Sai Jewel, we believe that every piece of jewellery tells a story. With decades of heritage in the art of jewellery making, we bring you exquisite designs crafted with passion and precision. Our commitment to quality, authenticity, and unparalleled customer service sets us apart. We source the finest materials and employ skilled artisans to create timeless pieces that celebrate life's most precious moments. Discover the Sai Jewel difference – where tradition meets contemporary elegance.</p>
+            </div>
+        </section>
+
+        <section id="testimonials" class="container">
+            <div class="testimonial-section">
+                <h2 class="section-title">What Our Customers Say</h2>
+                <div class="testimonial-item">
+                    <p>"Absolutely stunning jewellery! The craftsmanship is superb and the customer service was exceptional. I highly recommend Sai Jewel for their unique designs and quality."</p>
+                    <h4>- Anya Sharma</h4>
+                </div>
+                <div class="testimonial-item">
+                    <p>"I purchased an engagement ring from Sai Jewel, and it's even more beautiful in person. My fiancée loves it! Thank you for making our special day even brighter."</p>
+                    <h4>- Rohan Kapoor</h4>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer" id="contact">
+        <div class="footer-links">
+            <ul>
+                <li><a href="#about">About Us</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
+                <li><a href="#">Shipping & Returns</a></li>
+                <li><a href="#">FAQs</a></li>
+            </ul>
+        </div>
+        <div class="social-icons">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest"></i></a>
+        </div>
+        <p>&copy; 2023 Sai Jewel Online. All rights reserved.</p>
+    </footer>
+
+    <div id="productDetailModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn" aria-label="Close Modal">&times;</button>
+            <div class="modal-body product-detail-modal-content">
+                <img id="modalProductImage" src="" alt="Product Image">
+                <div class="product-detail-info">
+                    <h2 id="modalProductName"></h2>
+                    <p class="price" id="modalProductPrice"></p>
+                    <p id="modalProductDescription"></p>
+                    <button class="btn add-to-cart-btn" id="modalAddToCartBtn">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="addToCartModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn" aria-label="Close Modal">&times;</button>
+            <div class="modal-body">
+                <h2>Item Added to Cart!</h2>
+                <p>Your selected item has been successfully added to your shopping bag.</p>
+                <button class="btn" onclick="document.getElementById('addToCartModal').style.display='none'">Continue Shopping</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+        const products = [
+            {
+                id: 1,
+                name: "Elegant Diamond Ring",
+                price: "₹ 55,000",
+                image: "https://picsum.photos/seed/product1/400/300",
+                description: "A breathtaking diamond ring, expertly set in 18K white gold. Perfect for engagements or a timeless gift. Features a brilliant cut center stone surrounded by a halo of smaller diamonds."
+            },
+            {
+                id: 2,
+                name: "Classic Gold Necklace",
+                price: "₹ 82,500",
+                image: "https://picsum.photos/seed/product2/400/300",
+                description: "This exquisite 22K gold necklace features intricate filigree work and a stunning traditional design. Ideal for festive occasions and a true statement piece."
+            },
+            {
+                id: 3,
+                name: "Sparkling Stud Earrings",
+                price: "₹ 28,000",
+                image: "https://picsum.photos/seed/product3/400/300",
+                description: "Dainty yet dazzling, these 14K gold stud earrings with delicate pearl accents are perfect for everyday elegance or special events. Lightweight and comfortable."
+            },
+            {
+                id: 4,
+                name: "Pearl Drop Bracelet",
+                price: "₹ 35,000",
+                image: "https://picsum.photos/seed/product4/400/300",
+                description: "A graceful sterling silver bracelet adorned with lustrous freshwater pearls. Its timeless design makes it a versatile accessory for any outfit."
+            },
+            {
+                id: 5,
+                name: "Ruby & Gold Pendant",
+                price: "₹ 48,000",
+                image: "https://picsum.photos/seed/product5/400/300",
+                description: "A captivating pendant featuring a vibrant ruby set in warm 20K gold, showcasing traditional Indian artistry. Comes with a matching gold chain."
+            },
+            {
+                id: 6,
+                name: "Emerald Cut Ring",
+                price: "₹ 72,000",
+                image: "https://picsum.photos/seed/product6/400/300",
+                description: "A contemporary classic, this ring boasts a magnificent emerald-cut diamond set in platinum. Its clean lines and exceptional brilliance make it truly stand out."
+            },
+            {
+                id: 7,
+                name: "Temple Design Bangle",
+                price: "₹ 95,000",
+                image: "https://picsum.photos/seed/product7/400/300",
+                description: "Handcrafted 22K gold bangle inspired by traditional temple jewellery. Intricately detailed with motifs reflecting ancient Indian heritage. A magnificent heirloom piece."
+            },
+            {
+                id: 8,
+                name: "Kids' Gold Bracelet",
+                price: "₹ 18,000",
+                image: "https://picsum.photos/seed/product8/400/300",
+                description: "A charming and lightweight 18K gold bracelet designed for children, featuring a delicate butterfly charm. Safe and comfortable for young wearers."
+            }
+        ];
+
+        let cartCount = 0;
+
+        function updateCartCount() {
+            document.getElementById('cartCount').innerText = cartCount;
+        }
+
+        const heroSlides = document.querySelectorAll('.hero-slide');
+        let currentSlide = 0;
+
+        function showSlide(index) {
+            heroSlides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                if (i === index) {
+                    slide.classList.add('active');
+                }
+            });
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % heroSlides.length;
+            showSlide(currentSlide);
+        }
+
+        setInterval(nextSlide, 5000);
+        showSlide(0);
+
+        const productGrid = document.getElementById('productGrid');
+
+        function renderProducts() {
+            productGrid.innerHTML = '';
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.classList.add('product-card');
+                productCard.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}">
+                    <div class="product-card-content">
+                        <h3>${product.name}</h3>
+                        <p class="price">${product.price}</p>
+                        <button class="btn add-to-cart-btn" data-product-id="${product.id}">Add to Cart</button>
+                    </div>
+                `;
+                productGrid.appendChild(productCard);
+
+                const img = productCard.querySelector('img');
+                const h3 = productCard.querySelector('h3');
+                [img, h3].forEach(el => {
+                    el.style.cursor = 'pointer';
+                    el.addEventListener('click', () => showProductDetail(product.id));
+                });
+            });
+        }
+
+        const productDetailModal = document.getElementById('productDetailModal');
+        const addToCartModal = document.getElementById('addToCartModal');
+        const modalCloseButtons = document.querySelectorAll('.modal-close-btn');
+
+        modalCloseButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                productDetailModal.style.display = 'none';
+                addToCartModal.style.display = 'none';
+            });
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === productDetailModal) {
+                productDetailModal.style.display = 'none';
+            }
+            if (event.target === addToCartModal) {
+                addToCartModal.style.display = 'none';
+            }
+        });
+
+        function showProductDetail(productId) {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                document.getElementById('modalProductImage').src = product.image;
+                document.getElementById('modalProductImage').alt = product.name;
+                document.getElementById('modalProductName').innerText = product.name;
+                document.getElementById('modalProductPrice').innerText = product.price;
+                document.getElementById('modalProductDescription').innerText = product.description;
+                document.getElementById('modalAddToCartBtn').setAttribute('data-product-id', product.id);
+                productDetailModal.style.display = 'flex';
+            }
+        }
+
+        document.addEventListener('click', (event) => {
+            if (event.target.classList.contains('add-to-cart-btn')) {
+                cartCount++;
+                updateCartCount();
+                addToCartModal.style.display = 'flex';
+                productDetailModal.style.display = 'none';
+            }
+        });
+
+        document.querySelectorAll('.nav a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                document.querySelectorAll('.nav a').forEach(navLink => navLink.classList.remove('active'));
+                this.classList.add('active');
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    e.preventDefault();
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        document.querySelector('.fa-search').closest('.icon-btn').addEventListener('click', () => {
+            alert('Search functionality coming soon!');
+        });
+
+        document.querySelector('.fa-shopping-bag').closest('.icon-btn').addEventListener('click', () => {
+            alert('View your cart! (This is a demo, cart functionality is limited)');
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCartCount();
+            renderProducts();
+        });
+    </script>
+</body>
+</html>

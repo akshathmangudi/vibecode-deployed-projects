@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jump Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+
+        #game-container {
+            position: relative;
+            width: 700px;
+            height: 250px;
+            border: 5px solid #28a745; /* Green border for game area */
+            overflow: hidden;
+            background-color: #e6ffed; /* Light green background */
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        #dino {
+            position: absolute;
+            width: 45px;
+            height: 65px;
+            background-color: #5cb85c; /* Dino green */
+            bottom: 0; /* Sits on the ground line */
+            left: 70px;
+            border-radius: 8px 8px 0 0; /* Rounded top, flat bottom */
+            transition: background-color 0.1s linear; /* Smooth color change */
+        }
+
+        #obstacle {
+            position: absolute;
+            width: 30px;
+            height: 50px;
+            background-color: #dc3545; /* Red obstacle */
+            bottom: 0; /* Sits on the ground line */
+            right: -30px; /* Start off-screen */
+            border-radius: 5px;
+            animation: slide 2s linear infinite;
+            animation-play-state: paused; /* Initially paused */
+        }
+
+        #ground {
+            position: absolute;
+            width: 100%;
+            height: 20px;
+            background-color: #8B4513; /* Brown ground */
+            bottom: 0;
+            left: 0;
+            z-index: 1; /* Ensure ground is on top of dino/obstacle bottoms */
+        }
+
+        #score {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #212529;
+            z-index: 10;
+            transition: color 0.1s linear;
+        }
+
+        #message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #495057;
+            text-align: center;
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            z-index: 10;
+            min-width: 250px;
+            line-height: 1.4;
+        }
+
+        /* Dino jump animation */
+        .jump {
+            animation: jump 0.6s ease-out forwards;
+        }
+
+        @keyframes jump {
+            0% { bottom: 0px; }
+            50% { bottom: 120px; } /* Max jump height */
+            100% { bottom: 0px; }
+        }
+
+        /* Obstacle movement animation */
+        @keyframes slide {
+            from { right: -30px; }
+            to { right: 100%; } /* Moves completely off screen to the left */
+        }
+
+        /* Game Over state styling */
+        #dino.game-over {
+            background-color: #6c757d; /* Grey dino when game over */
+        }
+        #score.game-over {
+            color: #dc3545; /* Red score when game over */
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="dino"></div>
+        <div id="obstacle"></div>
+        <div id="ground"></div>
+        <div id="score">Score: 0</div>
+        <div id="message">Press Space to Start</div>
+    </div>
+
+    <script>
+        const dino = document.getElementById('dino');
+        const obstacle = document.getElementById('obstacle');
+        const scoreDisplay = document.getElementById('score');
+        const messageDisplay = document.getElementById('message');
+        const gameContainer = document.getElementById('game-container');
+
+        let score = 0;
+        let isJumping = false;
+        let isGameOver = true;
+        let gameLoopId; // To hold the requestAnimationFrame ID
+
+        function jump() {
+            if (isJumping || isGameOver) return;
+
+            isJumping = true;
+            dino.classList.add('jump');
+
+            setTimeout(() => {
+                dino.classList.remove('jump');
+                isJumping = false;
+            }, 600); // Matches CSS animation duration
+        }
+
+        function startGame() {
+            if (!isGameOver) return; // Already running
+
+            isGameOver = false;
+            score = 0;
+            scoreDisplay.textContent = 'Score: 0';
+            messageDisplay.textContent = '';
+            
+            dino.classList.remove('game-over'); // Reset dino color
+            scoreDisplay.classList.remove('game-over'); // Reset score color
+
+            obstacle.style.display = 'block'; // Ensure obstacle is visible
+            obstacle.style.right = '-30px'; // Reset obstacle position for first animation cycle
+
+            // Restart obstacle animation by toggling play state
+            obstacle.style.animationPlayState = 'paused';
+            void obstacle.offsetWidth; // Trigger reflow to restart animation
+            obstacle.style.animationPlayState = 'running';
+
+            gameLoop(); // Start collision and score check
+        }
+
+        function gameOver() {
+            isGameOver = true;
+            cancelAnimationFrame(gameLoopId);
+            messageDisplay.textContent = 'Game Over! Score: ' + score + '. Press Space to Restart.';
+            
+            obstacle.style.animationPlayState = 'paused'; // Pause obstacle animation
+            obstacle.style.display = 'none'; // Hide obstacle
+            dino.classList.add('game-over'); // Change dino color via class
+            scoreDisplay.classList.add('game-over'); // Change score color via class
+        }
+
+        function gameLoop() {
+            if (isGameOver) {
+                cancelAnimationFrame(gameLoopId);
+                return;
+            }
+
+            const dinoRect = dino.getBoundingClientRect();
+            const obstacleRect = obstacle.getBoundingClientRect();
+            const gameContainerRect = gameContainer.getBoundingClientRect();
+
+            // Collision detection
+            // Check for horizontal overlap: dino's right edge is past obstacle's left, AND dino's left edge is before obstacle's right
+            const horizontalOverlap = dinoRect.right > obstacleRect.left && dinoRect.left < obstacleRect.right;
+
+            // Check for vertical overlap: dino's bottom is past obstacle's top, AND dino's top is before obstacle's bottom
+            const verticalOverlap = dinoRect.bottom > obstacleRect.top && dinoRect.top < obstacleRect.bottom;
+
+            // Determine if dino is "on the ground" or low enough to collide
+            // The bottom of the dino should be close to the bottom of the container
+            // The dino's height is 65px, its `bottom` CSS property is 0.
+            // So its `dinoRect.bottom` will be equal to `gameContainerRect.bottom`.
+            // We want to detect collision when the dino is NOT high up jumping.
+            // A small threshold (e.g., 5px) can account for slight animation inaccuracies or padding.
+            const dinoIsLow = dinoRect.bottom > (gameContainerRect.bottom - 5); // dino's bottom is within 5px of container bottom
+
+            if (horizontalOverlap && verticalOverlap && dinoIsLow) {
+                gameOver();
+                return;
+            }
+
+            gameLoopId = requestAnimationFrame(gameLoop);
+        }
+
+        // Score using animationiteration event
+        // This fires each time the obstacle animation completes a full cycle (moves off-screen).
+        obstacle.addEventListener('animationiteration', () => {
+            if (!isGameOver) {
+                score++;
+                scoreDisplay.textContent = 'Score: ' + score;
+            }
+        });
+
+        // Event listener for spacebar to jump or start game
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'Space') {
+                if (isGameOver) {
+                    startGame();
+                } else {
+                    jump();
+                }
+            }
+        });
+
+        // Initial message display on load
+        messageDisplay.textContent = 'Press Space to Start';
+    </script>
+</body>
+</html>

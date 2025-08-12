@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Page</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            text-align: center;
+        }
+
+        #app-container {
+            background-color: #ffffff;
+            padding: 40px 60px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+            font-size: 2.8em;
+            font-weight: 600;
+        }
+
+        p {
+            font-size: 1.5em;
+            color: #555;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <h1 id="greeting"></h1>
+        <p id="current-time"></p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const greetingElement = document.getElementById('greeting');
+            const timeElement = document.getElementById('current-time');
+
+            function getGreeting() {
+                const hour = new Date().getHours();
+                if (hour < 12) {
+                    return "Good Morning!";
+                } else if (hour < 18) {
+                    return "Good Afternoon!";
+                } else {
+                    return "Good Evening!";
+                }
+            }
+
+            function updateTime() {
+                const now = new Date();
+                const options = {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                };
+                timeElement.textContent = now.toLocaleTimeString('en-US', options);
+            }
+
+            greetingElement.textContent = getGreeting();
+            updateTime();
+            setInterval(updateTime, 1000);
+        });
+    </script>
+</body>
+</html>

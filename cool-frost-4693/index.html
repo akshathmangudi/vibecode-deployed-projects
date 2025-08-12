@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steganography App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1', /* Indigo 500 */
+                        secondary: '#8b5cf6', /* Violet 500 */
+                        darkbg: '#1a202c',
+                        darkcard: '#2d3748',
+                        darktext: '#cbd5e0',
+                    }
+                }
+            }
+        }
+    </script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        /* Basic scrollbar styling for better UX - adapted for dark theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #2d3748; /* darkcard */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4a5568; /* slightly lighter dark grey */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6a768f; /* even lighter dark grey */
+        }
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+        /* Custom animations */
+        @keyframes fade-in-down {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes fade-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-down {
+            animation: fade-in-down 0.5s ease-out forwards;
+        }
+        .animate-fade-in-up {
+            animation: fade-in-up 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-darkbg min-h-screen text-darktext">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const MESSAGE_DELIMITER = '1111111111111110'; // Unique bit sequence to mark end of message
+
+        // Helper function to convert text to binary string
+        const textToBinary = (text) => {
+            return Array.from(text).map(char => {
+                // Pad to 8 bits for each character
+                return char.charCodeAt(0).toString(2).padStart(8, '0');
+            }).join('');
+        };
+
+        // Helper function to convert binary string to text
+        const binaryToText = (binaryString) => {
+            let text = '';
+            // Iterate in chunks of 8 bits (one character)
+            for (let i = 0; i < binaryString.length; i += 8) {
+                const byte = binaryString.substring(i, i + 8);
+                if (byte.length === 8) { // Ensure it's a full byte
+                    text += String.fromCharCode(parseInt(byte, 2));
+                }
+            }
+            return text;
+        };
+
+        // Steganography embedding logic
+        const embedMessageIntoImage = (file, message) => {
+            return new Promise((resolve, reject) => {
+                if (!file || !message) {
+                    reject("Please provide both an image and a message.");
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+
+                        const imageData = ctx.getImageData(0, 0, img.width, img.height);
+                        const data = imageData.data; // Uint8ClampedArray: [R, G, B, A, R, G, B, A, ...]
+
+                        const binaryMessage = textToBinary(message) + MESSAGE_DELIMITER;
+                        let messageIndex = 0;
+
+                        // Capacity check: each pixel's red channel can store 1 bit
+                        const maxBits = img.width * img.height;
+                        if (binaryMessage.length > maxBits) {
+                            alert(`Warning: Message is too long for this image. Maximum bits: ${maxBits}, Your message bits: ${binaryMessage.length}. The message will be truncated.`);
+                        }
+
+                        // Iterate over pixels (R, G, B, A)
+                        for (let i = 0; i < data.length; i += 4) {
+                            if (messageIndex < binaryMessage.length) {
+                                const bit = parseInt(binaryMessage[messageIndex], 2);
+                                // Clear the LSB of the Red channel (data[i]) and set it to the message bit
+                                data[i] = (data[i] & 0xFE) | bit; // 0xFE is 11111110 (binary 11111110)
+                                messageIndex++;
+                            } else {
+                                // Message fully embedded or truncated, stop modifying pixels for the message
+                                break;
+                            }
+                        }
+
+                        ctx.putImageData(imageData, 0, 0);
+                        resolve(canvas.toDataURL('image/png')); // Return data URL of the modified image
+                    };
+                    img.onerror = () => reject("Failed to load image. Make sure it's a valid image file.");
+                    img.src = e.target.result;
+                };
+                reader.onerror = () => reject("Failed to read file.");
+                reader.readAsDataURL(file);
+            });
+        };
+
+        // Steganography extraction logic
+        const extractMessageFromImage = (file) => {
+            return new Promise((resolve, reject) => {
+                if (!file) {
+                    reject("Please provide an image to extract from.");
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+
+                        const imageData = ctx.getImageData(0, 0, img.width, img.height);
+                        const data = imageData.data; // Uint8ClampedArray
+
+                        let binaryMessage = '';
+                        let delimiterFound = false;
+
+                        for (let i = 0; i < data.length; i += 4) {
+                            // Extract LSB from the Red channel
+                            const lsb = data[i] & 1; // 0x01 is 00000001
+                            binaryMessage += lsb.toString();
+
+                            // Check for delimiter
+                            if (binaryMessage.endsWith(MESSAGE_DELIMITER)) {
+                                delimiterFound = true;
+                                // Remove the delimiter from the message
+                                binaryMessage = binaryMessage.slice(0, -MESSAGE_DELIMITER.length);
+                                break; // Message found and extracted
+                            }
+                        }
+
+                        if (delimiterFound) {
+                            resolve(binaryToText(binaryMessage));
+                        } else {
+                            reject("No hidden message found or message is corrupted. (Delimiter not found)");
+                        }
+                    };
+                    img.onerror = () => reject("Failed to load image. Make sure it's a valid image file.");
+                    img.src = e.target.result;
+                };
+                reader.onerror = () => reject("Failed to read file.");
+                reader.readAsDataURL(file);
+            });
+        };
+
+        const NavigationBar = ({ onNavigate }) => {
+            return (
+                <nav className="bg-darkcard p-4 shadow-md sticky top-0 z-50">
+                    <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center">
+                        <div className="text-white text-2xl font-bold mb-2 sm:mb-0">
+                            Steganography App
+                        </div>
+                        <div className="flex flex-wrap justify-center sm:space-x-4 space-x-2">
+                            <button
+                                onClick={() => onNavigate('home')}
+                                className="px-4 py-2 rounded-full text-white bg-primary hover:bg-secondary transition-colors duration-200 text-sm sm:text-base mb-2 sm:mb-0"
+                            >
+                                Home
+                            </button>
+                            <button
+                                onClick={() => onNavigate('embed')}
+                                className="px-4 py-2 rounded-full text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200 text-sm sm:text-base mb-2 sm:mb-0"
+                            >
+                                Hide Message
+                            </button>
+                            <button
+                                onClick={() => onNavigate('extract')}
+                                className="px-4 py-2 rounded-full text-white bg-green-600 hover:bg-green-700 transition-colors duration-200 text-sm sm:text-base mb-2 sm:mb-0"
+                            >
+                                Seek Message
+                            </button>
+                            <button
+                                onClick={() => onNavigate('contact')}
+                                className="px-4 py-2 rounded-full text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200 text-sm sm:text-base mb-2 sm:mb-0"
+                            >
+                                Contact Us
+                            </button>
+                        </div>
+                    </div>
+                </nav>
+            );
+        };
+
+        const HomePage = () => {
+            return (
+                <div className="flex flex-col items-center justify-center p-6 bg-darkcard rounded-lg shadow-xl max-w-md w-full text-center animate-fade-in-down">
+                    <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">
+                        🤫 Steganography App
+                    </h1>
+                    <p className="text-lg md:text-xl text-gray-300 mb-8">
+                        Embed and extract secret messages from images using Steganography.
+                        Your hidden message, your secret.
+                    </p>
+                    <p className="text-md text-gray-400">
+                        Use the navigation bar above to hide or seek messages.
+                    </p>
+                </div>
+            );
+        };
+
+        const ContactPage = () => {
+            return (
+                <div className="flex flex-col items-center justify-center p-6 bg-darkcard rounded-lg shadow-xl max-w-md w-full text-center animate-fade-in-up">
+                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Contact Us</h2>
+                    <p className="text-lg text-gray-300 mb-4">
+                        Have questions or feedback about the Steganography App?
+                    </p>
+                    <div className="text-left w-full max-w-xs text-gray-200">
+                        <p className="mb-2"><strong className="text-primary">Email:</strong> support@steganoapp.com</p>
+                        <p className="mb-2"><strong className="text-primary">Phone:</strong> +1 (123) 456-7890</p>
+                        <p className="mb-2"><strong className="text-primary">Address:</strong> 123 Stealth Lane, Secret City, ST 98765</p>
+                        <p className="mt-4 text-sm text-gray-400">
+                            We aim to respond to all inquiries within 24-48 hours.
+                        </p>
+                    </div>
+                </div>
+            );
+        };
+
+        const SteganographyEmbedPage = ({ onNavigate }) => {
+            const [message, setMessage] = useState('');
+            const [imageFile, setImageFile] = useState(null);
+            const [modifiedImageUrl, setModifiedImageUrl] = useState(null);
+            const [isLoading, setIsLoading] = useState(false);
+            const [error, setError] = useState(null);
+            const [originalImageUrl, setOriginalImageUrl] = useState(null);
+
+            const handleImageChange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    setImageFile(file);
+                    setOriginalImageUrl(URL.createObjectURL(file)); // Display original preview
+                    setModifiedImageUrl(null); // Clear previous modified image
+                    setError(null);
+                } else {
+                    setImageFile(null);
+                    setOriginalImageUrl(null);
+                    setModifiedImageUrl(null);
+                }
+            };
+
+            const handleEmbed = async () => {
+                setError(null);
+                setModifiedImageUrl(null); // Clear previous result
+                if (!imageFile) {
+                    setError("Please upload an image first.");
+                    return;
+                }
+                if (!message.trim()) {
+                    setError("Please enter a message to hide.");
+                    return;
+                }
+
+                setIsLoading(true);
+                try {
+                    const url = await embedMessageIntoImage(imageFile, message);
+                    setModifiedImageUrl(url);
+                } catch (err) {
+                    setError(`Error: ${err.message || err}`);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+
+            // Cleanup URL objects when component unmounts or imageFile changes
+            useEffect(() => {
+                return () => {
+                    if (originalImageUrl) {
+                        URL.revokeObjectURL(originalImageUrl);
+                    }
+                    if (modifiedImageUrl) {
+                        // For data URLs, revoking isn't strictly necessary as they are self-contained,
+                        // but good practice if it were blob URLs.
+                    }
+                };
+            }, [originalImageUrl, modifiedImageUrl]);
+
+
+            return (
+                <div className="flex flex-col items-center p-6 bg-darkcard rounded-lg shadow-xl max-w-2xl w-full animate-fade-in-up">
+                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Embed Your Secret</h2>
+
+                    <button
+                        onClick={() => onNavigate('home')}
+                        className="mb-6 px-4 py-2 bg-gray-600 text-white font-semibold rounded-full hover:bg-gray-700 transition duration-300 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50"
+                    >
+                        &larr; Back to Home
+                    </button>
+
+                    <div className="w-full mb-6">
+                        <label htmlFor="message-input" className="block text-gray-300 text-sm font-bold mb-2">
+                            Message to Hide:
+                        </label>
+                        <textarea
+                            id="message-input"
+                            className="shadow appearance-none border border-gray-600 rounded w-full py-3 px-4 bg-gray-700 text-gray-100 leading-tight focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 resize-y placeholder-gray-400"
+                            rows="4"
+                            placeholder="Enter your secret message here..."
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                        ></textarea>
+                    </div>
+
+                    <div className="w-full mb-6">
+                        <label htmlFor="image-upload" className="block text-gray-300 text-sm font-bold mb-2">
+                            Upload Image:
+                        </label>
+                        <input
+                            type="file"
+                            id="image-upload"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="block w-full text-sm text-gray-400
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-full file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-primary file:text-white
+                                hover:file:bg-secondary transition duration-200"
+                        />
+                        {originalImageUrl && (
+                            <div className="mt-4 p-2 border border-gray-600 rounded-md bg-gray-700 text-center">
+                                <p className="text-sm text-gray-300 mb-2">Original Image Preview:</p>
+                                <img src={originalImageUrl} alt="Original Preview" className="max-w-full h-auto rounded-md mx-auto" style={{ maxHeight: '200px' }} />
+                            </div>
+                        )}
+                    </div>
+
+                    <button
+                        onClick={handleEmbed}
+                        disabled={isLoading}
+                        className="w-full md:w-auto px-8 py-3 bg-primary text-white font-semibold rounded-full shadow-lg hover:bg-secondary transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-primary focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isLoading ? (
+                            <span className="flex items-center justify-center">
+                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Embedding...
+                            </span>
+                        ) : 'Embed Message'}
+                    </button>
+
+                    {error && (
+                        <div className="mt-6 p-4 bg-red-800 border border-red-700 text-red-200 rounded-lg w-full">
+                            <p className="font-semibold">Error:</p>
+                            <p>{error}</p>
+                        </div>
+                    )}
+
+                    {modifiedImageUrl && (
+                        <div className="mt-6 w-full p-6 bg-gray-700 rounded-lg border border-gray-600 text-center animate-fade-in-up">
+                            <h3 className="text-2xl font-bold text-white mb-4">Modified Image</h3>
+                            <img
+                                src={modifiedImageUrl}
+                                alt="Modified with hidden message"
+                                className="max-w-full h-auto rounded-lg shadow-md mx-auto border border-gray-500"
+                                style={{ maxWidth: '400px', maxHeight: '400px' }}
+                            />
+                            <a
+                                href={modifiedImageUrl}
+                                download="steg_image.png"
+                                className="mt-6 inline-block px-6 py-2 bg-green-600 text-white font-semibold rounded-full shadow-md hover:bg-green-700 transition duration-300 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50"
+                            >
+                                Download Modified Image
+                            </a>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const SteganographyExtractPage = ({ onNavigate }) => {
+            const [imageFile, setImageFile] = useState(null);
+            const [extractedMessage, setExtractedMessage] = useState('');
+            const [isLoading, setIsLoading] = useState(false);
+            const [error, setError] = useState(null);
+            const [originalImageUrl, setOriginalImageUrl] = useState(null);
+
+            const handleImageChange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    setImageFile(file);
+                    setOriginalImageUrl(URL.createObjectURL(file));
+                    setExtractedMessage(''); // Clear previous message
+                    setError(null);
+                } else {
+                    setImageFile(null);
+                    setOriginalImageUrl(null);
+                }
+            };
+
+            const handleExtract = async () => {
+                setError(null);
+                setExtractedMessage('');
+                if (!imageFile) {
+                    setError("Please upload an image to extract from.");
+                    return;
+                }
+
+                setIsLoading(true);
+                try {
+                    const message = await extractMessageFromImage(imageFile);
+                    setExtractedMessage(message);
+                } catch (err) {
+                    setError(`Error: ${err.message || err}`);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+
+            useEffect(() => {
+                return () => {
+                    if (originalImageUrl) {
+                        URL.revokeObjectURL(originalImageUrl);
+                    }
+                };
+            }, [originalImageUrl]);
+
+            return (
+                <div className="flex flex-col items-center p-6 bg-darkcard rounded-lg shadow-xl max-w-2xl w-full animate-fade-in-up">
+                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Seek Your Secret</h2>
+
+                    <button
+                        onClick={() => onNavigate('home')}
+                        className="mb-6 px-4 py-2 bg-gray-600 text-white font-semibold rounded-full hover:bg-gray-700 transition duration-300 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50"
+                    >
+                        &larr; Back to Home
+                    </button>
+
+                    <div className="w-full mb-6">
+                        <label htmlFor="image-upload-extract" className="block text-gray-300 text-sm font-bold mb-2">
+                            Upload Image:
+                        </label>
+                        <input
+                            type="file"
+                            id="image-upload-extract"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="block w-full text-sm text-gray-400
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-full file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-primary file:text-white
+                                hover:file:bg-secondary transition duration-200"
+                        />
+                        {originalImageUrl && (
+                            <div className="mt-4 p-2 border border-gray-600 rounded-md bg-gray-700 text-center">
+                                <p className="text-sm text-gray-300 mb-2">Image Preview:</p>
+                                <img src={originalImageUrl} alt="Preview" className="max-w-full h-auto rounded-md mx-auto" style={{ maxHeight: '200px' }} />
+                            </div>
+                        )}
+                    </div>
+
+                    <button
+                        onClick={handleExtract}
+                        disabled={isLoading}
+                        className="w-full md:w-auto px-8 py-3 bg-green-600 text-white font-semibold rounded-full shadow-lg hover:bg-green-700 transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isLoading ? (
+                            <span className="flex items-center justify-center">
+                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Extracting...
+                            </span>
+                        ) : 'Extract Message'}
+                    </button>
+
+                    {error && (
+                        <div className="mt-6 p-4 bg-red-800 border border-red-700 text-red-200 rounded-lg w-full">
+                            <p className="font-semibold">Error:</p>
+                            <p>{error}</p>
+                        </div>
+                    )}
+
+                    {extractedMessage && (
+                        <div className="mt-6 w-full p-6 bg-gray-700 rounded-lg border border-gray-600 text-center animate-fade-in-up">
+                            <h3 className="text-2xl font-bold text-white mb-4">Extracted Message</h3>
+                            <p className="text-xl text-gray-100 break-words">{extractedMessage}</p>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+
+        const App = () => {
+            const [currentPage, setCurrentPage] = useState('home');
+
+            let content;
+            switch (currentPage) {
+                case 'home':
+                    content = <HomePage />;
+                    break;
+                case 'embed':
+                    content = <SteganographyEmbedPage onNavigate={setCurrentPage} />;
+                    break;
+                case 'extract':
+                    content = <SteganographyExtractPage onNavigate={setCurrentPage} />;
+                    break;
+                case 'contact':
+                    content = <ContactPage />;
+                    break;
+                default:
+                    content = <HomePage />;
+            }
+
+            return (
+                <div className="min-h-screen flex flex-col bg-darkbg text-darktext">
+                    <NavigationBar onNavigate={setCurrentPage} />
+                    <div className="flex-grow flex items-center justify-center p-4">
+                        {content}
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

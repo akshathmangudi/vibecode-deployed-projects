@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stranger Chat</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        #app {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+        }
+        #status {
+            padding: 15px;
+            background-color: #e0f2f7;
+            color: #2196f3;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-bottom: 1px solid #c0e0eb;
+        }
+        #chat-window {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-color: #fcfcfc;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .message {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        .message.self {
+            align-self: flex-end;
+            background-color: #007bff;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        .message.other {
+            align-self: flex-start;
+            background-color: #e9e9eb;
+            color: #333;
+            border-bottom-left-radius: 5px;
+        }
+        #input-area {
+            display: flex;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-top: 1px solid #e0e0e0;
+        }
+        #message-input {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        #message-input:focus {
+            border-color: #007bff;
+        }
+        #send-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            outline: none;
+        }
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+        #send-button:active {
+            transform: translateY(1px);
+        }
+        #send-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="status">Initializing...</div>
+        <div id="chat-window"></div>
+        <div id="input-area">
+            <input type="text" id="message-input" placeholder="Type your message..." disabled>
+            <button id="send-button" disabled>Send</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs from CDN -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        // NOTE: Replace these with your actual Firebase project configuration.
+        // Go to your Firebase project settings -> "General" tab -> "Your apps" section -> "Firebase SDK snippet" -> "Config"
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        const chatWindow = document.getElementById('chat-window');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const statusDiv = document.getElementById('status');
+
+        let myId = 'user_' + Math.random().toString(36).substring(2, 10) + Date.now();
+        let peerConnection;
+        let dataChannel;
+        let chatPartnerId = null;
+        let currentSessionId = null;
+        let isInitiator = false;
+
+        const firebaseRef = database.ref();
+        const waitingUserRef = firebaseRef.child('waiting_users');
+        const sessionsRef = firebaseRef.child('chat_sessions');
+
+        const iceServers = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+            ]
+        };
+
+        function updateStatus(message) {
+            statusDiv.textContent = message;
+        }
+
+        function addMessage(sender, message) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            if (sender === 'You') {
+                messageElement.classList.add('self');
+            } else {
+                messageElement.classList.add('other');
+            }
+            messageElement.textContent = `${sender}: ${message}`;
+            chatWindow.appendChild(messageElement);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function resetChat() {
+            if (peerConnection && peerConnection.connectionState !== 'closed') {
+                peerConnection.close();
+            }
+            peerConnection = null;
+            dataChannel = null;
+            chatPartnerId = null;
+            currentSessionId = null;
+            isInitiator = false;
+            chatWindow.innerHTML = ''; // Clear chat history
+            messageInput.value = '';
+            messageInput.disabled = true;
+            sendButton.disabled = true;
+            updateStatus('Searching for a partner...');
+            setTimeout(startMatching, 1000); // Give a moment before re-matching
+        }
+
+        function setupPeerConnection(isOfferCreator) {
+            peerConnection = new RTCPeerConnection(iceServers);
+
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate && currentSessionId) {
+                    sessionsRef.child(currentSessionId).child('candidates').child(myId).push(event.candidate.toJSON());
+                }
+            };
+
+            peerConnection.onconnectionstatechange = () => {
+                console.log('RTC connection state:', peerConnection.connectionState);
+                if (peerConnection.connectionState === 'connected') {
+                    // Status update handled by data channel 'open' event for more accuracy
+                } else if (['disconnected', 'failed', 'closed'].includes(peerConnection.connectionState)) {
+                    console.log(`Connection state: ${peerConnection.connectionState}. Attempting to reset chat.`);
+                    // Ensure cleanup happens only once per disconnection event
+                    if (currentSessionId) { // If a session was active, attempt to remove it from Firebase
+                        sessionsRef.child(currentSessionId).remove();
+                    }
+                    resetChat(); 
+                }
+            };
+
+            if (isOfferCreator) {
+                dataChannel = peerConnection.createDataChannel('chat');
+                setupDataChannel(dataChannel);
+            } else {
+                peerConnection.ondatachannel = (event) => {
+                    dataChannel = event.channel;
+                    setupDataChannel(dataChannel);
+                };
+            }
+        }
+
+        function setupDataChannel(dc) {
+            dc.onopen = () => {
+                console.log('Data channel opened');
+                messageInput.disabled = false;
+                sendButton.disabled = false;
+                updateStatus('Connected! You can start chatting.');
+            };
+            dc.onmessage = (event) => {
+                addMessage('Stranger', event.data);
+            };
+            dc.onclose = () => {
+                console.log('Data channel closed');
+                // Status update and reset handled by peerConnection.onconnectionstatechange
+            };
+            dc.onerror = (error) => {
+                console.error('Data channel error:', error);
+            };
+        }
+
+        async function sendOffer() {
+            try {
+                const offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
+                sessionsRef.child(currentSessionId).child('sdp').child(myId).set(offer.toJSON());
+            } catch (e) {
+                console.error('Error sending offer:', e);
+                resetChat();
+            }
+        }
+
+        async function sendAnswer(offer) {
+            try {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+                sessionsRef.child(currentSessionId).child('sdp').child(myId).set(answer.toJSON());
+            } catch (e) {
+                console.error('Error sending answer:', e);
+                resetChat();
+            }
+        }
+
+        async function handleSdp(sdp) {
+            try {
+                if (sdp.type === 'offer') {
+                    await sendAnswer(sdp);
+                } else if (sdp.type === 'answer') {
+                    await peerConnection.setRemoteDescription(new RTCSessionDescription(sdp));
+                }
+            } catch (e) {
+                console.error('Error handling SDP:', e);
+                resetChat();
+            }
+        }
+
+        function listenForSignals() {
+            const sessionRef = sessionsRef.child(currentSessionId);
+
+            sessionRef.child('sdp').child(chatPartnerId).on('value', async (snapshot) => {
+                const sdp = snapshot.val();
+                if (sdp && peerConnection && peerConnection.remoteDescription !== sdp) {
+                    console.log('Received SDP:', sdp.type);
+                    await handleSdp(sdp);
+                }
+            });
+
+            sessionRef.child('candidates').child(chatPartnerId).on('child_added', (snapshot) => {
+                const candidate = snapshot.val();
+                if (candidate && peerConnection) {
+                    peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => console.error('Error adding ICE candidate:', e));
+                }
+            });
+
+            sessionRef.on('value', (snapshot) => {
+                if (!snapshot.exists() && peerConnection) { // Session was removed by partner
+                    console.log('Session removed by partner.');
+                    if (peerConnection.connectionState !== 'closed') {
+                         peerConnection.close(); // This triggers onconnectionstatechange which handles reset
+                    } else {
+                        resetChat(); // If already closed, manually reset
+                    }
+                }
+            });
+        }
+
+        function startMatching() {
+            updateStatus('Searching for a partner...');
+            messageInput.disabled = true;
+            sendButton.disabled = true;
+            
+            // Use a transaction to atomically pick a partner or become the waiting user
+            waitingUserRef.transaction((currentWaitingUser) => {
+                if (currentWaitingUser) {
+                    // A user is waiting, pick them up
+                    return null; // Clear the waiting user
+                } else {
+                    // No user waiting, become the waiting user
+                    return myId;
+                }
+            }, async (error, committed, snapshot) => {
+                if (error) {
+                    console.error('Transaction failed:', error);
+                    setTimeout(startMatching, 3000); // Retry matching after a delay
+                } else if (committed) {
+                    const result = snapshot.val();
+                    if (result === myId) { // I am now the waiting user
+                        console.log('I am now waiting for a partner.');
+                        updateStatus('Waiting for a partner...');
+                        // Listen for a partner to pick me up
+                        sessionsRef.on('child_added', (sessionSnapshot) => {
+                            const sessionData = sessionSnapshot.val();
+                            // Check if this session is for me and I don't already have a currentSessionId
+                            if (sessionData && sessionData.receiver === myId && !currentSessionId) {
+                                currentSessionId = sessionSnapshot.key;
+                                chatPartnerId = sessionData.initiator;
+                                isInitiator = false;
+                                console.log(`Matched with ${chatPartnerId} in session ${currentSessionId}`);
+                                sessionsRef.off('child_added'); // Stop listening for new sessions
+                                setupPeerConnection(false); // Receiver
+                                listenForSignals();
+                            }
+                        });
+                    } else { // I found a partner (result is the old waiting user's ID)
+                        chatPartnerId = result;
+                        currentSessionId = 'session_' + Math.random().toString(36).substring(2, 10) + Date.now(); // Generate unique session ID
+                        isInitiator = true;
+                        console.log(`Found partner ${chatPartnerId}. Initiating session ${currentSessionId}`);
+                        await sessionsRef.child(currentSessionId).set({
+                            initiator: myId,
+                            receiver: chatPartnerId
+                        });
+                        setupPeerConnection(true); // Initiator
+                        await sendOffer();
+                        listenForSignals();
+                    }
+                } else {
+                    // Transaction aborted, likely another client got it. Retry.
+                    console.log('Transaction aborted (another client took the spot), retrying matching...');
+                    setTimeout(startMatching, 100);
+                }
+            });
+        }
+
+        // Event Listeners
+        sendButton.addEventListener('click', () => {
+            const message = messageInput.value.trim();
+            if (message && dataChannel && dataChannel.readyState === 'open') {
+                dataChannel.send(message);
+                addMessage('You', message);
+                messageInput.value = '';
+            }
+        });
+
+        messageInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendButton.click();
+            }
+        });
+
+        // Start the application
+        updateStatus('Initializing...');
+        setTimeout(startMatching, 500); // Small delay to ensure Firebase is fully loaded
+
+        // Handle window closing/refreshing to clean up Firebase entries
+        window.addEventListener('beforeunload', () => {
+            if (currentSessionId) {
+                sessionsRef.child(currentSessionId).remove();
+            }
+            // Atomically remove self from waiting list if still there
+            waitingUserRef.transaction((currentWaitingUser) => {
+                if (currentWaitingUser === myId) {
+                    return null; // Remove myself
+                }
+                return undefined; // Abort transaction if not myId
+            });
+            if (peerConnection && peerConnection.connectionState !== 'closed') {
+                peerConnection.close();
+            }
+        });
+    </script>
+</body>
+</html>

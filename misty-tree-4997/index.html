@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(to right, hsl(210, 36%, 96%), hsl(200, 40%, 92%)); /* Gradient background */
+            margin: 0;
+        }
+
+        .calculator {
+            background-color: #ffffff; /* White background */
+            border-radius: 15px; /* More rounded corners */
+            padding: 25px; /* Increased padding */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Softer shadow */
+            width: 320px; /* Slightly wider */
+            box-sizing: border-box;
+        }
+
+        .calculator-display {
+            width: 100%; /* Full width */
+            padding: 15px; /* Increased padding */
+            font-size: 2.8em; /* Slightly larger font */
+            text-align: right;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 8px; /* Softer rounded corners */
+            background-color: hsl(210, 36%, 90%); /* Light grey display background */
+            color: hsl(210, 10%, 20%); /* Darker text */
+            box-sizing: border-box;
+            cursor: default;
+            outline: none;
+        }
+
+        .calculator-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px; /* Increased gap */
+        }
+
+        .calculator-button {
+            background-color: hsl(210, 36%, 90%); /* Light grey for numbers */
+            color: hsl(210, 10%, 20%); /* Dark grey text */
+            border: none;
+            padding: 20px;
+            font-size: 1.6em; /* Slightly larger font */
+            border-radius: 8px; /* Softer rounded corners */
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease; /* Added transform */
+            outline: none;
+            font-weight: 500; /* Slightly bolder text */
+        }
+
+        .calculator-button:hover {
+            background-color: hsl(210, 36%, 85%); /* Lighter hover */
+        }
+
+        .calculator-button:active {
+            background-color: hsl(210, 36%, 80%); /* Even lighter active */
+            transform: translateY(1px); /* Slight press effect */
+        }
+
+        .calculator-button.operator {
+            background-color: hsl(30, 80%, 70%); /* Light orange for operators */
+            color: #ffffff; /* White text */
+        }
+
+        .calculator-button.operator:hover {
+            background-color: hsl(30, 80%, 65%);
+        }
+
+        .calculator-button.operator:active {
+            background-color: hsl(30, 80%, 60%);
+        }
+
+        .calculator-button.equals {
+            background-color: hsl(120, 60%, 50%); /* Green for equals */
+            color: #ffffff; /* White text */
+            grid-column: span 2;
+        }
+
+        .calculator-button.equals:hover {
+            background-color: hsl(120, 60%, 45%);
+        }
+
+        .calculator-button.equals:active {
+            background-color: hsl(120, 60%, 40%);
+        }
+
+        .calculator-button.clear {
+            background-color: hsl(0, 70%, 60%); /* Red for clear */
+            color: #ffffff; /* White text */
+        }
+
+        .calculator-button.clear:hover {
+            background-color: hsl(0, 70%, 55%);
+        }
+
+        .calculator-button.clear:active {
+            background-color: hsl(0, 70%, 50%);
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" class="calculator-display" id="display" value="0" readonly>
+        <div class="calculator-buttons">
+            <button class="calculator-button clear">C</button>
+            <button class="calculator-button operator">/</button>
+            <button class="calculator-button operator">*</button>
+            <button class="calculator-button">7</button>
+            <button class="calculator-button">8</button>
+            <button class="calculator-button">9</button>
+            <button class="calculator-button operator">-</button>
+            <button class="calculator-button">4</button>
+            <button class="calculator-button">5</button>
+            <button class="calculator-button">6</button>
+            <button class="calculator-button operator">+</button>
+            <button class="calculator-button">1</button>
+            <button class="calculator-button">2</button>
+            <button class="calculator-button">3</button>
+            <button class="calculator-button equals">=</button>
+            <button class="calculator-button zero">0</button>
+            <button class="calculator-button decimal">.</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const display = document.getElementById('display');
+            const buttons = document.querySelectorAll('.calculator-button');
+
+            let currentOperand = '';
+            let previousOperand = '';
+            let operation = undefined;
+            let shouldResetDisplay = false;
+
+            function clear() {
+                currentOperand = '0';
+                previousOperand = '';
+                operation = undefined;
+                shouldResetDisplay = false;
+                updateDisplay();
+            }
+
+            function appendNumber(number) {
+                if (currentOperand === '0' || shouldResetDisplay) {
+                    currentOperand = number.toString();
+                    shouldResetDisplay = false;
+                } else if (number === '.' && currentOperand.includes('.')) {
+                    return;
+                } else {
+                    currentOperand += number.toString();
+                }
+                updateDisplay();
+            }
+
+            function chooseOperation(op) {
+                if (currentOperand === '') return;
+                if (previousOperand !== '') {
+                    compute();
+                }
+                operation = op;
+                previousOperand = currentOperand;
+                currentOperand = '';
+                shouldResetDisplay = true;
+            }
+
+            function compute() {
+                let computation;
+                const prev = parseFloat(previousOperand);
+                const current = parseFloat(currentOperand);
+                if (isNaN(prev) || isNaN(current)) return;
+
+                switch (operation) {
+                    case '+':
+                        computation = prev + current;
+                        break;
+                    case '-':
+                        computation = prev - current;
+                        break;
+                    case '*':
+                        computation = prev * current;
+                        break;
+                    case '/':
+                        if (current === 0) {
+                            alert("Cannot divide by zero!");
+                            clear();
+                            return;
+                        }
+                        computation = prev / current;
+                        break;
+                    default:
+                        return;
+                }
+                currentOperand = computation.toString();
+                operation = undefined;
+                previousOperand = '';
+                shouldResetDisplay = true;
+            }
+
+            function updateDisplay() {
+                display.value = currentOperand === '' ? '0' : currentOperand;
+            }
+
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const buttonText = button.textContent;
+
+                    if (button.classList.contains('clear')) {
+                        clear();
+                    } else if (button.classList.contains('operator')) {
+                        chooseOperation(buttonText);
+                    } else if (button.classList.contains('equals')) {
+                        compute();
+                        updateDisplay();
+                    } else { // It's a number or decimal
+                        appendNumber(buttonText);
+                    }
+                });
+            });
+
+            // Initialize display
+            clear();
+        });
+    </script>
+</body>
+</html>

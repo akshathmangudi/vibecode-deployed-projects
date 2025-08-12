@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Impossible Clicker</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #moving-button {
+            position: absolute;
+            padding: 20px 40px;
+            font-size: 2em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+            transition: all 0.25s ease-out;
+            user-select: none;
+            outline: none;
+            z-index: 10;
+            transform: translate(-50%, -50%);
+            left: 50%;
+            top: 50%;
+        }
+
+        #moving-button:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+
+        #confetti-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 20;
+            overflow: hidden;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            opacity: 0;
+            animation: confetti-anim var(--animation-duration) forwards;
+            animation-timing-function: cubic-bezier(0.1, 1, 0.5, 1);
+        }
+
+        @keyframes confetti-anim {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--confetti-x), var(--confetti-y)) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <button id="moving-button">Click here</button>
+        <div id="confetti-container"></div>
+    </div>
+
+    <script>
+        const button = document.getElementById('moving-button');
+        const confettiContainer = document.getElementById('confetti-container');
+        const gameContainer = document.getElementById('game-container');
+
+        function setButtonPosition() {
+            const containerRect = gameContainer.getBoundingClientRect();
+            const buttonRect = button.getBoundingClientRect();
+
+            const maxX = containerRect.width - buttonRect.width;
+            const maxY = containerRect.height - buttonRect.height;
+
+            const newX = Math.random() * maxX;
+            const newY = Math.random() * maxY;
+
+            button.style.left = `${newX + buttonRect.width / 2}px`;
+            button.style.top = `${newY + buttonRect.height / 2}px`;
+        }
+        
+        window.addEventListener('load', setButtonPosition);
+        window.addEventListener('resize', setButtonPosition);
+
+        button.addEventListener('mouseover', setButtonPosition);
+        button.addEventListener('click', triggerConfetti);
+
+        function triggerConfetti() {
+            const colors = [
+                '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4',
+                '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107',
+                '#ff9800', '#ff5722', '#795548', '#9e9e9e', '#607d8b'
+            ];
+            const numConfetti = 100;
+
+            const buttonRect = button.getBoundingClientRect();
+            const startX = buttonRect.left + buttonRect.width / 2;
+            const startY = buttonRect.top + buttonRect.height / 2;
+
+            for (let i = 0; i < numConfetti; i++) {
+                const piece = document.createElement('div');
+                piece.classList.add('confetti-piece');
+                piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                const size = Math.random() * 10 + 5;
+                piece.style.width = `${size}px`;
+                piece.style.height = `${size}px`;
+                piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '0%';
+                
+                piece.style.left = `${startX}px`;
+                piece.style.top = `${startY}px`;
+
+                const horizontalSpread = (Math.random() - 0.5) * 400;
+                const verticalInitialUp = -(Math.random() * 150 + 50);
+                const verticalFall = Math.random() * 300 + 100;
+
+                piece.style.setProperty('--confetti-x', `${horizontalSpread}px`);
+                piece.style.setProperty('--confetti-y', `${verticalInitialUp + verticalFall}px`);
+
+                const flightDuration = Math.random() * 1 + 2;
+                piece.style.setProperty('--animation-duration', `${flightDuration}s`);
+                piece.style.animationDelay = `${Math.random() * 0.2}s`;
+
+                confettiContainer.appendChild(piece);
+
+                piece.addEventListener('animationend', () => {
+                    piece.remove();
+                });
+            }
+        }
+    </script>
+</body>
+</html>

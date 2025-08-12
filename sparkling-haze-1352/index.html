@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Annual Report 2024</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+        }
+
+        .report-container {
+            background-color: #ffffff;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 900px;
+            margin: 20px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        .report-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .report-header h1 {
+            color: #0056b3;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .report-header p {
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        .table-of-contents {
+            margin-top: 30px;
+            text-align: left;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .table-of-contents h2 {
+            color: #0056b3;
+            font-size: 1.5em;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .table-of-contents ul {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .table-of-contents li a {
+            text-decoration: none;
+            color: #007bff;
+            padding: 5px 0;
+            display: block;
+            transition: color 0.2s ease-in-out;
+        }
+
+        .table-of-contents li a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .report-page {
+            margin-bottom: 60px;
+            padding-top: 20px;
+            border-top: 1px dashed #ccc;
+        }
+
+        .report-page:first-of-type {
+            border-top: none;
+        }
+
+        .report-page h2 {
+            color: #007bff;
+            font-size: 1.8em;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .report-page p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+
+        .report-footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #777;
+            font-size: 0.9em;
+        }
+
+        #scrollToTopBtn {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 99;
+            border: none;
+            outline: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            padding: 15px;
+            border-radius: 50%;
+            font-size: 18px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        #scrollToTopBtn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <header class="report-header">
+            <h1>Comprehensive Annual Report 2024</h1>
+            <p>Prepared for Stakeholders</p>
+            <nav class="table-of-contents">
+                <h2>Table of Contents</h2>
+                <ul id="toc-list"></ul>
+            </nav>
+        </header>
+
+        <main class="report-content" id="reportContent"></main>
+
+        <footer class="report-footer">
+            <p>&copy; 2024 Fictional Corporation. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <button id="scrollToTopBtn" title="Go to top">Top</button>
+
+    <script>
+        const loremIpsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`;
+
+        const generatePages = (numPages) => {
+            const reportContent = document.getElementById('reportContent');
+            const tocList = document.getElementById('toc-list');
+
+            for (let i = 1; i <= numPages; i++) {
+                const pageId = `page-${i}`;
+
+                const pageDiv = document.createElement('section');
+                pageDiv.classList.add('report-page');
+                pageDiv.id = pageId;
+
+                const pageHeader = document.createElement('h2');
+                pageHeader.textContent = `Page ${i} of ${numPages}`;
+                pageDiv.appendChild(pageHeader);
+
+                for (let j = 0; j < 3; j++) {
+                    const p = document.createElement('p');
+                    p.textContent = loremIpsum.repeat(Math.floor(Math.random() * 2) + 1);
+                    pageDiv.appendChild(p);
+                }
+
+                reportContent.appendChild(pageDiv);
+
+                const tocItem = document.createElement('li');
+                const tocLink = document.createElement('a');
+                tocLink.href = `#${pageId}`;
+                tocLink.textContent = `Page ${i}`;
+                tocItem.appendChild(tocLink);
+                tocList.appendChild(tocItem);
+            }
+        };
+
+        let mybutton = document.getElementById("scrollToTopBtn");
+
+        window.onscroll = function() {scrollFunction()};
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                mybutton.style.display = "block";
+            } else {
+                mybutton.style.display = "none";
+            }
+        }
+
+        mybutton.addEventListener('click', function() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            generatePages(40);
+        });
+    </script>
+</body>
+</html>

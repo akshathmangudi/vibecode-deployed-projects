@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Racing Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #222;
+            font-family: 'Press Start 2P', cursive;
+            color: #eee;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        @font-face {
+            font-family: 'Press Start 2P';
+            src: url('https://fonts.gstatic.com/s/pressstart2p/v15/8ReDeCnghWKfxzchDVCchxYx.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        canvas {
+            background-color: #333;
+            border: 5px solid #eee;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            display: block;
+        }
+
+        #game-info {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px 40px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            z-index: 10;
+        }
+
+        #game-info h2 {
+            margin-top: 0;
+            font-size: 2em;
+            color: #ffcc00;
+        }
+
+        #game-info p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        #start-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.5em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #start-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="game-info">
+        <h2 id="info-heading">Racing Game</h2>
+        <p id="info-message">Avoid the cars! Use Left/Right Arrow keys to move.</p>
+        <p id="final-score" style="display: none;"></p>
+        <button id="start-button">Start Game</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const gameInfo = document.getElementById('game-info');
+        const infoHeading = document.getElementById('info-heading');
+        const infoMessage = document.getElementById('info-message');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const startButton = document.getElementById('start-button');
+
+        const CANVAS_WIDTH = 400;
+        const CANVAS_HEIGHT = 600;
+        canvas.width = CANVAS_WIDTH;
+        canvas.height = CANVAS_HEIGHT;
+
+        const PLAYER_WIDTH = 50;
+        const PLAYER_HEIGHT = 80;
+        const PLAYER_SPEED = 5;
+
+        const OBSTACLE_WIDTH = 50;
+        const OBSTACLE_HEIGHT = 80;
+        let OBSTACLE_SPEED = 3;
+        const OBSTACLE_SPAWN_CHANCE = 0.02;
+        const MAX_OBSTACLES = 5;
+
+        const ROAD_LINE_WIDTH = 10;
+        const ROAD_LINE_HEIGHT = 80;
+        const ROAD_LINE_GAP = 120;
+        const NUM_LANES = 3;
+
+        let playerX;
+        let playerY;
+        let obstacles;
+        let roadLines;
+        let score;
+        let gameActive;
+        let animationFrameId;
+
+        const keysPressed = {};
+
+        const lanePositions = [];
+        for (let i = 0; i < NUM_LANES; i++) {
+            lanePositions.push(CANVAS_WIDTH / (NUM_LANES * 2) + i * (CANVAS_WIDTH / NUM_LANES));
+        }
+
+        function initGame() {
+            playerX = lanePositions[1] - PLAYER_WIDTH / 2;
+            playerY = CANVAS_HEIGHT - PLAYER_HEIGHT - 30;
+            obstacles = [];
+            roadLines = [];
+            score = 0;
+            OBSTACLE_SPEED = 3;
+            gameActive = true;
+            gameInfo.style.display = 'none';
+
+            for (let i = 0; i < CANVAS_HEIGHT / ROAD_LINE_GAP + 2; i++) {
+                roadLines.push({
+                    y: i * ROAD_LINE_GAP - ROAD_LINE_HEIGHT
+                });
+            }
+
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            gameLoop();
+        }
+
+        function drawPlayer() {
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(playerX, playerY, PLAYER_WIDTH, PLAYER_HEIGHT);
+            ctx.fillStyle = 'lightblue';
+            ctx.fillRect(playerX + 5, playerY + 10, PLAYER_WIDTH - 10, 20);
+            ctx.fillRect(playerX + 5, playerY + PLAYER_HEIGHT - 30, PLAYER_WIDTH - 10, 20);
+        }
+
+        function drawObstacles() {
+            ctx.fillStyle = 'red';
+            obstacles.forEach(obs => {
+                ctx.fillRect(obs.x, obs.y, OBSTACLE_WIDTH, OBSTACLE_HEIGHT);
+                ctx.fillStyle = 'orange';
+                ctx.fillRect(obs.x + 5, obs.y + 10, OBSTACLE_WIDTH - 10, 20);
+                ctx.fillRect(obs.x + 5, obs.y + OBSTACLE_HEIGHT - 30, OBSTACLE_WIDTH - 10, 20);
+            });
+        }
+
+        function drawRoadLines() {
+            ctx.fillStyle = 'white';
+            roadLines.forEach(line => {
+                ctx.fillRect(CANVAS_WIDTH / NUM_LANES, line.y, ROAD_LINE_WIDTH, ROAD_LINE_HEIGHT);
+                ctx.fillRect(2 * CANVAS_WIDTH / NUM_LANES, line.y, ROAD_LINE_WIDTH, ROAD_LINE_HEIGHT);
+            });
+        }
+
+        function drawScore() {
+            ctx.fillStyle = 'white';
+            ctx.font = '20px "Press Start 2P"';
+            ctx.textAlign = 'left';
+            ctx.fillText('Score: ' + score, 10, 30);
+        }
+
+        function updatePlayer() {
+            if (keysPressed['ArrowLeft']) {
+                playerX -= PLAYER_SPEED;
+            }
+            if (keysPressed['ArrowRight']) {
+                playerX += PLAYER_SPEED;
+            }
+
+            if (playerX < 0) {
+                playerX = 0;
+            }
+            if (playerX + PLAYER_WIDTH > CANVAS_WIDTH) {
+                playerX = CANVAS_WIDTH - PLAYER_WIDTH;
+            }
+        }
+
+        function updateObstacles() {
+            obstacles.forEach(obs => {
+                obs.y += OBSTACLE_SPEED;
+            });
+
+            obstacles = obstacles.filter(obs => obs.y < CANVAS_HEIGHT);
+
+            if (Math.random() < OBSTACLE_SPAWN_CHANCE && obstacles.length < MAX_OBSTACLES) {
+                const lane = Math.floor(Math.random() * NUM_LANES);
+                const newObsX = lanePositions[lane] - OBSTACLE_WIDTH / 2;
+
+                const canSpawn = !obstacles.some(obs =>
+                    Math.abs(obs.x - newObsX) < OBSTACLE_WIDTH && obs.y < OBSTACLE_HEIGHT * 2
+                );
+
+                if (canSpawn) {
+                    obstacles.push({
+                        x: newObsX,
+                        y: -OBSTACLE_HEIGHT
+                    });
+                }
+            }
+        }
+
+        function updateRoadLines() {
+            roadLines.forEach(line => {
+                line.y += OBSTACLE_SPEED;
+
+                if (line.y > CANVAS_HEIGHT) {
+                    line.y = -ROAD_LINE_HEIGHT - (CANVAS_HEIGHT % ROAD_LINE_GAP);
+                }
+            });
+        }
+
+        function checkCollisions() {
+            for (let i = 0; i < obstacles.length; i++) {
+                const obs = obstacles[i];
+                if (playerX < obs.x + OBSTACLE_WIDTH &&
+                    playerX + PLAYER_WIDTH > obs.x &&
+                    playerY < obs.y + OBSTACLE_HEIGHT &&
+                    playerY + PLAYER_HEIGHT > obs.y) {
+                    gameActive = false;
+                    showGameOver();
+                    return;
+                }
+            }
+        }
+
+        function showGameOver() {
+            infoHeading.textContent = 'Game Over!';
+            infoMessage.textContent = 'You crashed!';
+            finalScoreDisplay.textContent = 'Final Score: ' + score;
+            finalScoreDisplay.style.display = 'block';
+            startButton.textContent = 'Play Again';
+            gameInfo.style.display = 'block';
+        }
+
+        function gameLoop() {
+            if (!gameActive) {
+                return;
+            }
+
+            ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+            updatePlayer();
+            updateObstacles();
+            updateRoadLines();
+            checkCollisions();
+
+            drawRoadLines();
+            drawObstacles();
+            drawPlayer();
+            drawScore();
+
+            score++;
+            if (score % 500 === 0 && OBSTACLE_SPEED < 10) {
+                OBSTACLE_SPEED += 0.5;
+            }
+
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                keysPressed[e.key] = true;
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                keysPressed[e.key] = false;
+            }
+        });
+
+        startButton.addEventListener('click', initGame);
+
+        gameInfo.style.display = 'block';
+        infoHeading.textContent = 'Racing Game';
+        infoMessage.textContent = 'Avoid the cars! Use Left/Right Arrow keys to move.';
+        finalScoreDisplay.style.display = 'none';
+
+    </script>
+</body>
+</html>

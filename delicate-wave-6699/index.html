@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>John Doe - Resume</title>
+    <style>
+        body, h1, h2, h3, p, ul, li {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f7f6;
+            color: #333;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .resume-container {
+            width: 100%;
+            max-width: 900px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            border-radius: 8px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .header .title {
+            font-size: 1.4em;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .header .contact-info span {
+            display: inline-block;
+            margin: 0 10px;
+            font-size: 0.95em;
+            color: #666;
+        }
+
+        .header .contact-info a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .header .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .section h2 {
+            font-size: 2em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            border-left: 5px solid #007bff;
+            padding-left: 10px;
+        }
+
+        .job-entry {
+            margin-bottom: 20px;
+        }
+
+        .job-entry h3 {
+            font-size: 1.4em;
+            color: #34495e;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 5px;
+        }
+
+        .job-entry .company {
+            font-weight: normal;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .job-entry .dates {
+            font-style: italic;
+            color: #777;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .job-entry ul {
+            list-style-type: disc;
+            margin-left: 25px;
+            margin-top: 10px;
+            color: #444;
+        }
+
+        .job-entry ul li {
+            margin-bottom: 8px;
+        }
+
+        .education-entry {
+            margin-bottom: 15px;
+        }
+
+        .education-entry h3 {
+            font-size: 1.3em;
+            color: #34495e;
+            margin-bottom: 5px;
+        }
+
+        .education-entry .institution {
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .education-entry .dates {
+            font-style: italic;
+            color: #777;
+            font-size: 0.9em;
+        }
+
+        .skills-category {
+            margin-bottom: 15px;
+        }
+
+        .skills-category h3 {
+            font-size: 1.2em;
+            color: #34495e;
+            margin-bottom: 5px;
+        }
+
+        .skills-category p {
+            font-size: 1em;
+            color: #444;
+            line-height: 1.5;
+        }
+
+        .print-button {
+            display: block;
+            width: fit-content;
+            margin: 30px auto 0;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .print-button:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 768px) {
+            .resume-container {
+                padding: 20px;
+            }
+            .header h1 {
+                font-size: 2.2em;
+            }
+            .header .title {
+                font-size: 1.2em;
+            }
+            .header .contact-info span {
+                display: block;
+                margin: 5px 0;
+            }
+            .section h2 {
+                font-size: 1.8em;
+            }
+            .job-entry h3 {
+                font-size: 1.2em;
+            }
+        }
+
+        @media print {
+            body {
+                background-color: #fff;
+                padding: 0;
+                display: block;
+            }
+            .resume-container {
+                box-shadow: none;
+                margin: 0;
+                border-radius: 0;
+                padding: 0;
+            }
+            .print-button {
+                display: none;
+            }
+            .section {
+                border-bottom: 1px solid #ddd;
+            }
+            .section:last-child {
+                border-bottom: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="resume-container">
+        <header class="header">
+            <h1>John Doe</h1>
+            <p class="title">Senior Software Engineer</p>
+            <div class="contact-info">
+                <span>john.doe@example.com</span> |
+                <span>(123) 456-7890</span> |
+                <span><a href="https://linkedin.com/in/johndoe" target="_blank">LinkedIn</a></span> |
+                <span><a href="https://github.com/johndoe" target="_blank">GitHub</a></span>
+            </div>
+        </header>
+
+        <section class="section summary">
+            <h2>Professional Summary</h2>
+            <p>Highly motivated and results-driven Senior Software Engineer with 10+ years of experience in designing, developing, and deploying scalable web applications. Proficient in full-stack development, cloud platforms, and agile methodologies. Seeking to leverage expertise in a challenging role.</p>
+        </section>
+
+        <section class="section experience">
+            <h2>Work Experience</h2>
+            <div class="job-entry">
+                <h3>Senior Software Engineer <span class="company">Tech Innovators Inc.</span></h3>
+                <p class="dates">January 2018 – Present</p>
+                <ul>
+                    <li>Led development of core microservices using Node.js and Python, improving system performance by 25%.</li>
+                    <li>Designed and implemented RESTful APIs, facilitating seamless integration with front-end applications.</li>
+                    <li>Mentored junior developers, conducted code reviews, and promoted best practices in a team of 8.</li>
+                    <li>Optimized database queries (PostgreSQL) leading to a 15% reduction in data retrieval times.</li>
+                </ul>
+            </div>
+            <div class="job-entry">
+                <h3>Software Developer <span class="company">Web Solutions Co.</span></h3>
+                <p class="dates">June 2013 – December 2017</p>
+                <ul>
+                    <li>Developed and maintained customer-facing web applications using React.js and Spring Boot.</li>
+                    <li>Collaborated with product managers and UX designers to translate requirements into technical specifications.</li>
+                    <li>Implemented automated testing (Jest, JUnit) ensuring high code quality and reducing bugs by 30%.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section education">
+            <h2>Education</h2>
+            <div class="education-entry">
+                <h3>Master of Science in Computer Science</h3>
+                <p class="institution">University of Technology</p>
+                <p class="dates">2012 – 2014</p>
+            </div>
+            <div class="education-entry">
+                <h3>Bachelor of Science in Software Engineering</h3>
+                <p class="institution">State University</p>
+                <p class="dates">2008 – 2012</p>
+            </div>
+        </section>
+
+        <section class="section skills">
+            <h2>Skills</h2>
+            <div class="skills-category">
+                <h3>Programming Languages:</h3>
+                <p>JavaScript (ES6+), Python, Java, Go, C#</p>
+            </div>
+            <div class="skills-category">
+                <h3>Frameworks & Libraries:</h3>
+                <p>React, Node.js (Express), Spring Boot, Django, Flask, .NET</p>
+            </div>
+            <div class="skills-category">
+                <h3>Databases:</h3>
+                <p>PostgreSQL, MySQL, MongoDB, Redis</p>
+            </div>
+            <div class="skills-category">
+                <h3>Cloud Platforms:</h3>
+                <p>AWS (EC2, S3, Lambda, RDS), Azure, Google Cloud Platform (GCP)</p>
+            </div>
+            <div class="skills-category">
+                <h3>Tools & Methodologies:</h3>
+                <p>Git, Docker, Kubernetes, CI/CD, Agile, Scrum, TDD</p>
+            </div>
+        </section>
+        
+        <button id="printResume" class="print-button">Print Resume</button>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const printButton = document.getElementById('printResume');
+            if (printButton) {
+                printButton.addEventListener('click', () => {
+                    window.print();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

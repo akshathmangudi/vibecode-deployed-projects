@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sunset Page</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+            background: linear-gradient(to bottom, #87CEEB, #F0E68C); /* Initial day colors */
+            animation: sunsetAnimation 60s infinite alternate;
+        }
+
+        @keyframes sunsetAnimation {
+            0% { background: linear-gradient(to bottom, #87CEEB, #F0E68C); } /* SkyBlue, Khaki (Day) */
+            20% { background: linear-gradient(to bottom, #F0E68C, #FFD700); } /* Khaki, Gold (Late Afternoon) */
+            40% { background: linear-gradient(to bottom, #FFD700, #FF8C00); } /* Gold, DarkOrange (Sunset Peak) */
+            60% { background: linear-gradient(to bottom, #FF8C00, #FF6347); } /* DarkOrange, Tomato (Dusk) */
+            80% { background: linear-gradient(to bottom, #FF6347, #4B0082); } /* Tomato, Indigo (Twilight) */
+            100% { background: linear-gradient(to bottom, #4B0082, #191970); } /* Indigo, MidnightBlue (Night) */
+        }
+
+        .message-box {
+            text-align: center;
+            padding: 25px 40px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            margin-bottom: 50px;
+            max-width: 90%;
+            box-sizing: border-box;
+        }
+
+        .message-box h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .message-box p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        #time-display {
+            margin-top: 20px;
+            font-size: 1em;
+            opacity: 0.8;
+            font-weight: lighter;
+        }
+
+        @media (max-width: 600px) {
+            .message-box h1 {
+                font-size: 1.8em;
+            }
+            .message-box p {
+                font-size: 1em;
+            }
+            #time-display {
+                font-size: 0.8em;
+            }
+            .message-box {
+                padding: 15px 25px;
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="message-box">
+        <h1>As the Sun Sets...</h1>
+        <p>...let worries fade away.</p>
+        <p id="time-display"></p>
+    </div>
+
+    <script>
+        function updateTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('time-display').textContent = `Current time: ${hours}:${minutes}:${seconds}`;
+        }
+
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
+</body>
+</html>

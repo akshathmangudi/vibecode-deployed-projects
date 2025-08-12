@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Name - Portfolio</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-color: #f8f9fa;
+            --text-color: #343a40;
+            --light-bg-color: #ffffff;
+            --border-color: #dee2e6;
+            --hover-color: #0056b3;
+            --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            scroll-behavior: smooth;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--hover-color);
+        }
+
+        header {
+            background-color: var(--light-bg-color);
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        nav .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-left: 25px;
+        }
+
+        nav ul li a {
+            color: var(--text-color);
+            font-weight: bold;
+            padding: 5px 0;
+            position: relative;
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            left: 0;
+            bottom: -5px;
+            transition: width 0.3s ease;
+        }
+
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        .section {
+            padding: 60px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            color: var(--primary-color);
+            position: relative;
+            display: inline-block;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 4px;
+            background: var(--primary-color);
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: -10px;
+        }
+
+        /* Hero Section */
+        #home {
+            min-height: calc(100vh - 80px); /* Adjust based on header height */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--background-color) 0%, #e0e6ec 100%);
+            padding-top: 80px; /* To prevent content from being hidden by fixed header */
+        }
+
+        #home .hero-content {
+            padding: 20px;
+            background-color: var(--light-bg-color);
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            max-width: 800px;
+            text-align: center;
+        }
+
+        #home img.profile-pic {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 5px solid var(--primary-color);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        #home h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        #home p {
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 30px;
+        }
+
+        #home .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+
+        #home .btn:hover {
+            background-color: var(--hover-color);
+        }
+
+        /* About Me Section */
+        #about {
+            background-color: var(--light-bg-color);
+            border-top: 1px solid var(--border-color);
+        }
+
+        #about .about-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            text-align: left;
+        }
+
+        #about .text-content {
+            max-width: 800px;
+        }
+
+        #about .text-content p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        #about .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 20px;
+        }
+
+        #about .skill-item {
+            background-color: var(--background-color);
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            color: var(--primary-color);
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s ease;
+            text-align: center;
+        }
+
+        #about .skill-item:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Projects Section */
+        #projects {
+            background-color: var(--background-color);
+        }
+
+        #projects .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .project-card {
+            background-color: var(--light-bg-color);
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            text-align: left;
+            transition: transform 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .project-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .project-card .card-content {
+            padding: 25px;
+        }
+
+        .project-card h3 {
+            font-size: 1.7rem;
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .project-card p {
+            font-size: 1rem;
+            color: var(--text-color);
+            margin-bottom: 20px;
+        }
+
+        .project-card .project-links a {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .project-card .project-links a:hover {
+            background-color: var(--hover-color);
+        }
+
+        /* Contact Section */
+        #contact {
+            background-color: var(--light-bg-color);
+            border-top: 1px solid var(--border-color);
+        }
+
+        #contact p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        #contact .contact-links a {
+            display: inline-block;
+            font-size: 1.1rem;
+            margin: 0 15px;
+            padding: 10px 20px;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        #contact .contact-links a:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--secondary-color);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            nav .logo {
+                margin-bottom: 15px;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            nav ul li {
+                margin: 0 10px 10px 10px;
+            }
+
+            #home h1 {
+                font-size: 2.5rem;
+            }
+
+            #home p {
+                font-size: 1.2rem;
+            }
+
+            .section {
+                padding: 40px 15px;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+            }
+
+            .project-card .card-content {
+                padding: 20px;
+            }
+
+            .project-card h3 {
+                font-size: 1.5rem;
+            }
+
+            #contact .contact-links a {
+                margin: 10px 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #home h1 {
+                font-size: 2rem;
+            }
+            #home p {
+                font-size: 1rem;
+            }
+            #home .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+                margin: 5px 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">My Portfolio</div>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="section">
+            <div class="hero-content">
+                <img src="https://via.placeholder.com/180/007bff/FFFFFF?text=JP" alt="Your Profile Picture" class="profile-pic">
+                <h1>Hi, I'm Jane P. Doe</h1>
+                <p>A Passionate Web Developer & Designer</p>
+                <a href="#projects" class="btn">View My Work</a>
+                <a href="#contact" class="btn">Get In Touch</a>
+            </div>
+        </section>
+
+        <section id="about" class="section">
+            <h2>About Me</h2>
+            <div class="about-content">
+                <div class="text-content">
+                    <p>Hello! I'm Jane P. Doe, a web developer with a knack for building beautiful and functional web applications. My journey into web development began several years ago, driven by a curiosity to understand how websites work and a desire to create impactful digital experiences.</p>
+                    <p>I specialize in front-end development, bringing designs to life with clean, efficient, and maintainable code. I'm always eager to learn new technologies and improve my craft. When I'm not coding, you can find me exploring new design trends or contributing to open-source projects.</p>
+                </div>
+                <h3>My Skills</h3>
+                <div class="skills-grid">
+                    <div class="skill-item">HTML5</div>
+                    <div class="skill-item">CSS3</div>
+                    <div class="skill-item">JavaScript</div>
+                    <div class="skill-item">React</div>
+                    <div class="skill-item">Node.js</div>
+                    <div class="skill-item">Express.js</div>
+                    <div class="skill-item">MongoDB</div>
+                    <div class="skill-item">Git & GitHub</div>
+                    <div class="skill-item">Responsive Design</div>
+                    <div class="skill-item">UI/UX Principles</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="section">
+            <h2>My Projects</h2>
+            <div class="project-grid">
+                <div class="project-card">
+                    <img src="https://via.placeholder.com/400x250/007bff/FFFFFF?text=Project+1" alt="Project 1">
+                    <div class="card-content">
+                        <h3>E-commerce Store</h3>
+                        <p>A full-stack e-commerce platform built with React, Node.js, and MongoDB, featuring user authentication, product management, and payment integration.</p>
+                        <div class="project-links">
+                            <a href="https://example.com/ecommerce-demo" target="_blank">View Demo</a>
+                            <a href="https://github.com/yourusername/ecommerce-repo" target="_blank">GitHub Repo</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <img src="https://via.placeholder.com/400x250/6c757d/FFFFFF?text=Project+2" alt="Project 2">
+                    <div class="card-content">
+                        <h3>Task Management App</h3>
+                        <p>A single-page application for managing daily tasks, featuring drag-and-drop functionality and local storage persistence. Developed using vanilla JavaScript.</p>
+                        <div class="project-links">
+                            <a href="https://example.com/task-app-demo" target="_blank">View Demo</a>
+                            <a href="https://github.com/yourusername/task-app-repo" target="_blank">GitHub Repo</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <img src="https://via.placeholder.com/400x250/007bff/FFFFFF?text=Project+3" alt="Project 3">
+                    <div class="card-content">
+                        <h3>Personal Blog Site</h3>
+                        <p>A responsive blog platform with a clean UI, built with HTML, CSS, and some JavaScript for interactive elements. Designed to be mobile-first.</p>
+                        <div class="project-links">
+                            <a href="https://example.com/blog-demo" target="_blank">View Demo</a>
+                            <a href="https://github.com/yourusername/blog-repo" target="_blank">GitHub Repo</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="section">
+            <h2>Contact Me</h2>
+            <p>I'm always open to new opportunities and collaborations. Feel free to reach out!</p>
+            <div class="contact-links">
+                <a href="mailto:your.email@example.com">Email Me</a>
+                <a href="https://www.linkedin.com/in/yourusername" target="_blank">LinkedIn</a>
+                <a href="https://github.com/yourusername" target="_blank">GitHub</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Jane P. Doe. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('nav ul li a');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+
+                    if (targetElement) {
+                        // Smooth scroll to the target element
+                        window.scrollTo({
+                            top: targetElement.offsetTop - (document.querySelector('header').offsetHeight), // Adjust for fixed header
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

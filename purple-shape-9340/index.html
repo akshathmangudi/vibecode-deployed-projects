@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jump Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            user-select: none; /* Prevent text selection */
+        }
+
+        #game-container {
+            width: 800px;
+            height: 400px;
+            background-color: #87CEEB; /* Sky blue */
+            border: 5px solid #555;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        #ground {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px; /* Height of the ground */
+            background-color: #228B22; /* Forest green */
+            border-top: 3px solid #333;
+        }
+
+        #player {
+            width: 50px;
+            height: 50px;
+            background-color: #FF6347; /* Tomato */
+            position: absolute;
+            bottom: 50px; /* Above the ground */
+            left: 80px;
+            border-radius: 8px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .jump {
+            animation: playerJump 0.6s cubic-bezier(0.42, 0, 0.58, 1) forwards; /* Smoother jump curve */
+        }
+
+        @keyframes playerJump {
+            0% { bottom: 50px; }
+            40% { bottom: 200px; } /* Max height */
+            70% { bottom: 200px; }
+            100% { bottom: 50px; }
+        }
+
+        .obstacle {
+            background-color: #696969; /* Dim Gray */
+            position: absolute;
+            bottom: 50px; /* Above the ground */
+            width: 30px; /* Default width */
+            height: 60px; /* Default height */
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        #score {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 1.8em;
+            color: #333;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+        }
+
+        #game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 25px 40px;
+            border-radius: 10px;
+            font-size: 2em;
+            text-align: center;
+            display: none; /* Hidden by default */
+            z-index: 10;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            line-height: 1.4;
+        }
+
+        #game-over button {
+            background-color: #4CAF50; /* Green */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        #game-over button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="ground"></div>
+        <div id="player"></div>
+        <div id="score">Score: 0</div>
+        <div id="game-over">
+            Game Over!<br>
+            <button id="restart-button">Press Space or Click to Restart</button>
+        </div>
+    </div>
+
+    <script>
+        const player = document.getElementById('player');
+        const gameContainer = document.getElementById('game-container');
+        const scoreDisplay = document.getElementById('score');
+        const gameOverDisplay = document.getElementById('game-over');
+        const restartButton = document.getElementById('restart-button');
+
+        let isJumping = false;
+        let isGameOver = false;
+        let score = 0;
+        let gameSpeed = 3; // Pixels per frame for obstacle movement
+        let obstacleGenerationIntervalId;
+        let activeObstacles = []; // To keep track of obstacles for collision and removal
+
+        // Define player's ground position. Matches CSS `bottom` for player and obstacles.
+        const GROUND_LEVEL = 50; // px
+
+        function jump() {
+            if (isJumping || isGameOver) return;
+
+            isJumping = true;
+            player.classList.add('jump');
+
+            // Listen for the animation to end to reset state
+            player.addEventListener('animationend', () => {
+                player.classList.remove('jump');
+                isJumping = false;
+                // Ensure player is at ground level visually after jump animation
+                player.style.bottom = GROUND_LEVEL + 'px';
+            }, { once: true }); // `once: true` ensures the listener is removed after being called once
+        }
+
+        function createObstacle() {
+            if (isGameOver) return;
+
+            const obstacle = document.createElement('div');
+            obstacle.classList.add('obstacle');
+            gameContainer.appendChild(obstacle);
+
+            // Randomize obstacle width and height for variety
+            const obstacleWidth = 20 + Math.random() * 30; // Min 20px, Max 50px
+            const obstacleHeight = 40 + Math.random() * 60; // Min 40px, Max 100px
+            obstacle.style.width = obstacleWidth + 'px';
+            obstacle.style.height = obstacleHeight + 'px';
+            obstacle.style.bottom = GROUND_LEVEL + 'px'; // Align to ground
+
+            let obstaclePosition = gameContainer.offsetWidth; // Start from right edge
+            obstacle.style.left = obstaclePosition + 'px';
+
+            activeObstacles.push(obstacle); // Add to active obstacles list
+
+            function moveObstacle() {
+                if (isGameOver) {
+                    // Remove obstacle and filter it out if game ends during its movement
+                    obstacle.remove();
+                    activeObstacles = activeObstacles.filter(o => o !== obstacle);
+                    return;
+                }
+
+                obstaclePosition -= gameSpeed;
+                obstacle.style.left = obstaclePosition + 'px';
+
+                // Check for obstacle going off screen
+                if (obstaclePosition < -obstacleWidth) {
+                    obstacle.remove();
+                    activeObstacles = activeObstacles.filter(o => o !== obstacle); // Remove from array
+                    if (!isGameOver) { // Only score if game is not over
+                        score++;
+                        scoreDisplay.textContent = 'Score: ' + score;
+                    }
+                    return; // Stop this specific obstacle's animation loop
+                }
+
+                requestAnimationFrame(moveObstacle); // Continue moving the obstacle
+            }
+            requestAnimationFrame(moveObstacle); // Start moving the obstacle
+        }
+
+        function checkCollisions() {
+            if (isGameOver) return;
+
+            const playerRect = player.getBoundingClientRect();
+
+            // Iterate through a copy of activeObstacles to avoid issues if obstacles are removed during iteration
+            [...activeObstacles].forEach(obstacle => {
+                const obstacleRect = obstacle.getBoundingClientRect();
+
+                // Basic Axis-Aligned Bounding Box (AABB) collision detection
+                // Checks if the rectangles overlap on both X and Y axes
+                if (
+                    playerRect.left < obstacleRect.right &&
+                    playerRect.right > obstacleRect.left &&
+                    playerRect.top < obstacleRect.bottom &&
+                    playerRect.bottom > obstacleRect.top
+                ) {
+                    gameOver();
+                }
+            });
+
+            requestAnimationFrame(checkCollisions); // Keep checking collisions continuously
+        }
+
+        function startGame() {
+            isGameOver = false;
+            isJumping = false;
+            score = 0;
+            scoreDisplay.textContent = 'Score: 0';
+            gameOverDisplay.style.display = 'none';
+            player.style.bottom = GROUND_LEVEL + 'px'; // Reset player position
+
+            // Clear existing obstacles from the DOM and the activeObstacles array
+            activeObstacles.forEach(obs => obs.remove());
+            activeObstacles = [];
+
+            // Clear any lingering obstacle generation interval to prevent multiple intervals
+            if (obstacleGenerationIntervalId) {
+                clearInterval(obstacleGenerationIntervalId);
+            }
+
+            // Start new obstacle generation interval (between 1.5s and 2.5s)
+            obstacleGenerationIntervalId = setInterval(createObstacle, 1500 + Math.random() * 1000);
+
+            // Start collision checking loop
+            requestAnimationFrame(checkCollisions);
+        }
+
+        function gameOver() {
+            isGameOver = true;
+            gameOverDisplay.style.display = 'block';
+            clearInterval(obstacleGenerationIntervalId); // Stop new obstacles from spawning
+            // Active obstacles will naturally stop their individual movement loops when isGameOver is true
+        }
+
+        // Event listener for keyboard input
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'Space' || event.code === 'ArrowUp') {
+                event.preventDefault(); // Prevent default browser actions (like scrolling with spacebar)
+                if (isGameOver) {
+                    startGame(); // Restart game if game over
+                } else {
+                    jump(); // Perform a jump
+                }
+            }
+        });
+
+        // Event listener for restart button click
+        restartButton.addEventListener('click', () => {
+            startGame();
+        });
+
+        // Initial start of the game when the page loads
+        startGame();
+    </script>
+</body>
+</html>

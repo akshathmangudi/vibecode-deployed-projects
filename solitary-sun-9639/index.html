@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nike - Just Do It</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👟</text></svg>" />
+    <style>
+        :root {
+            --nike-black: #111;
+            --nike-white: #fff;
+            --nike-grey: #f4f4f4;
+            --nike-dark-grey: #666;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--nike-black);
+            background-color: var(--nike-white);
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            outline: none;
+            background: none;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background-color: var(--nike-white);
+            border-bottom: 1px solid var(--nike-grey);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--nike-black);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--nike-dark-grey);
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 20px;
+            font-size: 1.2rem;
+        }
+
+        .nav-icon {
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .nav-icon:hover {
+            color: var(--nike-dark-grey);
+        }
+
+        .hamburger-menu {
+            display: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            position: relative;
+            z-index: 1001;
+        }
+
+        .hero {
+            background-image: url('https://images.unsplash.com/photo-1579298245143-6d0e6d62886f?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+            background-size: cover;
+            background-position: center;
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            color: var(--nike-white);
+            padding: 0 40px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            font-weight: 900;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .hero-button {
+            background-color: var(--nike-white);
+            color: var(--nike-black);
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .hero-button:hover {
+            background-color: var(--nike-black);
+            color: var(--nike-white);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 50px;
+            text-transform: uppercase;
+            padding-top: 80px;
+        }
+
+        .product-grid {
+            padding: 80px 40px;
+            background-color: var(--nike-white);
+        }
+
+        .products-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background-color: var(--nike-grey);
+            border-radius: 8px;
+            overflow: hidden;
+            text-align: left;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-info h3 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .product-info p {
+            font-size: 1rem;
+            color: var(--nike-dark-grey);
+            margin-bottom: 10px;
+        }
+
+        .product-info .price {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--nike-black);
+        }
+
+        .explore-section {
+            padding: 80px 40px;
+            background-color: var(--nike-black);
+            color: var(--nike-white);
+            text-align: center;
+        }
+
+        .explore-section .section-title {
+            color: var(--nike-white);
+            padding-top: 0;
+        }
+
+        .explore-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .explore-card {
+            background-color: var(--nike-dark-grey);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            min-height: 250px;
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
+            text-align: left;
+            transition: transform 0.3s ease;
+        }
+        .explore-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .explore-card img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.7;
+            z-index: 0;
+        }
+
+        .explore-card-content {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .explore-card h3 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            color: var(--nike-white);
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+        }
+
+        .explore-card .explore-button {
+            background-color: var(--nike-white);
+            color: var(--nike-black);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .explore-card .explore-button:hover {
+            background-color: var(--nike-black);
+            color: var(--nike-white);
+        }
+
+        .footer {
+            background-color: var(--nike-black);
+            color: var(--nike-grey);
+            padding: 40px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer-nav a {
+            color: var(--nike-grey);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .footer-nav a:hover {
+            color: var(--nike-white);
+        }
+
+        .social-icons {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+        }
+
+        .social-icons a {
+            color: var(--nike-grey);
+            transition: color 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: var(--nike-white);
+        }
+
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24;
+          vertical-align: middle;
+        }
+
+        @media (max-width: 1024px) {
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+            .hero p {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+            }
+
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 70%;
+                height: 100vh;
+                background-color: var(--nike-black);
+                padding: 100px 30px;
+                box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+                transition: right 0.4s ease-in-out;
+                z-index: 999;
+                align-items: flex-start;
+                gap: 25px;
+            }
+
+            .nav-links.active {
+                right: 0;
+                display: flex;
+            }
+
+            .nav-links a {
+                color: var(--nike-white);
+                font-size: 1.5rem;
+            }
+
+            .nav-icons {
+                display: none;
+            }
+
+            .hamburger-menu {
+                display: block;
+                color: var(--nike-black);
+            }
+
+            .hamburger-menu.active {
+                color: var(--nike-white);
+            }
+
+            .hero {
+                height: 60vh;
+                padding: 0 20px;
+            }
+
+            .hero h1 {
+                font-size: 2.8rem;
+                margin-bottom: 15px;
+            }
+
+            .hero p {
+                font-size: 1rem;
+                margin-bottom: 25px;
+            }
+
+            .hero-button {
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+                margin-bottom: 30px;
+                padding-top: 50px;
+            }
+
+            .product-grid, .explore-section {
+                padding: 50px 20px;
+            }
+
+            .products-container, .explore-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .product-card img {
+                height: 250px;
+            }
+
+            .explore-card {
+                min-height: 200px;
+            }
+
+            .footer {
+                padding: 30px 20px;
+            }
+
+            .footer-nav {
+                flex-direction: column;
+                gap: 15px;
+                margin-bottom: 25px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            .hero p {
+                font-size: 0.9rem;
+            }
+            .hero-button {
+                font-size: 0.9rem;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+</head>
+<body>
+    <header class="header">
+        <a href="#" class="logo">NIKE</a>
+        <nav class="nav-links">
+            <a href="#">New Releases</a>
+            <a href="#">Men</a>
+            <a href="#">Women</a>
+            <a href="#">Kids</a>
+            <a href="#">Sale</a>
+            <a href="#">Customize</a>
+        </nav>
+        <div class="nav-icons">
+            <span class="material-symbols-outlined nav-icon">search</span>
+            <span class="material-symbols-outlined nav-icon">shopping_bag</span>
+            <span class="material-symbols-outlined nav-icon">account_circle</span>
+        </div>
+        <div class="hamburger-menu">
+            <span class="material-symbols-outlined">menu</span>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>JUST DO IT.</h1>
+                <p>Explore the latest collections and innovations designed for your ultimate performance and style.</p>
+                <a href="#" class="hero-button">Shop Now</a>
+            </div>
+        </section>
+
+        <section class="product-grid">
+            <h2 class="section-title">Featured Products</h2>
+            <div class="products-container">
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1595952097368-2c2e0b5f5e27?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Nike Air Max Shoe">
+                    <div class="product-info">
+                        <h3>Nike Air Max 270</h3>
+                        <p>Men's Shoe</p>
+                        <span class="price">$150.00</span>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1628042459738-9e5c46440263?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Nike Women's Running Shoe">
+                    <div class="product-info">
+                        <h3>Nike ZoomX Invincible Run Flyknit 3</h3>
+                        <p>Women's Road Running Shoe</p>
+                        <span class="price">$180.00</span>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1610433284094-14b2d589fbfd?q=80&w=2862&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Nike Hoodie">
+                    <div class="product-info">
+                        <h3>Nike Sportswear Club Fleece Hoodie</h3>
+                        <p>Men's Pullover Hoodie</p>
+                        <span class="price">$70.00</span>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="https://images.unsplash.com/photo-1549298916-f52d7e00f91c?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Nike Kids Shoe">
+                    <div class="product-info">
+                        <h3>Nike Air Force 1 Low LV8</h3>
+                        <p>Kids' Shoe</p>
+                        <span class="price">$90.00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="explore-section">
+            <h2 class="section-title">Shop by Category</h2>
+            <div class="explore-grid">
+                <div class="explore-card">
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c67ef?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Shoes">
+                    <div class="explore-card-content">
+                        <h3>Shoes</h3>
+                        <a href="#" class="explore-button">Shop Shoes</a>
+                    </div>
+                </div>
+                <div class="explore-card">
+                    <img src="https://images.unsplash.com/photo-1521534407519-75b244791a27?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Apparel">
+                    <div class="explore-card-content">
+                        <h3>Apparel</h3>
+                        <a href="#" class="explore-button">Shop Apparel</a>
+                    </div>
+                </div>
+                <div class="explore-card">
+                    <img src="https://images.unsplash.com/photo-1628263590520-2b1574b62e49?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Accessories">
+                    <div class="explore-card-content">
+                        <h3>Accessories</h3>
+                        <a href="#" class="explore-button">Shop Accessories</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <nav class="footer-nav">
+            <a href="#">Find a Store</a>
+            <a href="#">Become a Member</a>
+            <a href="#">Sign Up for Email</a>
+            <a href="#">Student Discounts</a>
+            <a href="#">Send Us Feedback</a>
+        </nav>
+        <div class="social-icons">
+            <a href="#" aria-label="Twitter"><span class="material-symbols-outlined">auto_stories</span></a>
+            <a href="#" aria-label="Facebook"><span class="material-symbols-outlined">groups</span></a>
+            <a href="#" aria-label="Youtube"><span class="material-symbols-outlined">videocam</span></a>
+            <a href="#" aria-label="Instagram"><span class="material-symbols-outlined">camera_alt</span></a>
+        </div>
+        <p>&copy; <span id="currentYear"></span> Nike, Inc. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const hamburgerMenu = document.querySelector('.hamburger-menu');
+            const navLinks = document.querySelector('.nav-links');
+            const currentYearSpan = document.getElementById('currentYear');
+
+            if (hamburgerMenu && navLinks) {
+                hamburgerMenu.addEventListener('click', () => {
+                    navLinks.classList.toggle('active');
+                    hamburgerMenu.classList.toggle('active');
+                    document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : 'auto';
+                });
+
+                navLinks.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (window.innerWidth <= 768) {
+                            navLinks.classList.remove('active');
+                            hamburgerMenu.classList.remove('active');
+                            document.body.style.overflow = 'auto';
+                        }
+                    });
+                });
+            }
+
+            if (currentYearSpan) {
+                currentYearSpan.textContent = new Date().getFullYear();
+            }
+        });
+    </script>
+</body>
+</html>

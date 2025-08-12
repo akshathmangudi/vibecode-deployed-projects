@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome!</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        #app {
+            background-color: #ffffff;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid #e0e0e0;
+            box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 2.5em;
+            letter-spacing: -0.02em;
+        }
+
+        p {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        #nameInputSection {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #userNameInput {
+            width: calc(100% - 20px);
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1em;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #userNameInput:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        button#saveNameBtn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        button#saveNameBtn:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        button#saveNameBtn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        button#saveNameBtn:disabled {
+            background-color: #a0c3e8;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        button#clearNameBtn {
+            background-color: #dc3545;
+            color: white;
+            margin-top: 20px;
+        }
+
+        button#clearNameBtn:hover {
+            background-color: #c82333;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        button#clearNameBtn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #personalizedGreeting {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #28a745;
+            margin-top: 25px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1 id="greetingText"></h1>
+        <div id="nameInputSection">
+            <p>What's your name?</p>
+            <input type="text" id="userNameInput" placeholder="e.g., Alice">
+            <button id="saveNameBtn" disabled>Save Name</button>
+        </div>
+        <p id="personalizedGreeting" style="display: none;"></p>
+        <button id="clearNameBtn" style="display: none;">Not me? Clear Name</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const greetingTextElement = document.getElementById('greetingText');
+            const nameInputSection = document.getElementById('nameInputSection');
+            const userNameInput = document.getElementById('userNameInput');
+            const saveNameBtn = document.getElementById('saveNameBtn');
+            const personalizedGreetingElement = document.getElementById('personalizedGreeting');
+            const clearNameBtn = document.getElementById('clearNameBtn');
+
+            function getTimeBasedGreeting() {
+                const hour = new Date().getHours();
+                if (hour < 12) {
+                    return 'Good Morning';
+                } else if (hour < 18) {
+                    return 'Good Afternoon';
+                } else {
+                    return 'Good Evening';
+                }
+            }
+
+            function updateDisplay() {
+                const userName = localStorage.getItem('userName');
+                const timeGreeting = getTimeBasedGreeting();
+
+                if (userName) {
+                    greetingTextElement.textContent = `${timeGreeting}, ${userName}!`;
+                    personalizedGreetingElement.textContent = `Welcome back, ${userName}!`;
+                    nameInputSection.style.display = 'none';
+                    personalizedGreetingElement.style.display = 'block';
+                    clearNameBtn.style.display = 'block';
+                } else {
+                    greetingTextElement.textContent = `${timeGreeting}!`;
+                    nameInputSection.style.display = 'flex'; /* Use flex for vertical centering of input elements */
+                    personalizedGreetingElement.style.display = 'none';
+                    clearNameBtn.style.display = 'none';
+                    userNameInput.value = ''; // Clear input field if no name stored
+                    saveNameBtn.disabled = true; // Ensure save button is disabled when input is cleared
+                }
+            }
+
+            saveNameBtn.addEventListener('click', () => {
+                const name = userNameInput.value.trim();
+                if (name) {
+                    localStorage.setItem('userName', name);
+                    updateDisplay();
+                } else {
+                    alert('Please enter your name!');
+                    userNameInput.focus();
+                }
+            });
+
+            userNameInput.addEventListener('input', () => {
+                saveNameBtn.disabled = userNameInput.value.trim().length === 0;
+            });
+
+            userNameInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter' && !saveNameBtn.disabled) {
+                    saveNameBtn.click();
+                }
+            });
+
+            clearNameBtn.addEventListener('click', () => {
+                localStorage.removeItem('userName');
+                updateDisplay();
+            });
+
+            // Initial call to set up the page
+            updateDisplay();
+        });
+    </script>
+</body>
+</html>

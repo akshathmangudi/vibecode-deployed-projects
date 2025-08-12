@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organized Desk Setup</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #e0e2e5, #f0f2f5);
+            z-index: -2;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: inset 0 100px 50px -50px rgba(0, 0, 0, 0.1);
+            z-index: -1;
+        }
+
+        #desk-setup {
+            position: relative;
+            width: 800px;
+            height: 500px;
+            perspective: 1000px;
+        }
+
+        #desk {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%) rotateX(10deg);
+            width: 700px;
+            height: 300px;
+            background-color: #3f3f3f;
+            border-radius: 10px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        #desk::before, #desk::after {
+            content: '';
+            position: absolute;
+            bottom: -200px;
+            width: 30px;
+            height: 200px;
+            background-color: #2c2c2c;
+            border-radius: 5px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+        #desk::before {
+            left: 30px;
+        }
+        #desk::after {
+            right: 30px;
+        }
+
+        #monitor-arm {
+            position: absolute;
+            top: -150px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 170px;
+            background-color: #555;
+            border-radius: 5px;
+            z-index: 2;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #monitor {
+            position: absolute;
+            top: -120px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 350px;
+            height: 200px;
+            background-color: #1a1a1a;
+            border: 5px solid #2c2c2c;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            z-index: 3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #eee;
+            font-size: 1.5em;
+            overflow: hidden;
+        }
+        #monitor::before {
+            content: 'Clean Setup';
+            font-weight: bold;
+            color: #4CAF50;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        #keyboard {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 70px;
+            background-color: #2b2b2b;
+            border-radius: 8px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            z-index: 4;
+        }
+
+        #mouse {
+            position: absolute;
+            bottom: 70px;
+            left: calc(50% + 180px);
+            transform: translateX(-50%);
+            width: 50px;
+            height: 80px;
+            background-color: #2b2b2b;
+            border-radius: 30px 30px 15px 15px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            z-index: 4;
+        }
+
+        .organizer {
+            position: absolute;
+            width: 70px;
+            height: 80px;
+            background-color: #4a4a4a;
+            border-radius: 8px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+            z-index: 4;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            padding: 5px 0;
+            box-sizing: border-box;
+        }
+        .organizer.left {
+            bottom: 120px;
+            left: 80px;
+            transform: rotateY(15deg);
+        }
+        .organizer.right {
+            bottom: 120px;
+            right: 80px;
+            transform: rotateY(-15deg);
+        }
+        .organizer div {
+            width: 80%;
+            height: 15px;
+            background-color: #666;
+            border-radius: 3px;
+        }
+
+        #plant {
+            position: absolute;
+            bottom: 100px;
+            left: 200px;
+            width: 60px;
+            height: 60px;
+            z-index: 4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #plant .pot {
+            width: 30px;
+            height: 30px;
+            background-color: #8B4513;
+            border-radius: 0 0 15px 15px;
+        }
+        #plant .leaves {
+            width: 40px;
+            height: 30px;
+            background-color: #228B22;
+            border-radius: 50%;
+            position: relative;
+            top: -10px;
+            box-shadow: 0 0 10px rgba(34, 139, 34, 0.5);
+        }
+        #plant .leaves::before, #plant .leaves::after {
+            content: '';
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background-color: #3CB371;
+            border-radius: 50%;
+        }
+        #plant .leaves::before {
+            top: -5px;
+            left: -10px;
+        }
+        #plant .leaves::after {
+            top: -5px;
+            right: -10px;
+        }
+
+        #lamp {
+            position: absolute;
+            bottom: 100px;
+            right: 180px;
+            width: 50px;
+            height: 100px;
+            z-index: 4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #lamp .base {
+            width: 30px;
+            height: 10px;
+            background-color: #666;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        #lamp .stand {
+            width: 8px;
+            height: 70px;
+            background-color: #777;
+            border-radius: 4px;
+            transform-origin: bottom center;
+            transform: rotate(-10deg);
+        }
+        #lamp .head {
+            width: 40px;
+            height: 30px;
+            background-color: #999;
+            border-radius: 50% 50% 0 0;
+            position: relative;
+            top: -10px;
+            left: -10px;
+            transform: rotate(-5deg);
+            box-shadow: 0 0 15px rgba(255, 255, 0, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div id="desk-setup">
+        <div id="desk">
+            <div id="monitor-arm"></div>
+            <div id="monitor"></div>
+            <div id="keyboard"></div>
+            <div id="mouse"></div>
+            <div id="plant">
+                <div class="pot"></div>
+                <div class="leaves"></div>
+            </div>
+            <div id="lamp">
+                <div class="base"></div>
+                <div class="stand"></div>
+                <div class="head"></div>
+            </div>
+            <div class="organizer left">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+            <div class="organizer right">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

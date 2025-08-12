@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Page App</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px 60px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            max-width: 100%;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1.0em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+            outline: none;
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        button:active {
+            background-color: #004085;
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 123, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hello, Web App!</h1>
+        <p id="message">Welcome to your simple, single-file web application. Click the button to see some magic!</p>
+        <button id="actionButton">Click Me</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const actionButton = document.getElementById('actionButton');
+            const messageParagraph = document.getElementById('message');
+            let clickCount = 0;
+
+            actionButton.addEventListener('click', () => {
+                clickCount++;
+                switch (clickCount) {
+                    case 1:
+                        messageParagraph.textContent = "You clicked it! This demonstrates basic JavaScript interaction.";
+                        actionButton.textContent = "Click Again?";
+                        break;
+                    case 2:
+                        messageParagraph.textContent = "That's your second click! The app is still running smoothly.";
+                        actionButton.textContent = "One More Time!";
+                        break;
+                    case 3:
+                        messageParagraph.textContent = "You're persistent! This is just a simple example of a self-contained app.";
+                        actionButton.textContent = "Reset";
+                        break;
+                    default:
+                        messageParagraph.textContent = "Welcome to your simple, single-file web application. Click the button to see some magic!";
+                        actionButton.textContent = "Click Me";
+                        clickCount = 0; // Reset count
+                        break;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

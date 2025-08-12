@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Suggestor</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 2.2em;
+        }
+
+        p {
+            margin-bottom: 25px;
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            outline: none;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+            background-color: #2471a3;
+        }
+
+        .movie-card {
+            margin-top: 30px;
+            padding: 25px;
+            background-color: #e8f5ff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            text-align: left;
+            min-height: 120px; /* To prevent layout shift when content loads */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            opacity: 0; /* Hidden initially */
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+
+        .movie-card.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .movie-card h2 {
+            color: #34495e;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+
+        .movie-card p {
+            margin-bottom: 8px;
+            font-size: 1em;
+            color: #4a4a4a;
+            text-align: left;
+        }
+
+        .movie-card p strong {
+            color: #2c3e50;
+        }
+
+        .movie-card .plot {
+            font-style: italic;
+            color: #666;
+            margin-top: 15px;
+            border-top: 1px solid #cceeff;
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Movie Suggestor</h1>
+        <p>Need help deciding what to watch? Click the button for a random movie suggestion!</p>
+        <button id="suggestButton">Suggest a Movie</button>
+        <div id="movieSuggestion" class="movie-card">
+            <!-- Movie suggestion will be displayed here -->
+            <p>Your movie suggestion will appear here.</p>
+        </div>
+    </div>
+
+    <script>
+        const movies = [
+            { title: "The Shawshank Redemption", genre: "Drama", year: 1994, plot: "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency." },
+            { title: "The Dark Knight", genre: "Action/Crime", year: 2008, plot: "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice." },
+            { title: "Pulp Fiction", genre: "Crime/Drama", year: 1994, plot: "The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption." },
+            { title: "Forrest Gump", genre: "Drama/Romance", year: 1994, plot: "The presidencies of Kennedy and Johnson, the Vietnam War, the Watergate scandal and other historical events unfold from the perspective of an Alabama man with an IQ of 75, whose only desire is to be reunited with his childhood sweetheart." },
+            { title: "Inception", genre: "Sci-Fi/Action", year: 2010, plot: "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O." },
+            { title: "The Matrix", genre: "Sci-Fi/Action", year: 1999, plot: "A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers." },
+            { title: "Interstellar", genre: "Sci-Fi/Adventure", year: 2014, plot: "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival." },
+            { title: "Spirited Away", genre: "Animation/Fantasy", year: 2001, plot: "During her family's move to the suburbs, a sullen 10-year-old girl wanders into a world ruled by gods, witches, and spirits, and where humans are changed into beasts." },
+            { title: "Parasite", genre: "Thriller/Drama", year: 2019, plot: "Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Park family and the destitute Kim clan." },
+            { title: "La La Land", genre: "Musical/Drama", year: 2016, plot: "While navigating their careers in Los Angeles, a pianist and an actress fall in love while attempting to reconcile their aspirations for the future." },
+            { title: "Jaws", genre: "Thriller/Adventure", year: 1975, plot: "When a gigantic great white shark begins to menace the small island community of Amity, a police chief, a marine scientist and a grizzled fisherman set out to kill it." },
+            { title: "Eternal Sunshine of the Spotless Mind", genre: "Sci-Fi/Romance", year: 2004, plot: "When their relationship turns sour, a couple undergoes a medical procedure to have each other erased from their memories." },
+            { title: "No Country for Old Men", genre: "Crime/Thriller", year: 2007, plot: "Violence and mayhem ensue after a hunter stumbles upon a drug deal gone wrong at the Texas-Mexico border." }
+        ];
+
+        const suggestButton = document.getElementById('suggestButton');
+        const movieSuggestionDiv = document.getElementById('movieSuggestion');
+
+        function getRandomMovie() {
+            const randomIndex = Math.floor(Math.random() * movies.length);
+            return movies[randomIndex];
+        }
+
+        suggestButton.addEventListener('click', () => {
+            const movie = getRandomMovie();
+            movieSuggestionDiv.innerHTML = `
+                <h2>${movie.title}</h2>
+                <p><strong>Genre:</strong> ${movie.genre}</p>
+                <p><strong>Year:</strong> ${movie.year}</p>
+                <p class="plot"><strong>Plot:</strong> ${movie.plot}</p>
+            `;
+            // Remove 'show' class first to trigger animation on subsequent clicks
+            movieSuggestionDiv.classList.remove('show');
+            // Force reflow
+            void movieSuggestionDiv.offsetWidth;
+            // Add 'show' class to trigger fade-in animation
+            movieSuggestionDiv.classList.add('show');
+        });
+
+        // Initialize with a hidden state that will fade in on first click,
+        // or clear placeholder and hide if no immediate content
+        movieSuggestionDiv.innerHTML = '<p>Your movie suggestion will appear here.</p>';
+        movieSuggestionDiv.classList.add('show'); // Make initial placeholder visible
+    </script>
+</body>
+</html>

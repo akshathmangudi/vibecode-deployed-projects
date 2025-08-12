@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Details Collector</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 30px auto;
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+            margin-bottom: 35px;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+
+        h2 { /* Added for new sections */
+            color: #0056b3;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #555;
+            font-size: 1.1em;
+        }
+
+        textarea, input[type="text"] { /* Added input[type="text"] */
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ccddee;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+            resize: vertical;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        textarea {
+             min-height: 120px; /* Specific to textarea */
+        }
+
+        textarea:focus, input[type="text"]:focus { /* Added input[type="text"] */
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Styles for the new Goals section */
+        .goals-section, .session-check-section { /* Added .session-check-section */
+            margin-top: 40px;
+            padding: 25px;
+            background-color: #e9f7ff;
+            border: 1px solid #b3e0ff;
+            border-radius: 10px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .goals-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .goals-input-group input[type="text"] {
+            flex-grow: 1;
+            margin-bottom: 0; /* Override default margin for input */
+        }
+
+        .goals-input-group button {
+            width: auto; /* Override default button width */
+            padding: 10px 20px;
+            font-size: 1em;
+            display: inline-block; /* Make it fit the flex container */
+        }
+
+        #goalList {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #goalList li {
+            background-color: #ffffff;
+            border: 1px solid #cceeff;
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            font-size: 1.05em;
+            transition: background-color 0.3s ease;
+        }
+
+        #goalList li.completed {
+            background-color: #e6ffe6; /* Light green for completed */
+            text-decoration: line-through;
+            color: #666;
+        }
+
+        #goalList li input[type="checkbox"] {
+            margin-right: 15px;
+            transform: scale(1.4); /* Make checkbox larger */
+            cursor: pointer;
+            min-width: 20px; /* Ensure space for it */
+            min-height: 20px;
+        }
+
+        #goalList li span {
+            flex-grow: 1;
+        }
+
+        /* Styles for Session ID Check Section */
+        .session-check-section .form-group {
+            margin-bottom: 0; /* Adjust spacing */
+        }
+        .session-check-section input[type="text"] {
+            margin-bottom: 15px;
+        }
+        .session-check-section button {
+            margin-bottom: 15px;
+        }
+        #sessionStatus {
+            text-align: center;
+            font-size: 1.1em;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+        #sessionStatus.success {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+        #sessionStatus.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+        #sessionStatus.warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border-color: #ffeeba;
+        }
+
+
+        /* Existing output styles */
+        #output {
+            margin-top: 35px;
+            padding: 25px;
+            background-color: #e9f7ff;
+            border: 1px solid #b3e0ff;
+            border-radius: 10px;
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #output h2 {
+            color: #0056b3;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        #output p {
+            margin-bottom: 12px;
+            padding-left: 20px;
+            position: relative;
+            font-size: 1.05em;
+            line-height: 1.5;
+        }
+
+        #output p strong {
+            color: #004085;
+            display: inline-block;
+            min-width: 90px;
+        }
+
+        #output p::before {
+            content: '•';
+            color: #007bff;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            font-size: 1.2em;
+            top: 0px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Website Structure Details</h1>
+        <form id="websiteDetailsForm">
+            <div class="form-group">
+                <label for="purpose">Website's Purpose:</label>
+                <textarea id="purpose" rows="5" placeholder="e.g., To sell handmade crafts, to provide information on local events, to showcase a design portfolio, to educate on a specific topic." required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="content">Website's Key Content:</label>
+                <textarea id="content" rows="5" placeholder="e.g., Product listings, event calendar, blog posts, contact form, image gallery, About Us page, user testimonials, service descriptions." required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="design">Website's Desired Design (Tone & Style):</label>
+                <textarea id="design" rows="5" placeholder="e.g., Modern and minimalist, rustic and cozy, professional and corporate, vibrant and playful. Include color preferences, layout ideas (e.g., grid-based), or overall aesthetic." required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="notes">Additional Notes / To-Do List:</label>
+                <textarea id="notes" rows="5" placeholder="e.g., Remember to add social media links, check mobile responsiveness, or a list of specific tasks."></textarea>
+            </div>
+            <button type="submit">Submit Details</button>
+        </form>
+
+        <div class="goals-section">
+            <h2>Website Development Goals</h2>
+            <div class="goals-input-group">
+                <input type="text" id="newGoalInput" placeholder="Add a new development goal...">
+                <button id="addGoalButton">Add Goal</button>
+            </div>
+            <ul id="goalList">
+                <!-- Goals will be added here by JavaScript -->
+            </ul>
+        </div>
+
+        <div class="session-check-section">
+            <h2>Project Session ID Check</h2>
+            <div class="form-group">
+                <input type="text" id="sessionIdInput" placeholder="Enter Project Session ID (e.g., PROJ-XYZ123)">
+                <button id="checkSessionButton">Check Status</button>
+                <p id="sessionStatus"></p>
+            </div>
+        </div>
+
+        <div id="output">
+            <h2>Your Website Details Summary:</h2>
+            <p><strong>Purpose:</strong> <span id="outputPurpose"></span></p>
+            <p><strong>Content:</strong> <span id="outputContent"></span></p>
+            <p><strong>Design:</strong> <span id="outputDesign"></span></p>
+            <p><strong>Notes:</strong> <span id="outputNotes"></span></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Existing form elements
+            const form = document.getElementById('websiteDetailsForm');
+            const purposeInput = document.getElementById('purpose');
+            const contentInput = document.getElementById('content');
+            const designInput = document.getElementById('design');
+            const notesInput = document.getElementById('notes');
+
+            // Output elements
+            const outputDiv = document.getElementById('output');
+            const outputPurpose = document.getElementById('outputPurpose');
+            const outputContent = document.getElementById('outputContent');
+            const outputDesign = document.getElementById('outputDesign');
+            const outputNotes = document.getElementById('outputNotes');
+
+            // New Goals section elements
+            const newGoalInput = document.getElementById('newGoalInput');
+            const addGoalButton = document.getElementById('addGoalButton');
+            const goalList = document.getElementById('goalList');
+
+            // New Session ID Check elements
+            const sessionIdInput = document.getElementById('sessionIdInput');
+            const checkSessionButton = document.getElementById('checkSessionButton');
+            const sessionStatus = document.getElementById('sessionStatus');
+
+            // --- Form Submission Logic ---
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+
+                const purpose = purposeInput.value.trim();
+                const content = contentInput.value.trim();
+                const design = designInput.value.trim();
+                const notes = notesInput.value.trim();
+
+                outputPurpose.textContent = purpose || 'Not provided.';
+                outputContent.textContent = content || 'Not provided.';
+                outputDesign.textContent = design || 'Not provided.';
+                outputNotes.textContent = notes || 'No additional notes.';
+
+                outputDiv.style.display = 'block';
+
+                // Scroll to the output section smoothly
+                outputDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+
+            // --- Goals List Logic ---
+            addGoalButton.addEventListener('click', () => {
+                const goalText = newGoalInput.value.trim();
+                if (goalText) {
+                    addGoalItem(goalText);
+                    newGoalInput.value = ''; // Clear input
+                    newGoalInput.focus(); // Keep focus for quick entry
+                }
+            });
+
+            // Allow adding goals with Enter key
+            newGoalInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // Prevent default form submission behavior
+                    addGoalButton.click();
+                }
+            });
+
+            function addGoalItem(text) {
+                const listItem = document.createElement('li');
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.addEventListener('change', () => {
+                    listItem.classList.toggle('completed', checkbox.checked);
+                });
+
+                const span = document.createElement('span');
+                span.textContent = text;
+
+                listItem.appendChild(checkbox);
+                listItem.appendChild(span);
+                goalList.appendChild(listItem);
+            }
+
+            // --- Session ID Check Logic ---
+            checkSessionButton.addEventListener('click', () => {
+                const sessionId = sessionIdInput.value.trim();
+                sessionStatus.textContent = ''; // Clear previous status
+                sessionStatus.className = ''; // Clear previous classes
+
+                if (!sessionId) {
+                    sessionStatus.textContent = 'Please enter a Session ID.';
+                    sessionStatus.classList.add('warning');
+                } else {
+                    // Simulate an asynchronous check
+                    sessionStatus.textContent = 'Checking...';
+                    sessionStatus.classList.add('warning'); // Temporary styling during check
+
+                    setTimeout(() => {
+                        if (sessionId.startsWith('PROJ-') && sessionId.length >= 10) { // Simple simulated valid ID rule
+                            sessionStatus.textContent = `Session ID "${sessionId}" found and accessible.`;
+                            sessionStatus.classList.remove('warning');
+                            sessionStatus.classList.add('success');
+                        } else {
+                            sessionStatus.textContent = `Session ID "${sessionId}" not found or inaccessible. (Simulated)`;
+                            sessionStatus.classList.remove('warning');
+                            sessionStatus.classList.add('error');
+                        }
+                    }, 500); // Simulate network delay
+                }
+            });
+
+            // Allow checking session ID with Enter key
+            sessionIdInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    checkSessionButton.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

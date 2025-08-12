@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Race</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px 60px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+            font-size: 2.8em;
+            letter-spacing: 1px;
+        }
+        .game-status {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #007bff;
+            min-height: 1.8em; /* To prevent layout shift when text changes */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Changed for responsiveness */
+            gap: 5px;
+            max-width: 315px; /* Added max-width */
+            width: 90%; /* Added percentage width for responsiveness */
+            margin: 20px auto;
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .cell {
+            background-color: #ffffff;
+            border: 2px solid #adb5bd;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            border-radius: 4px;
+            aspect-ratio: 1 / 1; /* Added to maintain square aspect ratio */
+        }
+        .cell:hover {
+            background-color: #f8f9fa;
+        }
+        .cell.X {
+            color: #dc3545; /* Red for X */
+        }
+        .cell.O {
+            color: #28a745; /* Green for O */
+        }
+        button {
+            background-color: #007bff; /* Blue for reset button */
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            outline: none;
+            margin-top: 30px;
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+        }
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .crazy-facts-container {
+            background-color: #e9f0f7; /* Lighter blue tint */
+            padding: 25px 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            max-width: 500px;
+            width: 90%;
+            margin-top: 30px; /* Space from the game container */
+            margin-bottom: 30px; /* Space below this container */
+            text-align: left; /* Align text within facts container */
+        }
+        .crazy-facts-container h2 {
+            color: #007bff;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+        .crazy-facts-container ul {
+            list-style-type: disc;
+            padding-left: 25px;
+            margin: 0;
+            line-height: 1.6;
+        }
+        .crazy-facts-container li {
+            margin-bottom: 10px;
+            color: #555;
+        }
+        .crazy-facts-container li:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tic-Tac-Toe</h1>
+        <div id="statusDisplay" class="game-status"></div>
+        <div id="gameBoard" class="game-board">
+            <div class="cell" data-cell-index="0"></div>
+            <div class="cell" data-cell-index="1"></div>
+            <div class="cell" data-cell-index="2"></div>
+            <div class="cell" data-cell-index="3"></div>
+            <div class="cell" data-cell-index="4"></div>
+            <div class="cell" data-cell-index="5"></div>
+            <div class="cell" data-cell-index="6"></div>
+            <div class="cell" data-cell-index="7"></div>
+            <div class="cell" data-cell-index="8"></div>
+        </div>
+        <button id="resetButton">Play Again</button>
+    </div>
+
+    <div class="crazy-facts-container">
+        <h2>Crazy Facts!</h2>
+        <ul>
+            <li>Did you know that a group of pugs is called a "grumble"?</li>
+            <li>Honey never spoils. Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3,000 years old and still perfectly edible.</li>
+            <li>A single cloud can weigh more than 1 million pounds.</li>
+            <li>The shortest war in history was between Britain and Zanzibar on August 27, 1896. Zanzibar surrendered after 38 minutes.</li>
+        </ul>
+    </div>
+
+    <script>
+        const statusDisplay = document.getElementById('statusDisplay');
+        const gameBoard = document.getElementById('gameBoard');
+        const resetButton = document.getElementById('resetButton');
+        const cells = document.querySelectorAll('.cell');
+
+        let board = ['', '', '', '', '', '', '', '', ''];
+        let currentPlayer = 'X';
+        let gameActive = true;
+
+        const winningConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        function handleResultValidation() {
+            let roundWon = false;
+            for (let i = 0; i < winningConditions.length; i++) {
+                const winCondition = winningConditions[i];
+                let a = board[winCondition[0]];
+                let b = board[winCondition[1]];
+                let c = board[winCondition[2]];
+                if (a === '' || b === '' || c === '') {
+                    continue;
+                }
+                if (a === b && b === c) {
+                    roundWon = true;
+                    // Highlight winning cells
+                    winCondition.forEach(index => cells[index].style.backgroundColor = '#d4edda'); // Light green
+                    break;
+                }
+            }
+
+            if (roundWon) {
+                statusDisplay.textContent = `Player ${currentPlayer} has won!`;
+                statusDisplay.style.color = '#28a745'; // Green for win
+                gameActive = false;
+                return;
+            }
+
+            if (!board.includes('')) {
+                statusDisplay.textContent = `It's a Draw!`;
+                statusDisplay.style.color = '#ffc107'; // Yellow for draw
+                gameActive = false;
+                return;
+            }
+
+            changePlayer();
+        }
+
+        function updateCell(clickedCell, clickedCellIndex) {
+            board[clickedCellIndex] = currentPlayer;
+            clickedCell.textContent = currentPlayer;
+            clickedCell.classList.add(currentPlayer); // Add class for styling X/O
+        }
+
+        function changePlayer() {
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            statusDisplay.textContent = `Player ${currentPlayer}'s Turn`;
+            statusDisplay.style.color = '#007bff'; // Reset status color
+        }
+
+        function handleCellClick(event) {
+            const clickedCell = event.target;
+            const clickedCellIndex = parseInt(clickedCell.dataset.cellIndex);
+
+            if (board[clickedCellIndex] !== '' || !gameActive) {
+                return; // Cell already taken or game not active
+            }
+
+            updateCell(clickedCell, clickedCellIndex);
+            handleResultValidation();
+        }
+
+        function resetGame() {
+            board = ['', '', '', '', '', '', '', '', ''];
+            gameActive = true;
+            currentPlayer = 'X';
+            statusDisplay.textContent = `Player ${currentPlayer}'s Turn`;
+            statusDisplay.style.color = '#007bff'; // Reset status color
+            cells.forEach(cell => {
+                cell.textContent = '';
+                cell.classList.remove('X', 'O');
+                cell.style.backgroundColor = '#ffffff'; // Reset background color
+            });
+        }
+
+        // Event Listeners
+        cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+        resetButton.addEventListener('click', resetGame);
+
+        // Initial status display
+        statusDisplay.textContent = `Player ${currentPlayer}'s Turn`;
+    </script>
+</body>
+</html>

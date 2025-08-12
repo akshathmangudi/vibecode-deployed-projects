@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Glide X - The Ultimate Sneaker</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --light-bg: #ecf0f1;
+            --dark-text: #2f3640;
+            --white: #ffffff;
+            --shadow-light: rgba(0, 0, 0, 0.1);
+            --shadow-medium: rgba(0, 0, 0, 0.2);
+            --transition-speed: 0.3s;
+            --max-width: 1200px;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--light-bg), #dbe0e1);
+            color: var(--dark-text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            background-size: 200% 200%;
+            animation: gradientShift 15s ease infinite alternate;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        .header {
+            width: 100%;
+            background-color: var(--secondary-color);
+            color: var(--white);
+            padding: 1.5rem 0;
+            text-align: center;
+            box-shadow: var(--shadow-medium);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transform: translateY(-100%);
+            animation: slideInDown 0.8s ease-out forwards;
+            animation-delay: 0.2s;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .product-container {
+            display: flex;
+            flex-wrap: wrap;
+            width: 90%;
+            max-width: var(--max-width);
+            background-color: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 15px 30px var(--shadow-medium);
+            margin: 4rem auto 2rem auto;
+            padding: 2.5rem;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInMoveUp 1s ease-out forwards;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes fadeInMoveUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+
+        .product-image {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .product-image img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 10px;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        }
+
+        .product-image img:hover {
+            transform: scale(1.05) rotateZ(3deg);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .product-details {
+            flex: 1;
+            min-width: 300px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .product-details h2 {
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+            font-weight: 800;
+            animation: fadeInMoveUp 1s ease-out forwards;
+            animation-delay: 0.7s;
+        }
+
+        .product-details .product-price {
+            font-size: 2.2rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            animation: fadeInMoveUp 1s ease-out forwards;
+            animation-delay: 0.9s;
+        }
+
+        .product-details .product-description {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            color: var(--dark-text);
+            animation: fadeInMoveUp 1s ease-out forwards;
+            animation-delay: 1.1s;
+        }
+
+        .option-group {
+            margin-bottom: 1.5rem;
+            animation: fadeInMoveUp 1s ease-out forwards;
+            animation-delay: 1.3s;
+        }
+
+        .option-group h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .color-options {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: transform var(--transition-speed) ease, border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: var(--shadow-light);
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px var(--shadow-medium);
+        }
+
+        .color-swatch.active {
+            border-color: var(--primary-color);
+            transform: scale(1.15);
+            box-shadow: 0 5px 15px var(--primary-color);
+        }
+
+        .color-swatch[data-color="red"] { background-color: #e74c3c; }
+        .color-swatch[data-color="blue"] { background-color: #3498db; }
+        .color-swatch[data-color="green"] { background-color: #27ae60; }
+        .color-swatch[data-color="black"] { background-color: #34495e; }
+
+        .size-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .size-button {
+            background-color: var(--light-bg);
+            border: 1px solid #bdc3c7;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--dark-text);
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        }
+
+        .size-button:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px var(--shadow-light);
+        }
+
+        .size-button.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .add-to-cart {
+            background-color: var(--accent-color);
+            color: var(--white);
+            border: none;
+            padding: 1.2rem 2.5rem;
+            border-radius: 10px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color var(--transition-speed) ease, transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+            margin-top: 2rem;
+            align-self: flex-start;
+            box-shadow: 0 8px 15px rgba(231, 76, 60, 0.3);
+            animation: fadeInMoveUp 1s ease-out forwards;
+            animation-delay: 1.5s;
+        }
+
+        .add-to-cart:hover {
+            background-color: #c0392b;
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(231, 76, 60, 0.5);
+        }
+
+        .add-to-cart:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 10px rgba(231, 76, 60, 0.3);
+        }
+
+        @media (max-width: 850px) {
+            .product-container {
+                flex-direction: column;
+                padding: 1.5rem;
+                margin-top: 2rem;
+                width: 95%;
+            }
+
+            .product-image, .product-details {
+                min-width: unset;
+                width: 100%;
+                padding: 1rem 0;
+                text-align: center;
+            }
+
+            .product-details {
+                align-items: center;
+            }
+
+            .product-details h2 {
+                font-size: 2.2rem;
+            }
+
+            .product-details .product-price {
+                font-size: 1.8rem;
+            }
+
+            .product-details .product-description {
+                font-size: 1rem;
+                text-align: center;
+            }
+
+            .option-group {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .color-options, .size-options {
+                justify-content: center;
+                width: 100%;
+            }
+
+            .add-to-cart {
+                width: 80%;
+                font-size: 1.1rem;
+                padding: 1rem 2rem;
+                align-self: center;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .product-container {
+                margin: 1rem auto;
+            }
+
+            .product-details h2 {
+                font-size: 1.8rem;
+            }
+
+            .product-details .product-price {
+                font-size: 1.5rem;
+            }
+
+            .color-swatch {
+                width: 35px;
+                height: 35px;
+            }
+
+            .size-button {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>Air Glide X</h1>
+    </header>
+
+    <main class="product-container">
+        <div class="product-image">
+            <img id="shoe-image" src="https://images.unsplash.com/photo-1606105820696-6e1bb2a8b9e6?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Air Glide X Sneaker">
+        </div>
+        <div class="product-details">
+            <h2 id="product-title">Air Glide X - Zenith Edition</h2>
+            <p class="product-price">$189.99</p>
+            <p class="product-description">
+                Experience unparalleled comfort and style with the Air Glide X. Engineered for peak performance and urban exploration, its lightweight design and responsive cushioning provide an exceptional stride. Available in multiple vibrant colors to match your unique style.
+            </p>
+
+            <div class="option-group">
+                <h3>Color:</h3>
+                <div class="color-options">
+                    <div class="color-swatch active" data-color="black" data-image="https://images.unsplash.com/photo-1606105820696-6e1bb2a8b9e6?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"></div>
+                    <div class="color-swatch" data-color="red" data-image="https://images.unsplash.com/photo-1549298357-19d67965f724?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"></div>
+                    <div class="color-swatch" data-color="blue" data-image="https://images.unsplash.com/photo-1552346747-9380ef3dd744?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"></div>
+                    <div class="color-swatch" data-color="green" data-image="https://images.unsplash.com/photo-1582218817659-17d91d9e2621?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"></div>
+                </div>
+            </div>
+
+            <div class="option-group">
+                <h3>Size:</h3>
+                <div class="size-options">
+                    <button class="size-button">US 7</button>
+                    <button class="size-button">US 8</button>
+                    <button class="size-button active">US 9</button>
+                    <button class="size-button">US 10</button>
+                    <button class="size-button">US 11</button>
+                    <button class="size-button">US 12</button>
+                </div>
+            </div>
+
+            <button class="add-to-cart">Add to Cart</button>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const shoeImage = document.getElementById('shoe-image');
+            const colorSwatches = document.querySelectorAll('.color-swatch');
+            const sizeButtons = document.querySelectorAll('.size-button');
+            const addToCartButton = document.querySelector('.add-to-cart');
+
+            shoeImage.style.transition = 'opacity 0.2s ease-in-out, transform 0.3s ease, box-shadow 0.3s ease';
+
+            colorSwatches.forEach(swatch => {
+                swatch.addEventListener('click', () => {
+                    colorSwatches.forEach(s => s.classList.remove('active'));
+                    swatch.classList.add('active');
+
+                    const newImageSrc = swatch.dataset.image;
+                    shoeImage.style.opacity = 0;
+                    setTimeout(() => {
+                        shoeImage.src = newImageSrc;
+                        shoeImage.style.opacity = 1;
+                    }, 200);
+                });
+            });
+
+            sizeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    sizeButtons.forEach(b => b.classList.remove('active'));
+                    button.classList.add('active');
+                });
+            });
+
+            addToCartButton.addEventListener('click', () => {
+                const selectedColorSwatch = document.querySelector('.color-swatch.active');
+                const selectedSizeButton = document.querySelector('.size-button.active');
+
+                const color = selectedColorSwatch ? selectedColorSwatch.dataset.color : 'N/A';
+                const size = selectedSizeButton ? selectedSizeButton.textContent : 'N/A';
+                const productName = document.getElementById('product-title').textContent;
+
+                alert(`Added to Cart!\nProduct: ${productName}\nColor: ${color.charAt(0).toUpperCase() + color.slice(1)}\nSize: ${size}`);
+            });
+        });
+    </script>
+</body>
+</html>

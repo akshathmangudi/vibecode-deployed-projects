@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crazy Slow Turtle</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            overflow: hidden; /* Prevent scrollbars from popping up */
+        }
+
+        #game-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 90%;
+            width: 800px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 25px;
+            font-size: 2.2em;
+        }
+
+        #track {
+            width: 100%;
+            height: 80px;
+            background-color: #e0ffe0;
+            border: 2px solid #8bc34a;
+            border-radius: 10px;
+            position: relative;
+            margin-bottom: 25px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        #turtle {
+            position: absolute;
+            font-size: 60px; /* Adjust turtle size */
+            line-height: 1;
+            transform: translateX(0); /* Initial position */
+            transition: transform 0.05s linear; /* Smooth movement transition */
+            z-index: 10;
+        }
+
+        #finish-line {
+            position: absolute;
+            right: 10px;
+            font-size: 60px; /* Adjust flag size */
+            line-height: 1;
+            z-index: 5;
+        }
+
+        #progress-bar-container {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #4CAF50;
+            border-radius: 10px;
+            transition: width 0.1s ease-out;
+        }
+
+        #progress-text {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        #encourage-button {
+            padding: 15px 30px;
+            font-size: 1.3em;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            outline: none;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-top: 15px;
+        }
+
+        #encourage-button:hover {
+            background-color: #1976D2;
+            transform: translateY(-2px);
+        }
+
+        #encourage-button:active {
+            background-color: #115293;
+            transform: translateY(0);
+        }
+
+        #encourage-button:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #message {
+            margin-top: 20px;
+            font-size: 1.1em;
+            min-height: 1.5em; /* Reserve space */
+            color: #d32f2f;
+            font-weight: bold;
+        }
+
+        .boost-message {
+            color: #28a745;
+        }
+        
+        .crazy-message {
+            color: #ff9800;
+        }
+
+        .win-message {
+            color: #4CAF50;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>The Crazy Slow Turtle Race</h1>
+        <div id="track">
+            <div id="turtle">🐢</div>
+            <div id="finish-line">🏁</div>
+        </div>
+        <div id="progress-bar-container">
+            <div id="progress-bar"></div>
+        </div>
+        <p>Progress: <span id="progress-text">0%</span></p>
+        <button id="encourage-button">Encourage Turtle! (Boost)</button>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        const turtleElement = document.getElementById('turtle');
+        const trackElement = document.getElementById('track');
+        const progressBarElement = document.getElementById('progress-bar');
+        const progressTextElement = document.getElementById('progress-text');
+        const encourageButton = document.getElementById('encourage-button');
+        const messageElement = document.getElementById('message');
+
+        let turtleX = 0; // Current X position of the turtle
+        const baseSpeed = 0.2; // Pixels per frame (at 60fps)
+        const boostSpeedFactor = 3; // Multiplier for speed when boosting
+        const crazySlowdownFactor = 0.1; // Multiplier for speed when crazy
+        const crazyBackwardFactor = -0.5; // Multiplier for speed when crazy and moving backwards
+        
+        const boostDuration = 3000; // ms
+        let boostActive = false;
+        let boostEndTime = 0;
+
+        let crazyModeActive = false;
+        const crazyModeMinInterval = 4000; // Minimum time between crazy events (ms)
+        const crazyModeMaxInterval = 8000; // Maximum time between crazy events (ms)
+        const crazyModeDuration = 2000; // Duration of a crazy event (ms)
+        let nextCrazyEventTime = Date.now() + Math.random() * (crazyModeMaxInterval - crazyModeMinInterval) + crazyModeMinInterval;
+        let crazyModeEndTime = 0;
+        let lastCrazyEffect = 'slow'; // 'slow' or 'backward'
+
+        let gameStarted = false;
+        let gameOver = false;
+        let lastFrameTime = 0;
+
+        function getTrackWidth() {
+            // Subtract turtle width to make sure it can reach the end
+            return trackElement.clientWidth - turtleElement.clientWidth;
+        }
+
+        function startGame() {
+            if (!gameStarted) {
+                gameStarted = true;
+                lastFrameTime = performance.now();
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        function gameLoop(currentTime) {
+            if (gameOver) {
+                return;
+            }
+
+            if (!lastFrameTime) {
+                lastFrameTime = currentTime;
+            }
+            const deltaTime = currentTime - lastFrameTime; // Time in milliseconds since last frame
+            lastFrameTime = currentTime;
+
+            let currentSpeed = baseSpeed;
+
+            // Handle Crazy Mode
+            if (crazyModeActive) {
+                if (currentTime >= crazyModeEndTime) {
+                    crazyModeActive = false;
+                    messageElement.textContent = '';
+                    messageElement.classList.remove('crazy-message');
+                } else {
+                    if (lastCrazyEffect === 'slow') {
+                        currentSpeed *= crazySlowdownFactor;
+                        messageElement.textContent = '🐢 The turtle got distracted! So slow...';
+                    } else if (lastCrazyEffect === 'backward') {
+                        currentSpeed *= crazyBackwardFactor;
+                        messageElement.textContent = '🐢 Oh no! The turtle went backwards!';
+                    }
+                    messageElement.classList.add('crazy-message');
+                }
+            } else {
+                // Try to activate crazy mode
+                if (currentTime >= nextCrazyEventTime) {
+                    crazyModeActive = true;
+                    crazyModeEndTime = currentTime + crazyModeDuration;
+                    lastCrazyEffect = Math.random() < 0.5 ? 'slow' : 'backward'; // 50% chance for backward
+                    nextCrazyEventTime = currentTime + Math.random() * (crazyModeMaxInterval - crazyModeMinInterval) + crazyModeMinInterval;
+                }
+            }
+
+            // Handle Boost
+            if (boostActive) {
+                if (currentTime >= boostEndTime) {
+                    boostActive = false;
+                    messageElement.textContent = '';
+                    messageElement.classList.remove('boost-message');
+                    encourageButton.disabled = false; // Re-enable button
+                } else {
+                    currentSpeed *= boostSpeedFactor;
+                    messageElement.textContent = '💨 Turtle boosted! Go, go, go!';
+                    messageElement.classList.add('boost-message');
+                }
+            }
+
+            // Update turtle position
+            const pixelsPerMillisecond = currentSpeed / (1000 / 60); // Convert baseSpeed (pixels/frame) to pixels/ms
+            turtleX += pixelsPerMillisecond * deltaTime;
+
+            // Clamp position within track bounds
+            const maxTurtleX = getTrackWidth();
+            turtleX = Math.max(0, Math.min(turtleX, maxTurtleX));
+            turtleElement.style.transform = `translateX(${turtleX}px)`;
+
+            // Update progress bar
+            const progress = (turtleX / maxTurtleX) * 100;
+            progressBarElement.style.width = `${progress}%`;
+            progressTextElement.textContent = `${Math.round(progress)}%`;
+
+            // Check for win condition
+            if (turtleX >= maxTurtleX && !gameOver) {
+                gameOver = true;
+                messageElement.textContent = '🎉 Congratulations! The Crazy Slow Turtle reached the finish line!';
+                messageElement.classList.add('win-message');
+                encourageButton.disabled = true;
+            }
+
+            if (!gameOver) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        encourageButton.addEventListener('click', () => {
+            if (!boostActive && !gameOver) {
+                boostActive = true;
+                boostEndTime = performance.now() + boostDuration;
+                encourageButton.disabled = true; // Disable button while boosting
+                // Start game loop if not already started
+                startGame();
+            }
+        });
+
+        // Initial setup
+        window.addEventListener('resize', () => {
+            // Re-adjust turtle position relative to new track width on resize
+            if (gameOver) return; // Don't move turtle if game is over
+            const maxTurtleX = getTrackWidth();
+            turtleX = (parseFloat(progressBarElement.style.width) / 100) * maxTurtleX || 0;
+            turtleX = Math.max(0, Math.min(turtleX, maxTurtleX)); // Re-clamp
+            turtleElement.style.transform = `translateX(${turtleX}px)`;
+        });
+
+        // Start the game loop automatically when the page loads
+        // The turtle will crawl slowly even without interaction
+        startGame();
+    </script>
+</body>
+</html>

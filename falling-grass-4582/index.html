@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Animal Tycoon</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: #333;
+        }
+
+        #app {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 900px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-top: 0;
+            font-size: 2.5em;
+            letter-spacing: -0.5px;
+        }
+
+        .money-display {
+            background-color: #e6f7ff;
+            border: 1px solid #a0e6ff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #007bff;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .section {
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .section h2 {
+            color: #4a6c8e;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.6em;
+            border-bottom: 2px solid #d0d0d0;
+            padding-bottom: 10px;
+        }
+
+        .market-grid, .farm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .animal-card {
+            background-color: #ffffff;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .animal-card h3 {
+            margin: 10px 0 5px;
+            color: #333;
+            font-size: 1.3em;
+        }
+
+        .animal-card .icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        .animal-card p {
+            margin: 5px 0;
+            font-size: 0.95em;
+            color: #555;
+        }
+
+        .animal-card button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s ease, opacity 0.2s ease;
+            margin-top: 15px;
+        }
+
+        .animal-card button:hover:not(:disabled) {
+            background-color: #218838;
+        }
+
+        .animal-card button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        #ownedAnimalsList {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        #ownedAnimalsList li {
+            background-color: #e9f7ef;
+            border: 1px solid #c2e6d4;
+            padding: 10px 15px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        #ownedAnimalsList li .count {
+            font-weight: bold;
+            color: #008000;
+        }
+
+        @media (max-width: 768px) {
+            #app {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .money-display {
+                font-size: 1.5em;
+            }
+            .section h2 {
+                font-size: 1.4em;
+            }
+            .market-grid, .farm-grid, #ownedAnimalsList {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>💰 Money Animal Tycoon 🐷</h1>
+        <div class="money-display">
+            Current Money: <span id="moneyDisplay">$0.00</span>
+        </div>
+
+        <div class="section">
+            <h2>Animal Market</h2>
+            <div id="animalMarket" class="market-grid"></div>
+        </div>
+
+        <div class="section">
+            <h2>Your Farm</h2>
+            <p>Total Income per Second: <span id="totalIncomePerSecond">$0.00</span></p>
+            <ul id="ownedAnimalsList" class="farm-grid"></ul>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const animalsData = [
+                { id: 'chicken', name: 'Chicken', cost: 10, incomePerSecond: 0.1, icon: '🐔' },
+                { id: 'pig', name: 'Pig', cost: 100, incomePerSecond: 1, icon: '🐖' },
+                { id: 'cow', name: 'Cow', cost: 1000, incomePerSecond: 10, icon: '🐄' },
+                { id: 'sheep', name: 'Sheep', cost: 5000, incomePerSecond: 50, icon: '🐑' },
+                { id: 'goat', name: 'Goat', cost: 25000, incomePerSecond: 250, icon: '🐐' }
+            ];
+
+            let money = 50;
+            const ownedAnimals = {};
+
+            const INTERVAL_MS = 100;
+
+            const moneyDisplay = document.getElementById('moneyDisplay');
+            const totalIncomePerSecondDisplay = document.getElementById('totalIncomePerSecond');
+            const animalMarketDiv = document.getElementById('animalMarket');
+            const ownedAnimalsList = document.getElementById('ownedAnimalsList');
+
+            animalsData.forEach(animal => {
+                ownedAnimals[animal.id] = 0;
+            });
+
+            function formatCurrency(amount) {
+                return `$${amount.toFixed(2)}`;
+            }
+
+            function calculateTotalIncome() {
+                let total = 0;
+                for (const animal of animalsData) {
+                    total += ownedAnimals[animal.id] * animal.incomePerSecond;
+                }
+                return total;
+            }
+
+            function updateUI() {
+                moneyDisplay.textContent = formatCurrency(money);
+                totalIncomePerSecondDisplay.textContent = formatCurrency(calculateTotalIncome());
+
+                animalsData.forEach(animal => {
+                    const button = document.getElementById(`buy-${animal.id}-btn`);
+                    if (button) {
+                        button.disabled = money < animal.cost;
+                    }
+                });
+
+                ownedAnimalsList.innerHTML = '';
+                let farmIsEmpty = true;
+                for (const animal of animalsData) {
+                    if (ownedAnimals[animal.id] > 0) {
+                        farmIsEmpty = false;
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `
+                            <span>${animal.icon} ${animal.name}</span>
+                            <span class="count">x${ownedAnimals[animal.id]}</span>
+                        `;
+                        ownedAnimalsList.appendChild(listItem);
+                    }
+                }
+                if (farmIsEmpty) {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = 'Your farm is empty. Buy some animals!';
+                    ownedAnimalsList.appendChild(listItem);
+                }
+            }
+
+            function buyAnimal(animalId) {
+                const animal = animalsData.find(a => a.id === animalId);
+                if (animal && money >= animal.cost) {
+                    money -= animal.cost;
+                    ownedAnimals[animalId]++;
+                    updateUI();
+                } else if (animal) {
+                    // Optionally alert the user, but button disabled state handles this visually.
+                }
+            }
+
+            function createMarketCards() {
+                animalsData.forEach(animal => {
+                    const card = document.createElement('div');
+                    card.classList.add('animal-card');
+                    card.innerHTML = `
+                        <div class="icon">${animal.icon}</div>
+                        <h3>${animal.name}</h3>
+                        <p>Cost: ${formatCurrency(animal.cost)}</p>
+                        <p>Income: ${formatCurrency(animal.incomePerSecond)}/sec</p>
+                        <button id="buy-${animal.id}-btn" data-animal-id="${animal.id}">Buy</button>
+                    `;
+                    animalMarketDiv.appendChild(card);
+
+                    card.querySelector(`#buy-${animal.id}-btn`).addEventListener('click', (event) => {
+                        buyAnimal(event.target.dataset.animalId);
+                    });
+                });
+            }
+
+            function gameLoop() {
+                const totalIncome = calculateTotalIncome();
+                money += totalIncome * (INTERVAL_MS / 1000);
+                updateUI();
+            }
+
+            function initGame() {
+                createMarketCards();
+                updateUI();
+                setInterval(gameLoop, INTERVAL_MS);
+            }
+
+            document.addEventListener('DOMContentLoaded', initGame);
+        })();
+    </script>
+</body>
+</html>

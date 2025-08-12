@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Story Teller</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        input[type="text"] {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button#generateStoryBtn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        button#generateStoryBtn:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        button#generateStoryBtn:active {
+            transform: translateY(0);
+        }
+
+        button#clearInputsBtn {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        button#clearInputsBtn:hover {
+            background-color: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        button#clearInputsBtn:active {
+            transform: translateY(0);
+        }
+
+        #storyOutput {
+            margin-top: 30px;
+            padding: 25px;
+            background-color: #e9f5ff;
+            border: 1px solid #cce5ff;
+            border-radius: 8px;
+            min-height: 100px;
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-wrap;
+            text-align: justify;
+        }
+
+        @media (max-width: 600px) {
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+            .button-group {
+                flex-direction: column;
+            }
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>The Story Teller</h1>
+
+        <div class="input-grid">
+            <div class="input-group">
+                <label for="personName">Person's Name:</label>
+                <input type="text" id="personName" placeholder="e.g., Alex">
+            </div>
+            <div class="input-group">
+                <label for="adjective1">Adjective (1):</label>
+                <input type="text" id="adjective1" placeholder="e.g., silly">
+            </div>
+            <div class="input-group">
+                <label for="pluralNoun1">Plural Noun (1):</label>
+                <input type="text" id="pluralNoun1" placeholder="e.g., puppies">
+            </div>
+            <div class="input-group">
+                <label for="verbPastTense1">Verb (Past Tense):</label>
+                <input type="text" id="verbPastTense1" placeholder="e.g., jumped">
+            </div>
+            <div class="input-group">
+                <label for="adverb1">Adverb:</label>
+                <input type="text" id="adverb1" placeholder="e.g., quickly">
+            </div>
+            <div class="input-group">
+                <label for="place1">Place:</label>
+                <input type="text" id="place1" placeholder="e.g., the park">
+            </div>
+            <div class="input-group">
+                <label for="adjective2">Adjective (2):</label>
+                <input type="text" id="adjective2" placeholder="e.g., magical">
+            </div>
+            <div class="input-group">
+                <label for="food1">Food Item:</label>
+                <input type="text" id="food1" placeholder="e.g., tacos">
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button id="generateStoryBtn">Generate Story</button>
+            <button id="clearInputsBtn">Clear Inputs</button>
+        </div>
+
+        <div id="storyOutput">
+            Your generated story will appear here.
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const personNameInput = document.getElementById('personName');
+            const adjective1Input = document.getElementById('adjective1');
+            const pluralNoun1Input = document.getElementById('pluralNoun1');
+            const verbPastTense1Input = document.getElementById('verbPastTense1');
+            const adverb1Input = document.getElementById('adverb1');
+            const place1Input = document.getElementById('place1');
+            const adjective2Input = document.getElementById('adjective2');
+            const food1Input = document.getElementById('food1');
+            const generateStoryBtn = document.getElementById('generateStoryBtn');
+            const clearInputsBtn = document.getElementById('clearInputsBtn');
+            const storyOutputDiv = document.getElementById('storyOutput');
+
+            const inputs = [
+                personNameInput,
+                adjective1Input,
+                pluralNoun1Input,
+                verbPastTense1Input,
+                adverb1Input,
+                place1Input,
+                adjective2Input,
+                food1Input
+            ];
+
+            const storyTemplate = `One {{adjective1}} morning, {{personName}} woke up feeling {{adjective2}}. They looked out the window and saw {{pluralNoun1}} floating in the sky!
+
+{{personName}} {{verbPastTense1}} {{adverb1}} to {{place1}} to tell everyone the {{adjective1}} news. When they arrived, everyone was already eating {{food1}} for breakfast. What a {{adjective2}} day!`;
+
+            const defaultStoryOutputText = 'Your generated story will appear here.';
+
+            generateStoryBtn.addEventListener('click', () => {
+                let allInputsFilled = true;
+                inputs.forEach(input => {
+                    if (input.value.trim() === '') {
+                        allInputsFilled = false;
+                        input.style.borderColor = '#dc3545';
+                        input.style.boxShadow = '0 0 0 3px rgba(220, 53, 69, 0.25)';
+                    } else {
+                        input.style.borderColor = '';
+                        input.style.boxShadow = '';
+                    }
+                });
+
+                if (!allInputsFilled) {
+                    storyOutputDiv.textContent = 'Please fill in all the blanks to generate your story!';
+                    storyOutputDiv.style.color = '#dc3545';
+                    storyOutputDiv.style.borderColor = '#dc3545';
+                    storyOutputDiv.style.backgroundColor = '#f8d7da';
+                    return;
+                }
+
+                storyOutputDiv.style.color = '';
+                storyOutputDiv.style.borderColor = '';
+                storyOutputDiv.style.backgroundColor = '';
+
+                let story = storyTemplate;
+                story = story.replace(/{{personName}}/g, personNameInput.value.trim());
+                story = story.replace(/{{adjective1}}/g, adjective1Input.value.trim());
+                story = story.replace(/{{pluralNoun1}}/g, pluralNoun1Input.value.trim());
+                story = story.replace(/{{verbPastTense1}}/g, verbPastTense1Input.value.trim());
+                story = story.replace(/{{adverb1}}/g, adverb1Input.value.trim());
+                story = story.replace(/{{place1}}/g, place1Input.value.trim());
+                story = story.replace(/{{adjective2}}/g, adjective2Input.value.trim());
+                story = story.replace(/{{food1}}/g, food1Input.value.trim());
+
+                storyOutputDiv.textContent = story;
+            });
+
+            clearInputsBtn.addEventListener('click', () => {
+                inputs.forEach(input => {
+                    input.value = '';
+                    input.style.borderColor = '';
+                    input.style.boxShadow = '';
+                });
+                storyOutputDiv.textContent = defaultStoryOutputText;
+                storyOutputDiv.style.color = '';
+                storyOutputDiv.style.borderColor = '';
+                storyOutputDiv.style.backgroundColor = '';
+            });
+
+            inputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    input.style.borderColor = '';
+                    input.style.boxShadow = '';
+                    if (storyOutputDiv.textContent === 'Please fill in all the blanks to generate your story!') {
+                        storyOutputDiv.textContent = defaultStoryOutputText;
+                        storyOutputDiv.style.color = '';
+                        storyOutputDiv.style.borderColor = '';
+                        storyOutputDiv.style.backgroundColor = '';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Material Notes</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%236750A4' d='M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 16H5V5h14v14zM8 10h8v2H8zm0 4h8v2H8z'/%3E%3C/svg%3E" type="image/svg+xml">
+    <style>
+        /* CSS Variables for Material You - default palette */
+        :root {
+            --md-sys-color-primary: #6750A4;
+            --md-sys-color-on-primary: #FFFFFF;
+            --md-sys-color-primary-container: #EADDFF;
+            --md-sys-color-on-primary-container: #21005D;
+            --md-sys-color-secondary: #625B71;
+            --md-sys-color-on-secondary: #FFFFFF;
+            --md-sys-color-secondary-container: #E8DEF8;
+            --md-sys-color-on-secondary-container: #1D192B;
+            --md-sys-color-tertiary: #7D5260;
+            --md-sys-color-on-tertiary: #FFFFFF;
+            --md-sys-color-tertiary-container: #FFD8E4;
+            --md-sys-color-on-tertiary-container: #31111D;
+            --md-sys-color-error: #BA1A1A;
+            --md-sys-color-on-error: #FFFFFF;
+            --md-sys-color-error-container: #FFDAD6;
+            --md-sys-color-on-error-container: #410002;
+            --md-sys-color-background: #FFFBFE;
+            --md-sys-color-on-background: #1C1B1F;
+            --md-sys-color-surface: #FFFBFE;
+            --md-sys-color-on-surface: #1C1B1F;
+            --md-sys-color-surface-variant: #E7E0EC;
+            --md-sys-color-on-surface-variant: #49454F;
+            --md-sys-color-outline: #79747E;
+            --md-sys-color-outline-variant: #CAC4D0;
+            --md-sys-color-shadow: #000000;
+            --md-sys-color-scrim: #000000;
+            --md-sys-color-inverse-surface: #313033;
+            --md-sys-color-inverse-on-surface: #F4EFF4;
+            --md-sys-color-inverse-primary: #CFBCFF;
+            --md-sys-color-surface-dim: #DED8E1;
+            --md-sys-color-surface-bright: #FFFBFE;
+            --md-sys-color-surface-container-lowest: #FFFFFF;
+            --md-sys-color-surface-container-low: #F7F2F8;
+            --md-sys-color-surface-container: #F2ECF4;
+            --md-sys-color-surface-container-high: #ECE6EB;
+            --md-sys-color-surface-container-highest: #E6E0E5;
+
+            /* Typography */
+            --md-sys-typescale-display-large-font-family-name: Roboto, sans-serif;
+            --md-sys-typescale-display-large-line-height: 64px;
+            --md-sys-typescale-display-large-font-size: 57px;
+            --md-sys-typescale-display-large-letter-spacing: -0.25px;
+            --md-sys-typescale-display-large-weight: 400;
+
+            --md-sys-typescale-headline-medium-font-family-name: Roboto, sans-serif;
+            --md-sys-typescale-headline-medium-line-height: 36px;
+            --md-sys-typescale-headline-medium-font-size: 28px;
+            --md-sys-typescale-headline-medium-letter-spacing: 0px;
+            --md-sys-typescale-headline-medium-weight: 400;
+
+            --md-sys-typescale-body-large-font-family-name: Roboto, sans-serif;
+            --md-sys-typescale-body-large-line-height: 24px;
+            --md-sys-typescale-body-large-font-size: 16px;
+            --md-sys-typescale-body-large-letter-spacing: 0.5px;
+            --md-sys-typescale-body-large-weight: 400;
+
+            --md-sys-typescale-body-medium-font-family-name: Roboto, sans-serif;
+            --md-sys-typescale-body-medium-line-height: 20px;
+            --md-sys-typescale-body-medium-font-size: 14px;
+            --md-sys-typescale-body-medium-letter-spacing: 0.25px;
+            --md-sys-typescale-body-medium-weight: 400;
+
+            --md-sys-typescale-label-large-font-family-name: Roboto, sans-serif;
+            --md-sys-typescale-label-large-line-height: 20px;
+            --md-sys-typescale-label-large-font-size: 14px;
+            --md-sys-typescale-label-large-letter-spacing: 0.1px;
+            --md-sys-typescale-label-large-weight: 500;
+        }
+
+        /* Basic Reset & Body Styling */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: var(--md-sys-typescale-body-large-font-family-name, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif);
+            color: var(--md-sys-color-on-background);
+            background-color: var(--md-sys-color-background);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        #app {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--md-sys-color-surface-container-lowest);
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            background-color: var(--md-sys-color-surface-container-high);
+            border-bottom: 1px solid var(--md-sys-color-outline-variant);
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        header h1 {
+            font-size: var(--md-sys-typescale-headline-medium-font-size);
+            font-weight: var(--md-sys-typescale-headline-medium-weight);
+            color: var(--md-sys-color-on-surface);
+            flex-shrink: 0;
+        }
+
+        .search-container {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            padding-right: 2.5rem; /* Space for clear button */
+            border: none;
+            border-radius: 1.5rem;
+            background-color: var(--md-sys-color-surface-container-low);
+            color: var(--md-sys-color-on-surface-variant);
+            font-size: var(--md-sys-typescale-body-large-font-size);
+            outline: none;
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-container input:focus {
+            background-color: var(--md-sys-color-surface-container);
+            box-shadow: 0 0 0 2px var(--md-sys-color-primary);
+        }
+
+        .search-container .clear-search-btn {
+            position: absolute;
+            right: 0.5rem;
+            background: none;
+            border: none;
+            color: var(--md-sys-color-on-surface-variant);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.2rem;
+            border-radius: 50%;
+            display: none; /* Hidden by default */
+        }
+
+        .search-container .clear-search-btn:hover {
+            background-color: var(--md-sys-color-surface-container-high);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Main Content Layout */
+        main {
+            display: flex;
+            flex: 1;
+            overflow: hidden; /* For scrolling content */
+        }
+
+        .note-list-panel {
+            flex: 0 0 320px; /* Fixed width for list */
+            background-color: var(--md-sys-color-surface-container-low);
+            border-right: 1px solid var(--md-sys-color-outline-variant);
+            overflow-y: auto;
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .note-editor-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            overflow-y: auto;
+            background-color: var(--md-sys-color-surface);
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 2rem;
+            text-align: center;
+            color: var(--md-sys-color-on-surface-variant);
+            font-size: var(--md-sys-typescale-body-large-font-size);
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .empty-state button {
+            margin-top: 1rem;
+        }
+
+
+        /* Note Card */
+        .note-card {
+            background-color: var(--md-sys-color-surface-container);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            border: 1px solid transparent;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* For inner elements */
+        }
+
+        .note-card:hover {
+            background-color: var(--md-sys-color-surface-container-high);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .note-card.active {
+            border: 2px solid var(--md-sys-color-primary);
+            background-color: var(--md-sys-color-primary-container);
+            transform: translateY(0); /* Reset transform */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Reset shadow to match non-hover */
+        }
+
+        .note-card .note-title {
+            font-size: var(--md-sys-typescale-body-large-font-size);
+            font-weight: 500;
+            color: var(--md-sys-color-on-surface);
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .note-card .note-snippet {
+            font-size: var(--md-sys-typescale-body-medium-font-size);
+            color: var(--md-sys-color-on-surface-variant);
+            line-height: 1.3;
+            max-height: 3em; /* Show max 2 lines */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .note-card .note-date {
+            font-size: 0.75rem;
+            color: var(--md-sys-color-outline);
+            margin-top: 0.5rem;
+            text-align: right;
+        }
+
+        .note-card .note-color-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 8px;
+            height: 100%;
+            border-top-left-radius: 0.75rem;
+            border-bottom-left-radius: 0.75rem;
+        }
+
+        .note-card.active .note-color-indicator {
+            width: 10px; /* Slightly thicker when active */
+        }
+
+        /* Editor Section */
+        .editor-section {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .editor-section.active {
+            display: flex;
+        }
+
+        .editor-title-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--md-sys-color-outline);
+            border-radius: 0.5rem;
+            font-size: var(--md-sys-typescale-headline-medium-font-size);
+            font-weight: var(--md-sys-typescale-headline-medium-weight);
+            color: var(--md-sys-color-on-surface);
+            background-color: var(--md-sys-color-surface-container-low);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .editor-title-input:focus {
+            border-color: var(--md-sys-color-primary);
+            box-shadow: 0 0 0 2px var(--md-sys-color-primary-container);
+        }
+
+        .editor-toolbar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            background-color: var(--md-sys-color-surface-container-low);
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--md-sys-color-outline-variant);
+        }
+
+        .editor-toolbar button {
+            background-color: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface-variant);
+            border: 1px solid var(--md-sys-color-outline);
+            border-radius: 0.5rem;
+            padding: 0.6rem 0.8rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .editor-toolbar button:hover {
+            background-color: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+        }
+
+        .editor-toolbar button.active {
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+        }
+
+        .color-palette-picker {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: auto; /* Push to right */
+            flex-wrap: wrap;
+        }
+
+        .color-palette-picker button {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--md-sys-color-outline-variant);
+            background-color: currentColor; /* Uses the color from `style` */
+            cursor: pointer;
+            transition: transform 0.1s ease, border-color 0.2s;
+            padding: 0;
+            flex-shrink: 0;
+        }
+
+        .color-palette-picker button.selected {
+            border-color: var(--md-sys-color-primary);
+            transform: scale(1.1);
+        }
+
+
+        .note-content-editor {
+            flex: 1;
+            padding: 1rem;
+            border: 1px solid var(--md-sys-color-outline);
+            border-radius: 0.5rem;
+            background-color: var(--md-sys-color-surface-container-low);
+            min-height: 200px;
+            font-size: var(--md-sys-typescale-body-large-font-size);
+            color: var(--md-sys-color-on-surface);
+            outline: none;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .note-content-editor:focus {
+            border-color: var(--md-sys-color-primary);
+            box-shadow: 0 0 0 2px var(--md-sys-color-primary-container);
+        }
+
+        .editor-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--md-sys-color-outline-variant);
+            margin-top: auto; /* Push to bottom */
+        }
+
+        /* Buttons (General) */
+        button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: var(--md-sys-typescale-label-large-font-size);
+            font-weight: var(--md-sys-typescale-label-large-weight);
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s, color 0.2s, transform 0.1s ease;
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .button-primary {
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .button-primary:hover {
+            background-color: var(--md-sys-color-inverse-primary);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .button-secondary {
+            background-color: var(--md-sys-color-secondary-container);
+            color: var(--md-sys-color-on-secondary-container);
+        }
+
+        .button-secondary:hover {
+            background-color: var(--md-sys-color-secondary);
+            color: var(--md-sys-color-on-secondary);
+        }
+
+        .button-text {
+            background: none;
+            color: var(--md-sys-color-primary);
+            padding: 0.6rem 0.8rem;
+        }
+
+        .button-text:hover {
+            background-color: var(--md-sys-color-primary-container);
+        }
+
+        .button-danger {
+            background-color: var(--md-sys-color-error);
+            color: var(--md-sys-color-on-error);
+        }
+        .button-danger:hover {
+            background-color: var(--md-sys-color-on-error-container);
+            color: var(--md-sys-color-error-container);
+        }
+
+        /* Floating Action Button (FAB) */
+        .fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: background-color 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .fab:hover {
+            background-color: var(--md-sys-color-inverse-primary);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 350px;
+            height: 100%;
+            background-color: var(--md-sys-color-surface-container-high);
+            box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s ease-out;
+            z-index: 1000;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .settings-panel.open {
+            transform: translateX(0);
+        }
+
+        .settings-panel h2 {
+            font-size: var(--md-sys-typescale-headline-medium-font-size);
+            color: var(--md-sys-color-on-surface);
+            margin-bottom: 1.5rem;
+        }
+
+        .settings-panel label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: var(--md-sys-typescale-label-large-font-size);
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        .settings-panel input[type="color"] {
+            width: 100%;
+            height: 50px;
+            border: 1px solid var(--md-sys-color-outline);
+            border-radius: 0.75rem;
+            padding: 0.25rem;
+            background-color: var(--md-sys-color-surface-container-low);
+            cursor: pointer;
+        }
+
+        .settings-panel .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--md-sys-color-on-surface-variant);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+        }
+
+        .settings-panel .close-btn:hover {
+            background-color: var(--md-sys-color-surface-container);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-container {
+                width: 100%;
+                max-width: none;
+                margin-top: 0.5rem;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: flex-end;
+                margin-top: 0.5rem;
+            }
+
+            main {
+                flex-direction: column;
+            }
+
+            .note-list-panel {
+                flex: none;
+                width: 100%;
+                height: 300px; /* Constrain height on small screens */
+                border-right: none;
+                border-bottom: 1px solid var(--md-sys-color-outline-variant);
+            }
+
+            .note-editor-panel {
+                flex: 1;
+                padding: 1rem;
+            }
+
+            .fab {
+                bottom: 1rem;
+                right: 1rem;
+                width: 48px;
+                height: 48px;
+                font-size: 1.8rem;
+            }
+
+            .settings-panel {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 0.75rem 1rem;
+            }
+            .note-editor-panel {
+                padding: 0.75rem;
+            }
+            .editor-toolbar {
+                padding: 0.5rem;
+                gap: 0.25rem;
+            }
+            .editor-toolbar button {
+                padding: 0.5rem 0.6rem;
+                font-size: 0.9rem;
+            }
+            .color-palette-picker button {
+                width: 28px;
+                height: 28px;
+            }
+        }
+
+        /* Basic Icons using SVG */
+        .icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            vertical-align: middle;
+            fill: currentColor;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Material Notes</h1>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search notes...">
+                <button type="button" class="clear-search-btn" id="clearSearchBtn" aria-label="Clear search">&times;</button>
+            </div>
+            <div class="header-actions">
+                <button id="newNoteBtn" class="button-primary">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    New Note
+                </button>
+                <button id="settingsBtn" class="button-secondary" aria-label="Settings">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.07-.73-1.66-.96L14 2h-4l-.47 2.21c-.59.23-1.14.56-1.66.96l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.12.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.07.73 1.66.96L10 22h4l.47-2.21c.59-.23 1.14-.56 1.66-.96l2.49 1c.22.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <main>
+            <section class="note-list-panel" id="noteListPanel">
+                <div id="notesContainer">
+                    <!-- Note cards will be rendered here by JavaScript -->
+                </div>
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    No notes found.
+                    <button class="button-secondary" id="emptyStateNewNoteBtn">Create your first note!</button>
+                </div>
+            </section>
+
+            <section class="note-editor-panel" id="noteEditorPanel">
+                <div class="editor-section" id="editorSection">
+                    <input type="text" id="editorTitle" class="editor-title-input" placeholder="Note title...">
+                    <div class="editor-toolbar">
+                        <button id="boldBtn" aria-label="Bold"><b>B</b></button>
+                        <button id="italicBtn" aria-label="Italic"><i>I</i></button>
+                        <button id="underlineBtn" aria-label="Underline"><u>U</u></button>
+                        <div class="color-palette-picker" id="noteColorPicker">
+                            <!-- Color buttons will be dynamically added here -->
+                        </div>
+                    </div>
+                    <div id="noteContent" class="note-content-editor" contenteditable="true" aria-label="Note content"></div>
+                    <div class="editor-actions">
+                        <button id="deleteNoteBtn" class="button-danger">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                            Delete
+                        </button>
+                        <button id="saveNoteBtn" class="button-primary">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+                            Save Note
+                        </button>
+                    </div>
+                </div>
+                <div class="empty-state" id="noNoteSelectedState">
+                    Select a note from the left panel, or create a new one.
+                </div>
+            </section>
+        </main>
+
+        <button class="fab" id="fabNewNoteBtn" aria-label="New Note">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        </button>
+
+        <aside class="settings-panel" id="settingsPanel">
+            <button class="close-btn" id="closeSettingsBtn" aria-label="Close settings">&times;</button>
+            <h2>Settings</h2>
+            <label for="themeColorPicker">Base Theme Color:</label>
+            <input type="color" id="themeColorPicker" value="#6750A4">
+            <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--md-sys-color-on-surface-variant);">
+                <i>Note: Dynamic theming is simulated by generating a Material You-like palette from this base color.</i>
+            </p>
+        </aside>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const notesContainer = document.getElementById('notesContainer');
+            const editorSection = document.getElementById('editorSection');
+            const editorTitleInput = document.getElementById('editorTitle');
+            const noteContentDiv = document.getElementById('noteContent');
+            const saveNoteBtn = document.getElementById('saveNoteBtn');
+            const deleteNoteBtn = document.getElementById('deleteNoteBtn');
+            const newNoteBtn = document.getElementById('newNoteBtn');
+            const fabNewNoteBtn = document.getElementById('fabNewNoteBtn');
+            const searchInput = document.getElementById('searchInput');
+            const clearSearchBtn = document.getElementById('clearSearchBtn');
+            const boldBtn = document.getElementById('boldBtn');
+            const italicBtn = document.getElementById('italicBtn');
+            const underlineBtn = document.getElementById('underlineBtn');
+            const noteColorPicker = document.getElementById('noteColorPicker');
+            const settingsBtn = document.getElementById('settingsBtn');
+            const settingsPanel = document.getElementById('settingsPanel');
+            const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+            const themeColorPicker = document.getElementById('themeColorPicker');
+            const emptyState = document.getElementById('emptyState');
+            const emptyStateNewNoteBtn = document.getElementById('emptyStateNewNoteBtn');
+            const noNoteSelectedState = document.getElementById('noNoteSelectedState');
+            const noteEditorPanel = document.getElementById('noteEditorPanel');
+
+
+            let notes = [];
+            let currentEditingNoteId = null;
+            const NOTE_COLORS = [
+                '#FFD700', '#FF6347', '#6A5ACD', '#3CB371', '#8A2BE2', '#40E0D0', '#FF4500', '#DAA520'
+            ]; // Standardized set of appealing colors
+
+            // --- Utility Functions ---
+
+            // Simple HSL to RGB/Hex conversion (for dynamic theme)
+            function hslToHex(h, s, l) {
+                l /= 100;
+                const a = s * Math.min(l, 1 - l) / 100;
+                const f = n => {
+                    const k = (n + h / 30) % 12;
+                    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+                    return Math.round(255 * color).toString(16).padStart(2, '0'); // convert to Hex and pad
+                };
+                return `#${f(0)}${f(8)}${f(4)}`;
+            }
+
+            // Simple Hex to HSL conversion (for dynamic theme)
+            function hexToHsl(hex) {
+                let r = 0, g = 0, b = 0;
+                // handle 3 digit hex
+                if (hex.length == 4) {
+                    r = "0x" + hex[1] + hex[1];
+                    g = "0x" + hex[2] + hex[2];
+                    b = "0x" + hex[3] + hex[3];
+                } else if (hex.length == 7) {
+                    r = "0x" + hex[1] + hex[2];
+                    g = "0x" + hex[3] + hex[4];
+                    b = "0x" + hex[5] + hex[6];
+                }
+                r /= 255;
+                g /= 255;
+                b /= 255;
+
+                let cmin = Math.min(r, g, b),
+                    cmax = Math.max(r, g, b),
+                    delta = cmax - cmin,
+                    h = 0,
+                    s = 0,
+                    l = 0;
+
+                if (delta == 0) h = 0;
+                else if (cmax == r) h = ((g - b) / delta) % 6;
+                else if (cmax == g) h = (b - r) / delta + 2;
+                else h = (r - g) / delta + 4;
+
+                h = Math.round(h * 60);
+
+                if (h < 0) h += 360;
+
+                l = (cmax + cmin) / 2;
+                s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+                s = +(s * 100).toFixed(1);
+                l = +(l * 100).toFixed(1);
+
+                return { h, s, l };
+            }
+
+            // Function to determine if a color is light or dark for text contrast
+            function getContrastTextColor(hexColor) {
+                const { h, s, l } = hexToHsl(hexColor);
+                // A common heuristic: if lightness is > 60%, use black, else white.
+                return l > 60 ? '#1C1B1F' : '#FFFFFF'; // Material You on-colors
+            }
+
+            // Generate Material You-like palette from a base color
+            function generateMaterialYouPalette(baseHex) {
+                const { h, s, l } = hexToHsl(baseHex);
+
+                const palette = {
+                    '--md-sys-color-primary': hslToHex(h, s, l),
+                    '--md-sys-color-on-primary': getContrastTextColor(baseHex),
+                    '--md-sys-color-primary-container': hslToHex(h, Math.min(100, s * 0.5), Math.min(100, l + (100 - l) * 0.7)),
+                    '--md-sys-color-on-primary-container': getContrastTextColor(hslToHex(h, Math.min(100, s * 0.5), Math.min(100, l + (100 - l) * 0.7))),
+
+                    '--md-sys-color-secondary': hslToHex(h + 30, Math.min(100, s * 0.7), Math.max(0, l * 0.9)),
+                    '--md-sys-color-on-secondary': getContrastTextColor(hslToHex(h + 30, Math.min(100, s * 0.7), Math.max(0, l * 0.9))),
+                    '--md-sys-color-secondary-container': hslToHex(h + 30, Math.min(100, s * 0.4), Math.min(100, l + (100 - l) * 0.5)),
+
+                    '--md-sys-color-tertiary': hslToHex(h + 60, Math.min(100, s * 0.8), Math.max(0, l * 0.8)),
+                    '--md-sys-color-on-tertiary': getContrastTextColor(hslToHex(h + 60, Math.min(100, s * 0.8), Math.max(0, l * 0.8))),
+                    '--md-sys-color-tertiary-container': hslToHex(h + 60, Math.min(100, s * 0.5), Math.min(100, l + (100 - l) * 0.6)),
+
+                    '--md-sys-color-background': hslToHex(h, Math.min(100, s * 0.05), 99),
+                    '--md-sys-color-on-background': hslToHex(h, Math.min(100, s * 0.1), 10),
+
+                    '--md-sys-color-surface': hslToHex(h, Math.min(100, s * 0.05), 99),
+                    '--md-sys-color-on-surface': hslToHex(h, Math.min(100, s * 0.1), 10),
+                    '--md-sys-color-surface-variant': hslToHex(h, Math.min(100, s * 0.15), 90),
+                    '--md-sys-color-on-surface-variant': hslToHex(h, Math.min(100, s * 0.1), 30),
+
+                    '--md-sys-color-outline': hslToHex(h, Math.min(100, s * 0.1), 70),
+                    '--md-sys-color-outline-variant': hslToHex(h, Math.min(100, s * 0.1), 90),
+
+                    '--md-sys-color-inverse-surface': hslToHex(h, Math.min(100, s * 0.1), 20),
+                    '--md-sys-color-inverse-on-surface': hslToHex(h, Math.min(100, s * 0.05), 95),
+                    '--md-sys-color-inverse-primary': hslToHex(h, s, Math.min(100, l + 20)),
+                };
+
+                for (const key in palette) {
+                    document.documentElement.style.setProperty(key, palette[key]);
+                }
+            }
+
+
+            // --- Data Management ---
+
+            function loadNotes() {
+                const storedNotes = localStorage.getItem('materialNotes');
+                notes = storedNotes ? JSON.parse(storedNotes) : [];
+                notes.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)); // Sort by most recent
+                renderNotes();
+            }
+
+            function saveNotes() {
+                localStorage.setItem('materialNotes', JSON.stringify(notes));
+                renderNotes(searchInput.value); // Re-render with current search filter
+            }
+
+            function getNoteById(id) {
+                return notes.find(note => note.id === id);
+            }
+
+            function addNewNote() {
+                const newNoteId = crypto.randomUUID();
+                const now = new Date().toISOString();
+                const newNote = {
+                    id: newNoteId,
+                    title: 'New Note',
+                    content: '',
+                    color: NOTE_COLORS[0], // Default color
+                    createdAt: now,
+                    updatedAt: now
+                };
+                notes.unshift(newNote); // Add to the beginning
+                saveNotes();
+                editNote(newNoteId);
+            }
+
+            function updateNoteInArray(id, title, content, color) {
+                const noteIndex = notes.findIndex(note => note.id === id);
+                if (noteIndex > -1) {
+                    notes[noteIndex].title = title;
+                    notes[noteIndex].content = content;
+                    notes[noteIndex].color = color;
+                    notes[noteIndex].updatedAt = new Date().toISOString();
+                    saveNotes();
+                }
+            }
+
+            function deleteNote(id) {
+                if (confirm('Are you sure you want to delete this note?')) {
+                    notes = notes.filter(note => note.id !== id);
+                    saveNotes();
+                    currentEditingNoteId = null;
+                    hideEditor();
+                    renderNotes(searchInput.value); // Re-render the list immediately
+                }
+            }
+
+            // --- UI Rendering ---
+
+            function renderNotes(filterText = '') {
+                notesContainer.innerHTML = '';
+                const filteredNotes = notes.filter(note =>
+                    note.title.toLowerCase().includes(filterText.toLowerCase()) ||
+                    note.content.toLowerCase().includes(filterText.toLowerCase())
+                );
+
+                if (filteredNotes.length === 0) {
+                    emptyState.style.display = 'flex';
+                    notesContainer.style.display = 'none';
+                } else {
+                    emptyState.style.display = 'none';
+                    notesContainer.style.display = 'flex';
+                }
+
+                filteredNotes.forEach(note => {
+                    const noteCard = document.createElement('div');
+                    noteCard.className = 'note-card';
+                    if (note.id === currentEditingNoteId) {
+                        noteCard.classList.add('active');
+                    }
+                    noteCard.dataset.id = note.id;
+
+                    const date = new Date(note.updatedAt).toLocaleString();
+
+                    noteCard.innerHTML = `
+                        <div class="note-color-indicator" style="background-color: ${note.color};"></div>
+                        <h3 class="note-title">${note.title || 'Untitled Note'}</h3>
+                        <p class="note-snippet">${note.content.replace(/<[^>]*>/g, '').substring(0, 100)}...</p>
+                        <p class="note-date">Edited: ${date}</p>
+                    `;
+                    noteCard.addEventListener('click', () => editNote(note.id));
+                    notesContainer.appendChild(noteCard);
+                });
+            }
+
+            function showEditor() {
+                editorSection.classList.add('active');
+                noNoteSelectedState.style.display = 'none';
+            }
+
+            function hideEditor() {
+                editorSection.classList.remove('active');
+                noNoteSelectedState.style.display = 'flex';
+                noteEditorPanel.scrollTop = 0; // Reset scroll position
+            }
+
+            function editNote(id) {
+                const note = getNoteById(id);
+                if (note) {
+                    currentEditingNoteId = id;
+                    editorTitleInput.value = note.title;
+                    noteContentDiv.innerHTML = note.content;
+                    selectNoteColor(note.color);
+                    showEditor();
+                    updateNoteCardActiveClass();
+                    updateToolbarState(); // Update formatting buttons on load
+                }
+            }
+
+            function updateNoteCardActiveClass() {
+                document.querySelectorAll('.note-card').forEach(card => {
+                    card.classList.remove('active');
+                    if (card.dataset.id === currentEditingNoteId) {
+                        card.classList.add('active');
+                    }
+                });
+            }
+
+            function saveCurrentNote() {
+                if (currentEditingNoteId) {
+                    const title = editorTitleInput.value.trim() || 'Untitled Note';
+                    const content = noteContentDiv.innerHTML;
+                    const selectedColor = noteColorPicker.querySelector('.selected')?.dataset.color || NOTE_COLORS[0];
+                    updateNoteInArray(currentEditingNoteId, title, content, selectedColor);
+                }
+            }
+
+            function populateColorPicker() {
+                noteColorPicker.innerHTML = '';
+                NOTE_COLORS.forEach(color => {
+                    const button = document.createElement('button');
+                    button.style.backgroundColor = color;
+                    button.dataset.color = color;
+                    button.title = color;
+                    button.addEventListener('click', () => selectNoteColor(color));
+                    noteColorPicker.appendChild(button);
+                });
+            }
+
+            function selectNoteColor(color) {
+                document.querySelectorAll('#noteColorPicker button').forEach(btn => {
+                    btn.classList.remove('selected');
+                    if (btn.dataset.color === color) {
+                        btn.classList.add('selected');
+                    }
+                });
+            }
+
+            // --- Event Listeners ---
+
+            // New Note buttons
+            newNoteBtn.addEventListener('click', addNewNote);
+            fabNewNoteBtn.addEventListener('click', addNewNote);
+            emptyStateNewNoteBtn.addEventListener('click', addNewNote);
+
+
+            // Save Note
+            saveNoteBtn.addEventListener('click', saveCurrentNote);
+
+            // Delete Note
+            deleteNoteBtn.addEventListener('click', () => {
+                if (currentEditingNoteId) {
+                    deleteNote(currentEditingNoteId);
+                }
+            });
+
+            // Auto-save on editor input
+            let saveTimeout;
+            const autoSaveDelay = 1000; // 1 second debounce
+            editorTitleInput.addEventListener('input', () => {
+                clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(saveCurrentNote, autoSaveDelay);
+            });
+            noteContentDiv.addEventListener('input', () => {
+                clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(saveCurrentNote, autoSaveDelay);
+            });
+
+            // Search functionality
+            let searchTimeout;
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const query = searchInput.value;
+                    renderNotes(query);
+                    clearSearchBtn.style.display = query ? 'block' : 'none';
+                }, 300); // Debounce search
+            });
+            clearSearchBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                clearSearchBtn.style.display = 'none';
+                renderNotes('');
+            });
+
+            // Text Formatting
+            boldBtn.addEventListener('click', () => document.execCommand('bold', false, null));
+            italicBtn.addEventListener('click', () => document.execCommand('italic', false, null));
+            underlineBtn.addEventListener('click', () => document.execCommand('underline', false, null));
+
+            // Update toolbar button active states based on selection
+            noteContentDiv.addEventListener('mouseup', updateToolbarState);
+            noteContentDiv.addEventListener('keyup', updateToolbarState);
+            noteContentDiv.addEventListener('focus', updateToolbarState); // Initial focus
+            noteContentDiv.addEventListener('blur', () => { // On blur, remove active states
+                boldBtn.classList.remove('active');
+                italicBtn.classList.remove('active');
+                underlineBtn.classList.remove('active');
+            });
+
+            function updateToolbarState() {
+                boldBtn.classList.toggle('active', document.queryCommandState('bold'));
+                italicBtn.classList.toggle('active', document.queryCommandState('italic'));
+                underlineBtn.classList.toggle('active', document.queryCommandState('underline'));
+            }
+
+            // Settings Panel
+            settingsBtn.addEventListener('click', () => {
+                settingsPanel.classList.add('open');
+            });
+            closeSettingsBtn.addEventListener('click', () => {
+                settingsPanel.classList.remove('open');
+            });
+            themeColorPicker.addEventListener('input', (event) => {
+                generateMaterialYouPalette(event.target.value);
+            });
+
+            // Initial load
+            loadNotes();
+            populateColorPicker();
+            hideEditor(); // Hide editor on initial load
+
+            // Apply default theme color from picker on load
+            generateMaterialYouPalette(themeColorPicker.value);
+        });
+    </script>
+</body>
+</html>

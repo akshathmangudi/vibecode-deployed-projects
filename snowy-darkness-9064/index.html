@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Recommendation App</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .search-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .search-area input[type="text"] {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            max-width: 400px;
+            min-width: 200px;
+        }
+
+        .search-area button {
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+        }
+
+        .search-area button:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .search-area button:active {
+            transform: translateY(0);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .book-card {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .book-card img {
+            max-width: 120px;
+            height: auto;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .book-card h3 {
+            font-size: 1.25rem;
+            color: #34495e;
+            margin-top: 0;
+            margin-bottom: 10px;
+            word-break: break-word;
+        }
+
+        .book-card p {
+            font-size: 0.95rem;
+            color: #777;
+            margin-bottom: 5px;
+        }
+
+        .book-card .description {
+            font-size: 0.85rem;
+            color: #555;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            margin-bottom: 15px;
+        }
+
+        .book-card a {
+            display: inline-block;
+            margin-top: auto; /* Pushes the button to the bottom */
+            padding: 8px 15px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .book-card a:hover {
+            background-color: #218838;
+        }
+
+        .message {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #666;
+            padding: 20px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none; /* Hidden by default */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .search-area {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-area input[type="text"] {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Book Recommendation App</h1>
+
+        <div class="search-area">
+            <input type="text" id="searchInput" placeholder="Search for a book by title or author...">
+            <button id="searchButton">Search Books</button>
+            <button id="recommendButton">Get Random Recommendation</button>
+        </div>
+
+        <div id="loadingSpinner" class="loading-spinner"></div>
+        <div id="resultsContainer" class="results-grid">
+            <p class="message" id="initialMessage">Start by searching for books or get a random recommendation!</p>
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const recommendButton = document.getElementById('recommendButton');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const initialMessage = document.getElementById('initialMessage');
+
+        const GOOGLE_BOOKS_API_BASE = 'https://www.googleapis.com/books/v1/volumes';
+        const RANDOM_CATEGORIES = ['fiction', 'mystery', 'fantasy', 'science fiction', 'romance', 'thriller', 'history', 'biography', 'cooking', 'travel', 'young adult', 'poetry'];
+
+        async function fetchBooks(query, isRandom = false) {
+            resultsContainer.innerHTML = ''; // Clear previous results
+            initialMessage.style.display = 'none'; // Hide initial message
+            loadingSpinner.style.display = 'block'; // Show spinner
+
+            try {
+                let url = `${GOOGLE_BOOKS_API_BASE}?q=${encodeURIComponent(query)}&maxResults=20`;
+                if (isRandom) {
+                    url += '&orderBy=relevance'; // Ensure some relevance for random pick
+                }
+
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                if (data.items && data.items.length > 0) {
+                    displayBooks(data.items, isRandom);
+                } else {
+                    resultsContainer.innerHTML = '<p class="message">No books found for your query. Try a different search term.</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching books:', error);
+                resultsContainer.innerHTML = '<p class="message">Oops! Something went wrong. Please try again later.</p>';
+            } finally {
+                loadingSpinner.style.display = 'none'; // Hide spinner
+            }
+        }
+
+        function displayBooks(books, isRandom) {
+            resultsContainer.innerHTML = ''; // Clear existing content
+
+            let booksToDisplay = books;
+            if (isRandom && books.length > 0) {
+                // Pick a single random book from the fetched results
+                const randomIndex = Math.floor(Math.random() * books.length);
+                booksToDisplay = [books[randomIndex]];
+            }
+
+            if (booksToDisplay.length === 0) {
+                 resultsContainer.innerHTML = '<p class="message">No recommendations found.</p>';
+                 return;
+            }
+
+            booksToDisplay.forEach(book => {
+                const volumeInfo = book.volumeInfo;
+                if (!volumeInfo) return; // Skip if no volumeInfo
+
+                const bookCard = document.createElement('div');
+                bookCard.classList.add('book-card');
+
+                const title = volumeInfo.title || 'No Title Available';
+                const authors = volumeInfo.authors ? volumeInfo.authors.join(', ') : 'Unknown Author';
+                const description = volumeInfo.description ? volumeInfo.description : 'No description available.';
+                const thumbnailUrl = volumeInfo.imageLinks ? volumeInfo.imageLinks.thumbnail : 'https://via.placeholder.com/128x190?text=No+Cover';
+                const infoLink = volumeInfo.infoLink || '#';
+
+                bookCard.innerHTML = `
+                    <img src="${thumbnailUrl}" alt="${title} Cover">
+                    <h3>${title}</h3>
+                    <p>by ${authors}</p>
+                    <p class="description">${description}</p>
+                    <a href="${infoLink}" target="_blank" rel="noopener noreferrer">View on Google Books</a>
+                `;
+                resultsContainer.appendChild(bookCard);
+            });
+        }
+
+        searchButton.addEventListener('click', () => {
+            const query = searchInput.value.trim();
+            if (query) {
+                fetchBooks(query);
+            } else {
+                resultsContainer.innerHTML = '<p class="message">Please enter a book title or author to search.</p>';
+            }
+        });
+
+        recommendButton.addEventListener('click', () => {
+            const randomCategory = RANDOM_CATEGORIES[Math.floor(Math.random() * RANDOM_CATEGORIES.length)];
+            fetchBooks(randomCategory, true); // Pass true to indicate it's a random recommendation
+        });
+
+        // Allow pressing Enter in the search input
+        searchInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                searchButton.click();
+            }
+        });
+
+    </script>
+</body>
+</html>

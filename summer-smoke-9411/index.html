@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Uno</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 90%;
+            max-width: 900px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            min-height: 700px;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.7;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            width: calc(100% - 24px);
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        #lobby-screen {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        #player-input-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        #player-input-section input {
+            flex-grow: 1;
+            margin-bottom: 0;
+        }
+
+        #player-list {
+            margin-top: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 100px;
+            width: 100%;
+            max-width: 400px;
+            background-color: #fdfdfd;
+            box-sizing: border-box;
+        }
+
+        #player-list p {
+            margin: 8px 0;
+            font-size: 1.1em;
+            color: #555;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 5px;
+        }
+
+        #player-list p:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        #game-board {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            gap: 20px;
+            position: relative;
+        }
+
+        #game-status {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        #game-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-grow: 1;
+        }
+
+        #draw-pile, #discard-pile {
+            width: 100px;
+            height: 150px;
+            border: 2px dashed #bbb;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9em;
+            color: #888;
+            background-color: #f5f5f5;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        #draw-pile {
+            cursor: pointer;
+            background-color: #e0e0e0;
+            border-style: solid;
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        #draw-pile::before {
+            content: 'Draw Pile';
+            position: absolute;
+            bottom: 5px;
+            font-size: 0.8em;
+            color: #555;
+        }
+
+        .card {
+            width: 90px;
+            height: 140px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 2.5em;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            position: relative;
+            box-shadow: 3px 3px 8px rgba(0,0,0,0.2);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            cursor: default;
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        .card:active {
+            transform: translateY(2px);
+        }
+
+        .card.red { background-color: #e74c3c; }
+        .card.green { background-color: #2ecc71; }
+        .card.blue { background-color: #3498db; }
+        .card.yellow { background-color: #f1c40f; }
+        .card.wild { background: linear-gradient(45deg, #e74c3c, #2ecc71, #3498db, #f1c40f); }
+
+        .card.playable {
+            cursor: pointer;
+        }
+        .card.playable:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 5px 5px 12px rgba(0,0,0,0.3);
+        }
+
+        .empty-discard {
+            background-color: #f0f0f0;
+            color: #ccc;
+            font-size: 1.5em;
+            border: 2px dashed #ccc;
+        }
+        .empty-discard::before {
+            content: 'Discard Pile';
+            position: absolute;
+            bottom: 5px;
+            font-size: 0.8em;
+            color: #888;
+        }
+
+        .card .card-value {
+            font-size: 1em;
+            line-height: 1;
+            margin-bottom: -5px;
+        }
+
+        #player-hands-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #current-player-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        #current-player-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        #current-player-status {
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        #current-player-hand {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            min-height: 160px;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background-color: #fdfdfd;
+            box-sizing: border-box;
+            overflow-x: auto;
+        }
+
+        #other-players-hands {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .other-player-hand {
+            background-color: #ecf0f1;
+            border-radius: 8px;
+            padding: 10px 15px;
+            text-align: center;
+            min-width: 100px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+
+        .other-player-hand .player-name {
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 5px;
+        }
+
+        .other-player-hand .card-count {
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        #game-log-section {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 300px;
+            height: 150px;
+            background-color: #fdfdfd;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 10px;
+            overflow-y: auto;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        #game-log p {
+            margin: 3px 0;
+            color: #666;
+            line-height: 1.3;
+        }
+
+        #color-picker {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            display: none;
+            flex-direction: row;
+            gap: 15px;
+            border: 1px solid #ddd;
+        }
+
+        .color-option {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: border-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .color-option:hover {
+            transform: scale(1.08);
+            border-color: #555;
+        }
+
+        .color-option.red { background-color: #e74c3c; }
+        .color-option.green { background-color: #2ecc71; }
+        .color-option.blue { background-color: #3498db; }
+        .color-option.yellow { background-color: #f1c40f; }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 20px;
+                min-height: 600px;
+            }
+
+            #game-area {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            #game-log-section {
+                position: static;
+                width: auto;
+                margin-top: 20px;
+                height: 100px;
+            }
+
+            #current-player-hand {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .card {
+                width: 70px;
+                height: 100px;
+                font-size: 2em;
+            }
+
+            #draw-pile, #discard-pile {
+                width: 80px;
+                height: 120px;
+            }
+
+            .color-option {
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="lobby-screen">
+            <h1>Simple Uno</h1>
+            <h2>Join Game</h2>
+            <div id="player-input-section">
+                <input type="text" id="player-name-input" placeholder="Enter player name (max 4)" maxlength="15">
+                <button id="add-player-btn">Add Player</button>
+            </div>
+            <div id="player-list">
+                <p style="color:#888;">No players added yet.</p>
+            </div>
+            <button id="start-game-btn" disabled>Start Game</button>
+        </div>
+
+        <div id="game-board">
+            <div id="game-status">
+                <span id="current-player-name"></span><span id="current-player-status"></span>
+            </div>
+
+            <div id="game-area">
+                <div id="draw-pile">UNO</div>
+                <div id="discard-pile"></div>
+            </div>
+
+            <div id="other-players-hands">
+            </div>
+
+            <div id="player-hands-section">
+                <div id="current-player-hand">
+                </div>
+                <button id="draw-card-btn">Draw Card</button>
+            </div>
+
+            <div id="game-log-section">
+                <h3>Game Log</h3>
+                <div id="game-log"></div>
+            </div>
+
+            <div id="color-picker">
+                <h3>Pick a color</h3>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let gameState = {
+            players: [],
+            deck: [],
+            discardPile: [],
+            currentPlayerIndex: 0,
+            direction: 1,
+            currentColor: '',
+            currentValue: '',
+            isGameStarted: false,
+            waitingForColorPick: false,
+            drawPileElement: null,
+            discardPileElement: null,
+            currentPlayerHandElement: null,
+            gameLogElement: null,
+            playerHandsDisplayElement: null,
+            colorPickerElement: null,
+            currentWildCardPlayerId: null
+        };
+
+        const COLORS = ['red', 'green', 'blue', 'yellow'];
+        const VALUES = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'drawTwo', 'skip', 'reverse'];
+        const WILD_CARDS = ['wild', 'wildDrawFour'];
+
+        function createDeck() {
+            let deck = [];
+            COLORS.forEach(color => {
+                deck.push({ color: color, value: '0' });
+                for (let i = 1; i <= 9; i++) {
+                    deck.push({ color: color, value: String(i) });
+                    deck.push({ color: color, value: String(i) });
+                }
+                VALUES.slice(10).forEach(value => {
+                    deck.push({ color: color, value: value });
+                    deck.push({ color: color, value: value });
+                });
+            });
+            WILD_CARDS.forEach(value => {
+                for (let i = 0; i < 4; i++) {
+                    deck.push({ color: 'wild', value: value });
+                }
+            });
+            return shuffle(deck);
+        }
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function initializeGame() {
+            gameState.deck = createDeck();
+            gameState.discardPile = [];
+            gameState.currentPlayerIndex = 0;
+            gameState.direction = 1;
+            gameState.isGameStarted = true;
+            gameState.waitingForColorPick = false;
+            gameState.currentWildCardPlayerId = null;
+
+            gameState.players.forEach(player => {
+                player.hand = [];
+                for (let i = 0; i < 7; i++) {
+                    player.hand.push(gameState.deck.pop());
+                }
+            });
+
+            let firstCard = gameState.deck.pop();
+            while (firstCard.color === 'wild') {
+                gameState.deck.push(firstCard);
+                gameState.deck = shuffle(gameState.deck);
+                firstCard = gameState.deck.pop();
+            }
+            gameState.discardPile.push(firstCard);
+            gameState.currentColor = firstCard.color;
+            gameState.currentValue = firstCard.value;
+
+            gameState.gameLogElement.innerHTML = '';
+            logEvent(`Game started! First card is ${formatCard(firstCard)}.`);
+            logEvent(`It's ${gameState.players[gameState.currentPlayerIndex].name}'s turn.`);
+
+            renderGame();
+        }
+
+        function formatCard(card) {
+            let valueText = card.value;
+            switch (card.value) {
+                case 'drawTwo': valueText = '+2'; break;
+                case 'skip': valueText = '🚫'; break;
+                case 'reverse': valueText = '🔄'; break;
+                case 'wild': valueText = 'WILD'; break;
+                case 'wildDrawFour': valueText = '+4 WILD'; break;
+            }
+            if (card.color === 'wild') {
+                return `${valueText}`;
+            }
+            return `${card.color.charAt(0).toUpperCase() + card.color.slice(1)} ${valueText}`;
+        }
+
+        function logEvent(message) {
+            if (gameState.gameLogElement) {
+                const p = document.createElement('p');
+                p.textContent = message;
+                gameState.gameLogElement.appendChild(p);
+                gameState.gameLogElement.scrollTop = gameState.gameLogElement.scrollHeight;
+            }
+        }
+
+        function isValidPlay(card) {
+            const topCard = gameState.discardPile[gameState.discardPile.length - 1];
+            if (card.color === 'wild') return true;
+            if (card.color === gameState.currentColor || card.value === gameState.currentValue) return true;
+            return false;
+        }
+
+        function playCard(cardIndex) {
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            const card = currentPlayer.hand[cardIndex];
+
+            if (!card || gameState.waitingForColorPick) return;
+
+            if (!isValidPlay(card)) {
+                logEvent(`${currentPlayer.name}: You cannot play ${formatCard(card)} on ${formatCard(gameState.discardPile[gameState.discardPile.length - 1])}.`);
+                return;
+            }
+
+            currentPlayer.hand.splice(cardIndex, 1);
+            gameState.discardPile.push(card);
+
+            logEvent(`${currentPlayer.name} played ${formatCard(card)}.`);
+
+            gameState.currentColor = card.color;
+            gameState.currentValue = card.value;
+
+            applyCardEffect(card);
+
+            if (currentPlayer.hand.length === 0) {
+                endGame(currentPlayer);
+                return;
+            }
+
+            if (!gameState.waitingForColorPick) {
+                nextTurn();
+            }
+            renderGame();
+        }
+
+        function applyCardEffect(card) {
+            let nextPlayerIndex = (gameState.currentPlayerIndex + gameState.direction) % gameState.players.length;
+            if (nextPlayerIndex < 0) nextPlayerIndex += gameState.players.length;
+            const nextPlayer = gameState.players[nextPlayerIndex];
+
+            switch (card.value) {
+                case 'drawTwo':
+                    logEvent(`${nextPlayer.name} draws 2 cards and skips their turn.`);
+                    drawCards(nextPlayer, 2);
+                    gameState.currentPlayerIndex = nextPlayerIndex;
+                    break;
+                case 'skip':
+                    logEvent(`${nextPlayer.name} skips their turn.`);
+                    gameState.currentPlayerIndex = nextPlayerIndex;
+                    break;
+                case 'reverse':
+                    gameState.direction *= -1;
+                    logEvent(`Direction reversed! Play is now ${gameState.direction === 1 ? 'clockwise' : 'counter-clockwise'}.`);
+                    break;
+                case 'wild':
+                    gameState.waitingForColorPick = true;
+                    gameState.currentWildCardPlayerId = gameState.players[gameState.currentPlayerIndex].id;
+                    logEvent(`${gameState.players[gameState.currentPlayerIndex].name} played a Wild card. Choose a color.`);
+                    break;
+                case 'wildDrawFour':
+                    gameState.waitingForColorPick = true;
+                    gameState.currentWildCardPlayerId = gameState.players[gameState.currentPlayerIndex].id;
+                    logEvent(`${gameState.players[gameState.currentPlayerIndex].name} played a Wild Draw Four. Choose a color.`);
+                    logEvent(`${nextPlayer.name} draws 4 cards and skips their turn.`);
+                    drawCards(nextPlayer, 4);
+                    gameState.currentPlayerIndex = nextPlayerIndex;
+                    break;
+            }
+        }
+
+        function pickColor(color) {
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            if (!gameState.waitingForColorPick || gameState.currentWildCardPlayerId !== currentPlayer.id) {
+                return;
+            }
+
+            gameState.currentColor = color;
+            gameState.waitingForColorPick = false;
+            gameState.currentWildCardPlayerId = null;
+            logEvent(`${currentPlayer.name} chose ${color.charAt(0).toUpperCase() + color.slice(1)}.`);
+            gameState.colorPickerElement.style.display = 'none';
+            nextTurn();
+            renderGame();
+        }
+
+        function drawCards(player, count) {
+            for (let i = 0; i < count; i++) {
+                if (gameState.deck.length === 0) {
+                    if (gameState.discardPile.length <= 1) {
+                         logEvent("No more cards to draw from deck or discard pile!");
+                         break;
+                    }
+                    const topDiscard = gameState.discardPile.pop();
+                    gameState.deck = shuffle(gameState.discardPile);
+                    gameState.discardPile = [topDiscard];
+                    logEvent(`Deck is empty! Reshuffling discard pile into new deck.`);
+                }
+                player.hand.push(gameState.deck.pop());
+            }
+            renderGame();
+        }
+
+        function drawCardAction() {
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            if (gameState.waitingForColorPick) {
+                logEvent("You must pick a color first for the Wild card!");
+                return;
+            }
+            
+            drawCards(currentPlayer, 1);
+            logEvent(`${currentPlayer.name} drew a card.`);
+
+            const drawnCard = currentPlayer.hand[currentPlayer.hand.length - 1];
+            if (!isValidPlay(drawnCard)) {
+                logEvent(`${currentPlayer.name} drew ${formatCard(drawnCard)} but still cannot play. Turn passes.`);
+                nextTurn();
+            } else {
+                logEvent(`${currentPlayer.name}: You drew ${formatCard(drawnCard)}. You can play it now or choose not to.`);
+            }
+            renderGame();
+        }
+
+        function nextTurn() {
+            if (gameState.waitingForColorPick) return;
+
+            gameState.currentPlayerIndex = (gameState.currentPlayerIndex + gameState.direction) % gameState.players.length;
+            if (gameState.currentPlayerIndex < 0) {
+                gameState.currentPlayerIndex += gameState.players.length;
+            }
+            logEvent(`It's ${gameState.players[gameState.currentPlayerIndex].name}'s turn.`);
+            renderGame();
+        }
+
+        function endGame(winner) {
+            logEvent(`${winner.name} wins the game! Congratulations!`);
+            gameState.isGameStarted = false;
+            document.getElementById('game-board').style.display = 'none';
+            document.getElementById('lobby-screen').style.display = 'flex';
+            document.getElementById('start-game-btn').textContent = 'Play Again';
+            document.getElementById('start-game-btn').style.display = 'block';
+            gameState.players = [];
+            renderLobby();
+        }
+
+        function renderLobby() {
+            const playerListDiv = document.getElementById('player-list');
+            playerListDiv.innerHTML = '';
+            if (gameState.players.length === 0) {
+                 playerListDiv.innerHTML = '<p style="color:#888;">No players added yet.</p>';
+            }
+            gameState.players.forEach(player => {
+                const p = document.createElement('p');
+                p.textContent = player.name;
+                playerListDiv.appendChild(p);
+            });
+
+            const startGameBtn = document.getElementById('start-game-btn');
+            if (gameState.players.length >= 2) {
+                startGameBtn.disabled = false;
+                startGameBtn.style.opacity = '1';
+            } else {
+                startGameBtn.disabled = true;
+                startGameBtn.style.opacity = '0.5';
+            }
+        }
+
+        function renderGame() {
+            if (!gameState.isGameStarted) return;
+
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            document.getElementById('current-player-name').textContent = currentPlayer.name;
+            document.getElementById('current-player-status').textContent = gameState.currentWildCardPlayerId === currentPlayer.id ? ' (Picking Color)' : ' (Your Turn)';
+
+            const topCard = gameState.discardPile[gameState.discardPile.length - 1];
+            if (topCard) {
+                gameState.discardPileElement.innerHTML = `<div class="card ${topCard.color}" data-color="${topCard.color}" data-value="${topCard.value}">
+                    <span class="card-value">${formatCardValue(topCard.value)}</span>
+                </div>`;
+            } else {
+                gameState.discardPileElement.innerHTML = '<div class="card empty-discard"></div>';
+            }
+            
+            gameState.drawPileElement.innerHTML = 'UNO';
+
+            gameState.playerHandsDisplayElement.innerHTML = '';
+            gameState.players.forEach((player, index) => {
+                if (player.id !== currentPlayer.id) {
+                    const playerHandDiv = document.createElement('div');
+                    playerHandDiv.className = 'other-player-hand';
+                    playerHandDiv.innerHTML = `
+                        <div class="player-name ${index === gameState.currentPlayerIndex ? 'active' : ''}">${player.name}</div>
+                        <div class="card-count">${player.hand.length} cards</div>
+                    `;
+                    gameState.playerHandsDisplayElement.appendChild(playerHandDiv);
+                }
+            });
+
+            gameState.currentPlayerHandElement.innerHTML = '';
+            currentPlayer.hand.forEach((card, index) => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = `card ${card.color} ${isValidPlay(card) && gameState.currentWildCardPlayerId !== currentPlayer.id ? 'playable' : ''}`;
+                cardDiv.dataset.index = index;
+                cardDiv.dataset.color = card.color;
+                cardDiv.dataset.value = card.value;
+                cardDiv.innerHTML = `<span class="card-value">${formatCardValue(card.value)}</span>`;
+                cardDiv.addEventListener('click', () => {
+                    if (gameState.players[gameState.currentPlayerIndex].id === currentPlayer.id && !gameState.waitingForColorPick) {
+                        playCard(index);
+                    }
+                });
+                gameState.currentPlayerHandElement.appendChild(cardDiv);
+            });
+
+            const drawCardBtn = document.getElementById('draw-card-btn');
+            if (gameState.players[gameState.currentPlayerIndex].id === currentPlayer.id && !gameState.waitingForColorPick) {
+                drawCardBtn.style.display = 'block';
+            } else {
+                drawCardBtn.style.display = 'none';
+            }
+
+            if (gameState.waitingForColorPick && gameState.currentWildCardPlayerId === currentPlayer.id) {
+                gameState.colorPickerElement.style.display = 'flex';
+            } else {
+                gameState.colorPickerElement.style.display = 'none';
+            }
+        }
+
+        function formatCardValue(value) {
+            switch (value) {
+                case 'drawTwo': return '+2';
+                case 'skip': return '🚫';
+                case 'reverse': return '🔄';
+                case 'wild': return 'WILD';
+                case 'wildDrawFour': return '+4';
+                default: return value;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            gameState.drawPileElement = document.getElementById('draw-pile');
+            gameState.discardPileElement = document.getElementById('discard-pile');
+            gameState.currentPlayerHandElement = document.getElementById('current-player-hand');
+            gameState.gameLogElement = document.getElementById('game-log');
+            gameState.playerHandsDisplayElement = document.getElementById('other-players-hands');
+            gameState.colorPickerElement = document.getElementById('color-picker');
+
+            document.getElementById('add-player-btn').addEventListener('click', () => {
+                const playerNameInput = document.getElementById('player-name-input');
+                const name = playerNameInput.value.trim();
+                if (name && gameState.players.length < 4) {
+                    if (gameState.players.some(player => player.name.toLowerCase() === name.toLowerCase())) {
+                        alert('Player name already exists!');
+                        return;
+                    }
+                    gameState.players.push({ id: Date.now(), name: name, hand: [] });
+                    playerNameInput.value = '';
+                    renderLobby();
+                } else if (gameState.players.length >= 4) {
+                    alert('Maximum 4 players for this simple game.');
+                } else {
+                    alert('Please enter a player name.');
+                }
+            });
+
+            document.getElementById('player-name-input').addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    document.getElementById('add-player-btn').click();
+                }
+            });
+
+            document.getElementById('start-game-btn').addEventListener('click', () => {
+                if (gameState.players.length >= 2) {
+                    document.getElementById('lobby-screen').style.display = 'none';
+                    document.getElementById('game-board').style.display = 'flex';
+                    initializeGame();
+                } else {
+                    alert('Need at least 2 players to start the game.');
+                }
+            });
+
+            document.getElementById('draw-card-btn').addEventListener('click', drawCardAction);
+
+            COLORS.forEach(color => {
+                const colorDiv = document.createElement('div');
+                colorDiv.className = `color-option ${color}`;
+                colorDiv.dataset.color = color;
+                colorDiv.addEventListener('click', () => pickColor(color));
+                gameState.colorPickerElement.appendChild(colorDiv);
+            });
+
+            renderLobby();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Page</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #e0f2f7; /* Light blue background */
+            color: #333;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #ffffff;
+            padding: 40px 50px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            animation: fadeIn 1s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #2c3e50; /* Dark blue */
+            margin-bottom: 20px;
+            font-size: 2.8em;
+            letter-spacing: 1px;
+        }
+
+        p {
+            color: #7f8c8d; /* Grayish blue */
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 15px 30px;
+            background-color: #3498db; /* Bright blue */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            outline: none;
+        }
+
+        button:hover {
+            background-color: #2980b9; /* Darker blue on hover */
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            background-color: #21618c;
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        #messageDisplay {
+            margin-top: 25px;
+            font-size: 1.1em;
+            color: #27ae60; /* Green for success message */
+            min-height: 1.2em; /* To prevent layout shift */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hello, Web!</h1>
+        <p>This is a simple single-file web application.</p>
+        <button id="actionButton">Click Me!</button>
+        <p id="messageDisplay"></p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const actionButton = document.getElementById('actionButton');
+            const messageDisplay = document.getElementById('messageDisplay');
+
+            actionButton.addEventListener('click', () => {
+                const now = new Date();
+                const dateTimeString = now.toLocaleString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+                messageDisplay.textContent = `Current time: ${dateTimeString}`;
+                actionButton.textContent = 'Time Updated!';
+                setTimeout(() => {
+                    actionButton.textContent = 'Click Me Again!';
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>

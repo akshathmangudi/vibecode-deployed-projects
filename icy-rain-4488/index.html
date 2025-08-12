@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwipeMatch</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        #app {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+            padding: 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        #navigation-tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        #navigation-tabs button {
+            flex-grow: 1;
+            padding: 12px 0;
+            border: none;
+            background-color: #e0e0e0;
+            color: #555;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            border-radius: 8px;
+            margin: 0 5px;
+        }
+        #navigation-tabs button.active {
+            background-color: #ff4d6d;
+            color: white;
+            box-shadow: 0 2px 8px rgba(255, 77, 109, 0.3);
+        }
+        #navigation-tabs button:hover:not(.active) {
+            background-color: #d0d0d0;
+        }
+
+        #profile-display, #matches-section {
+            display: none; /* Controlled by JS */
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        #profile-display.active, #matches-section.active {
+            display: flex;
+        }
+
+        #profile-card {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            min-height: 350px; /* To prevent layout shift when no profiles */
+            justify-content: center;
+        }
+        #profile-image {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #ff4d6d;
+            box-shadow: 0 0 15px rgba(255, 77, 109, 0.4);
+        }
+        #profile-name-age {
+            font-size: 1.8em;
+            margin: 10px 0 5px;
+            color: #333;
+        }
+        #profile-bio {
+            font-size: 1em;
+            color: #555;
+            line-height: 1.5;
+            max-height: 80px;
+            overflow: auto;
+        }
+        #no-more-profiles {
+            font-size: 1.2em;
+            color: #888;
+        }
+
+        #actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        #actions button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            font-size: 2em;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        #nope-btn {
+            background-color: #ff6b6b; /* Red */
+            color: white;
+        }
+        #like-btn {
+            background-color: #4CAF50; /* Green */
+            color: white;
+        }
+        #nope-btn:hover {
+            background-color: #ff4c4c;
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(255, 107, 107, 0.4);
+        }
+        #like-btn:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(76, 175, 80, 0.4);
+        }
+
+        #matches-list {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+        }
+        .match-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background-color: #f0f0f0;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .match-item img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ff4d6d;
+        }
+        .match-item span {
+            font-size: 1.1em;
+            color: #333;
+            font-weight: bold;
+        }
+        .match-item:last-child {
+            margin-bottom: 0;
+        }
+        #no-matches {
+            color: #888;
+            font-style: italic;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="navigation-tabs">
+            <button id="browse-tab" class="active">Browse</button>
+            <button id="matches-tab">Matches</button>
+        </div>
+
+        <div id="profile-display" class="active">
+            <div id="profile-card">
+                <img id="profile-image" src="" alt="Profile Image">
+                <h2 id="profile-name-age"></h2>
+                <p id="profile-bio"></p>
+                <p id="no-more-profiles" style="display: none;">No more profiles for now! Check back later.</p>
+            </div>
+            <div id="actions">
+                <button id="nope-btn">👎</button>
+                <button id="like-btn">❤️</button>
+            </div>
+        </div>
+
+        <div id="matches-section">
+            <h2>Your Matches</h2>
+            <ul id="matches-list">
+                <!-- Matches will be dynamically inserted here -->
+            </ul>
+            <p id="no-matches" style="display: none;">You haven't matched with anyone yet. Keep swiping!</p>
+        </div>
+    </div>
+
+    <script>
+        const profiles = [
+            { id: 'p1', name: 'Alice', age: 24, bio: 'Loves hiking, coffee, and good conversations. Looking for someone adventurous!', imageUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=1976&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+            { id: 'p2', name: 'Bob', age: 28, bio: 'Software engineer by day, amateur chef by night. Obsessed with sci-fi and board games.', imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a8117730d43?auto=format&fit=crop&q=80&w=1974&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+            { id: 'p3', name: 'Charlie', age: 26, bio: 'Artist and cat lover. Enjoys quiet evenings and exploring new art galleries.', imageUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=1961&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+            { id: 'p4', name: 'Diana', age: 30, bio: 'Travel enthusiast and yoga instructor. Always planning my next adventure. Looking for my travel buddy!', imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=1964&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+            { id: 'p5', name: 'Eve', age: 22, bio: 'Student and aspiring musician. Plays guitar and writes songs. Looking for someone to share tunes with.', imageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734b31e?auto=format&fit=crop&q=80&w=1976&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+            { id: 'p6', name: 'Frank', age: 32, bio: 'Fitness fanatic and dog dad. Enjoys outdoor activities and staying active. Seeking a partner in crime for workouts!', imageUrl: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+            { id: 'p7', name: 'Grace', age: 27, bio: 'Foodie and bookworm. My ideal evening involves a good book and a delicious meal. Always open to new restaurant suggestions!', imageUrl: 'https://images.unsplash.com/photo-1546447147-38411b9319e7?auto=format&fit=crop&q=80&w=2000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ];
+
+        let currentProfileIndex = 0;
+        let matches = [];
+        const profilesWhoLikedMe = new Set(); // IDs of profiles that "randomly" liked me back (for match simulation)
+
+        // Pre-populate some random "likes back" for simulation purposes
+        // In a real app, this would come from a backend based on actual likes
+        profiles.forEach(profile => {
+            if (Math.random() < 0.2) { // 20% chance they "liked" me
+                profilesWhoLikedMe.add(profile.id);
+            }
+        });
+
+        const profileImage = document.getElementById('profile-image');
+        const profileNameAge = document.getElementById('profile-name-age');
+        const profileBio = document.getElementById('profile-bio');
+        const nopeBtn = document.getElementById('nope-btn');
+        const likeBtn = document.getElementById('like-btn');
+        const noMoreProfiles = document.getElementById('no-more-profiles');
+        const profileDisplay = document.getElementById('profile-display');
+        const matchesSection = document.getElementById('matches-section');
+        const matchesList = document.getElementById('matches-list');
+        const noMatchesText = document.getElementById('no-matches');
+
+        const browseTab = document.getElementById('browse-tab');
+        const matchesTab = document.getElementById('matches-tab');
+
+        function displayProfile(index) {
+            if (index < profiles.length) {
+                const profile = profiles[index];
+                profileImage.src = profile.imageUrl;
+                profileImage.alt = profile.name;
+                profileNameAge.textContent = `${profile.name}, ${profile.age}`;
+                profileBio.textContent = profile.bio;
+                noMoreProfiles.style.display = 'none';
+                profileImage.style.display = 'block';
+                profileNameAge.style.display = 'block';
+                profileBio.style.display = 'block';
+                nopeBtn.style.display = 'flex';
+                likeBtn.style.display = 'flex';
+            } else {
+                profileImage.style.display = 'none';
+                profileNameAge.style.display = 'none';
+                profileBio.style.display = 'none';
+                noMoreProfiles.style.display = 'block';
+                nopeBtn.style.display = 'none';
+                likeBtn.style.display = 'none';
+            }
+        }
+
+        function handleLike() {
+            if (currentProfileIndex < profiles.length) {
+                const likedProfile = profiles[currentProfileIndex];
+
+                if (profilesWhoLikedMe.has(likedProfile.id)) {
+                    matches.push(likedProfile);
+                    alert(`It's a Match with ${likedProfile.name}! 🎉`);
+                    renderMatches();
+                }
+                currentProfileIndex++;
+                displayProfile(currentProfileIndex);
+            }
+        }
+
+        function handleNope() {
+            currentProfileIndex++;
+            displayProfile(currentProfileIndex);
+        }
+
+        function renderMatches() {
+            matchesList.innerHTML = ''; // Clear existing list
+            if (matches.length === 0) {
+                noMatchesText.style.display = 'block';
+            } else {
+                noMatchesText.style.display = 'none';
+                matches.forEach(match => {
+                    const li = document.createElement('li');
+                    li.classList.add('match-item');
+                    li.innerHTML = `
+                        <img src="${match.imageUrl}" alt="${match.name}">
+                        <span>${match.name}</span>
+                    `;
+                    matchesList.appendChild(li);
+                });
+            }
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('#app > div').forEach(section => {
+                if (section.id !== 'navigation-tabs') {
+                    section.classList.remove('active');
+                }
+            });
+            document.getElementById(sectionId).classList.add('active');
+
+            browseTab.classList.remove('active');
+            matchesTab.classList.remove('active');
+            if (sectionId === 'profile-display') {
+                browseTab.classList.add('active');
+            } else if (sectionId === 'matches-section') {
+                matchesTab.classList.add('active');
+            }
+        }
+
+        // Event Listeners
+        nopeBtn.addEventListener('click', handleNope);
+        likeBtn.addEventListener('click', handleLike);
+        browseTab.addEventListener('click', () => showSection('profile-display'));
+        matchesTab.addEventListener('click', () => {
+            renderMatches(); // Re-render matches every time tab is clicked to ensure freshness
+            showSection('matches-section');
+        });
+
+        // Initial setup
+        displayProfile(currentProfileIndex);
+    </script>
+</body>
+</html>

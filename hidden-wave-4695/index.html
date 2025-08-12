@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Library</title>
+    <style>
+        :root {
+            --primary-bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --border-color: #ddd;
+            --accent-color: #007bff;
+            --accent-hover: #0056b3;
+            --delete-color: #dc3545;
+            --delete-hover: #c82333;
+            --read-color: #28a745;
+            --read-hover: #218838;
+            --unread-color: #ffc107;
+            --unread-hover: #e0a800;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5rem;
+        }
+
+        .form-container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .form-container h2 {
+            margin-top: 0;
+            color: var(--text-color);
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input[type="text"],
+        .input-group input[type="number"] {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            width: calc(100% - 22px); /* Account for padding and border */
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            font-weight: bold;
+        }
+
+        button[type="submit"] {
+            background-color: var(--accent-color);
+            color: white;
+            width: 100%;
+        }
+
+        button[type="submit"]:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .library-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1200px;
+            justify-content: center;
+        }
+
+        .book-card {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 180px;
+            border: 1px solid var(--border-color);
+        }
+
+        .book-card h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+            font-size: 1.5rem;
+            word-wrap: break-word;
+        }
+
+        .book-card p {
+            margin: 5px 0;
+        }
+
+        .book-card .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 10px;
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+        }
+
+        .book-card .actions button {
+            flex: 1;
+            padding: 10px 15px;
+            min-width: 120px; /* Ensure buttons don't get too small */
+        }
+
+        .book-card .delete-btn {
+            background-color: var(--delete-color);
+            color: white;
+        }
+
+        .book-card .delete-btn:hover {
+            background-color: var(--delete-hover);
+        }
+
+        .book-card .read-toggle-btn {
+            background-color: var(--read-color);
+            color: white;
+        }
+
+        .book-card .read-toggle-btn.unread {
+            background-color: var(--unread-color);
+            color: var(--text-color); /* Make text visible on yellow */
+        }
+
+        .book-card .read-toggle-btn:hover {
+            background-color: var(--read-hover);
+        }
+
+        .book-card .read-toggle-btn.unread:hover {
+            background-color: var(--unread-hover);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .form-container {
+                padding: 20px;
+            }
+            .form-container h2 {
+                font-size: 1.5rem;
+            }
+            .library-grid {
+                grid-template-columns: 1fr;
+            }
+            .book-card .actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .book-card .actions button {
+                min-width: unset;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>My Library</h1>
+
+    <div class="form-container">
+        <h2>Add a New Book</h2>
+        <form id="newBookForm">
+            <div class="input-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" required>
+            </div>
+            <div class="input-group">
+                <label for="author">Author</label>
+                <input type="text" id="author" required>
+            </div>
+            <div class="input-group">
+                <label for="pages">Pages</label>
+                <input type="number" id="pages" min="1" required>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="read">
+                <label for="read">I have read this book</label>
+            </div>
+            <button type="submit">Add Book</button>
+        </form>
+    </div>
+
+    <div class="library-grid" id="libraryGrid">
+        <!-- Books will be rendered here -->
+    </div>
+
+    <script>
+        let myLibrary = [];
+        const STORAGE_KEY = 'myLibrary';
+
+        // Get DOM elements
+        const newBookForm = document.getElementById('newBookForm');
+        const titleInput = document.getElementById('title');
+        const authorInput = document.getElementById('author');
+        const pagesInput = document.getElementById('pages');
+        const readInput = document.getElementById('read');
+        const libraryGrid = document.getElementById('libraryGrid');
+
+        // Book object constructor
+        function Book(id, title, author, pages, read) {
+            this.id = id;
+            this.title = title;
+            this.author = author;
+            this.pages = pages;
+            this.read = read;
+        }
+
+        // --- Local Storage Functions ---
+        function saveLibrary() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(myLibrary));
+        }
+
+        function loadLibrary() {
+            const storedLibrary = localStorage.getItem(STORAGE_KEY);
+            if (storedLibrary) {
+                myLibrary = JSON.parse(storedLibrary).map(bookData =>
+                    new Book(bookData.id, bookData.title, bookData.author, bookData.pages, bookData.read)
+                );
+            } else {
+                myLibrary = [];
+            }
+        }
+
+        // --- Unique ID Generator ---
+        function generateUniqueId() {
+            return Date.now().toString(36) + Math.random().toString(36).substring(2);
+        }
+
+        // --- Render Books to DOM ---
+        function renderLibrary() {
+            libraryGrid.innerHTML = ''; // Clear current display
+
+            myLibrary.forEach(book => {
+                const bookCard = document.createElement('div');
+                bookCard.classList.add('book-card');
+                bookCard.setAttribute('data-id', book.id);
+
+                const readStatusText = book.read ? 'Read' : 'Not Read';
+                const readToggleClass = book.read ? '' : 'unread';
+                const readToggleButtonText = book.read ? 'Mark as Unread' : 'Mark as Read';
+
+                bookCard.innerHTML = `
+                    <h3>${book.title}</h3>
+                    <p>by ${book.author}</p>
+                    <p>${book.pages} pages</p>
+                    <p>Status: ${readStatusText}</p>
+                    <div class="actions">
+                        <button class="read-toggle-btn ${readToggleClass}" data-id="${book.id}">
+                            ${readToggleButtonText}
+                        </button>
+                        <button class="delete-btn" data-id="${book.id}">
+                            Delete
+                        </button>
+                    </div>
+                `;
+
+                // Add event listeners directly to the buttons within the card
+                bookCard.querySelector('.delete-btn').addEventListener('click', (e) => handleDeleteBook(e.target.dataset.id));
+                bookCard.querySelector('.read-toggle-btn').addEventListener('click', (e) => handleToggleRead(e.target.dataset.id));
+
+                libraryGrid.appendChild(bookCard);
+            });
+        }
+
+        // --- Event Handlers ---
+
+        function addBook(title, author, pages, read) {
+            const newBook = new Book(generateUniqueId(), title, author, pages, read);
+            myLibrary.push(newBook);
+            saveLibrary();
+            renderLibrary();
+        }
+
+        function handleDeleteBook(bookId) {
+            myLibrary = myLibrary.filter(book => book.id !== bookId);
+            saveLibrary();
+            renderLibrary();
+        }
+
+        function handleToggleRead(bookId) {
+            const bookIndex = myLibrary.findIndex(book => book.id === bookId);
+            if (bookIndex > -1) {
+                myLibrary[bookIndex].read = !myLibrary[bookIndex].read;
+                saveLibrary();
+                renderLibrary();
+            }
+        }
+
+        // --- Initial Load & Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLibrary();
+            renderLibrary();
+        });
+
+        newBookForm.addEventListener('submit', (e) => {
+            e.preventDefault(); // Prevent default form submission
+
+            const title = titleInput.value.trim();
+            const author = authorInput.value.trim();
+            const pages = parseInt(pagesInput.value); // Convert to number
+            const read = readInput.checked;
+
+            if (title && author && !isNaN(pages) && pages > 0) { // Basic validation
+                addBook(title, author, pages, read);
+                newBookForm.reset(); // Clear form fields
+            } else {
+                alert('Please fill in all book details correctly: Title, Author, and Pages (must be a positive number).');
+            }
+        });
+    </script>
+</body>
+</html>

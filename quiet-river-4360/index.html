@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Calculator</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .calculator {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            width: 320px;
+            box-sizing: border-box;
+        }
+
+        .display {
+            width: calc(100% - 20px);
+            height: 70px;
+            background-color: #f5f5f5;
+            border: none;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 2.8em;
+            text-align: right;
+            padding: 0 10px;
+            box-sizing: border-box;
+            color: #333;
+            outline: none;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .button {
+            width: 100%;
+            height: 70px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.9em;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            color: #333;
+            background-color: #e0e0e0;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            outline: none;
+        }
+
+        .button:hover {
+            background-color: #d0d0d0;
+        }
+
+        .button:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .button.number {
+            background-color: #f0f0f0;
+        }
+
+        .button.number:hover {
+            background-color: #e6e6e6;
+        }
+
+        .button.operator {
+            background-color: #ff9500;
+            color: white;
+        }
+
+        .button.operator:hover {
+            background-color: #e08500;
+        }
+
+        .button.clear {
+            background-color: #ff3b30;
+            color: white;
+        }
+
+        .button.clear:hover {
+            background-color: #e6342b;
+        }
+
+        .button.equals {
+            background-color: #007aff;
+            color: white;
+            grid-row: span 2;
+            grid-column: 4;
+        }
+
+        .button.equals:hover {
+            background-color: #006ee6;
+        }
+
+        .button.zero {
+            grid-column: span 2;
+        }
+
+        .button.decimal {
+            background-color: #f0f0f0;
+        }
+
+        .button.decimal:hover {
+            background-color: #e6e6e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" class="display" readonly value="">
+        <div class="buttons">
+            <button class="button clear" data-value="C">C</button>
+            <button class="button operator" data-value="/">/</button>
+            <button class="button operator" data-value="*">*</button>
+            <button class="button operator" data-value="-">-</button>
+
+            <button class="button number" data-value="7">7</button>
+            <button class="button number" data-value="8">8</button>
+            <button class="button number" data-value="9">9</button>
+            <button class="button operator" data-value="+">+</button>
+
+            <button class="button number" data-value="4">4</button>
+            <button class="button number" data-value="5">5</button>
+            <button class="button number" data-value="6">6</button>
+            <button class="button equals" data-value="=">=</button>
+
+            <button class="button number" data-value="1">1</button>
+            <button class="button number" data-value="2">2</button>
+            <button class="button number" data-value="3">3</button>
+
+            <button class="button number zero" data-value="0">0</button>
+            <button class="button decimal" data-value=".">.</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const display = document.querySelector('.calculator .display');
+            const buttons = document.querySelectorAll('.calculator .button');
+
+            buttons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const value = e.target.dataset.value;
+
+                    if (value === 'C') {
+                        display.value = '';
+                    } else if (value === '=') {
+                        try {
+                            if (display.value.trim() === '' || ['+', '-', '*', '/', '.'].includes(display.value.slice(-1))) {
+                                display.value = 'Error';
+                                return;
+                            }
+                            let result = eval(display.value);
+                            if (Number.isFinite(result)) {
+                                display.value = parseFloat(result.toFixed(10)).toString();
+                            } else {
+                                display.value = 'Error';
+                            }
+                        } catch (error) {
+                            display.value = 'Error';
+                        }
+                    } else {
+                        if (display.value === 'Error') {
+                            display.value = value;
+                            return;
+                        }
+
+                        if (display.value === '0' && value !== '.' && !['+', '-', '*', '/'].includes(value)) {
+                            display.value = value;
+                        } else {
+                            // Prevent consecutive operators, replace the last one
+                            const lastChar = display.value.slice(-1);
+                            const isOperator = ['+', '-', '*', '/'].includes(value);
+                            const lastCharIsOperatorOrDecimal = ['+', '-', '*', '/', '.'].includes(lastChar);
+
+                            if (isOperator && lastCharIsOperatorOrDecimal) {
+                                display.value = display.value.slice(0, -1) + value;
+                            } else if (value === '.' && display.value.endsWith('.')) {
+                                // Prevent multiple decimals if last char is already a decimal
+                                return;
+                            } else if (value === '.' && display.value === '') {
+                                display.value = '0.'; // Start with 0. if '.' is pressed first
+                            }
+                             else if (value === '0' && display.value === '0') {
+                                return; // Prevent "00"
+                            }
+                            else {
+                                display.value += value;
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

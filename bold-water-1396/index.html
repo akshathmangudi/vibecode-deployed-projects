@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Animal Savings Tracker</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #8BC34A;
+            --background-color: #E8F5E9;
+            --card-background: #FFFFFF;
+            --text-color: #333;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --progress-bar-empty: #E0E0E0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: var(--card-background);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+        }
+
+        .section {
+            border: 1px solid #eee;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .section h2 {
+            margin-top: 0;
+            color: var(--secondary-color);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: var(--border-radius);
+            font-size: 1em;
+            width: calc(100% - 22px);
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .progress-display {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 20px;
+            background-color: var(--progress-bar-empty);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary-color);
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .animal-svg-wrapper {
+            width: 100px;
+            height: 100px;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .animal-svg {
+            width: 100%;
+            height: 100%;
+            fill: none;
+            stroke: var(--primary-color);
+            stroke-width: 2px;
+        }
+
+        .animal-fill-rect {
+            fill: var(--primary-color);
+            transform-origin: 0% 100%;
+            transition: transform 0.5s ease-in-out, fill 0.3s ease;
+        }
+
+        .goal-info span {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .reset-button {
+            background-color: #f44336;
+        }
+
+        .reset-button:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Money Animal Savings Tracker</h1>
+
+        <div class="section" id="setGoalSection">
+            <h2>Set Your Goal</h2>
+            <div class="input-group">
+                <label for="goalName">Goal Name:</label>
+                <input type="text" id="goalName" placeholder="e.g., New Pet Toy" maxlength="50">
+            </div>
+            <div class="input-group">
+                <label for="goalAmount">Goal Amount ($):</label>
+                <input type="number" id="goalAmount" min="1" step="0.01" value="100.00">
+            </div>
+            <button id="setGoalBtn">Set Goal</button>
+        </div>
+
+        <div class="section" id="progressSection" style="display: none;">
+            <h2>Your Progress</h2>
+            <div class="progress-display">
+                <p>Goal: <span id="displayGoalName"></span> - $<span id="displayGoalAmount"></span></p>
+                <p>Saved: $<span id="currentAmountDisplay">0.00</span> / $<span id="remainingAmountDisplay">0.00</span> remaining</p>
+
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <p><span id="progressPercentage">0%</span> Complete!</p>
+
+                <div class="animal-svg-wrapper">
+                    <svg class="animal-svg" viewBox="0 0 100 100">
+                        <path d="M 15 50 C 15 20, 85 20, 85 50 C 85 80, 15 80, 15 50 Z M 30 40 C 30 35, 40 35, 40 40 C 40 45, 30 45, 30 40 Z M 60 40 C 60 35, 70 35, 70 40 C 70 45, 60 45, 60 40 Z M 45 65 C 45 60, 55 60, 55 65 C 55 70, 45 70, 45 65 Z" stroke-linejoin="round" stroke-linecap="round"></path>
+                        <rect id="animalFillRect" class="animal-fill-rect" x="15" y="80" width="70" height="0" rx="10" ry="10"></rect>
+                    </svg>
+                </div>
+            </div>
+            <button id="resetGoalBtn" class="reset-button">Reset Goal</button>
+        </div>
+
+        <div class="section" id="addMoneySection" style="display: none;">
+            <h2>Add Money</h2>
+            <div class="input-group">
+                <label for="addAmount">Amount to Add ($):</label>
+                <input type="number" id="addAmount" min="0.01" step="0.01" value="10.00">
+            </div>
+            <button id="addMoneyBtn">Add Money</button>
+        </div>
+    </div>
+
+    <script>
+        const goalNameInput = document.getElementById('goalName');
+        const goalAmountInput = document.getElementById('goalAmount');
+        const setGoalBtn = document.getElementById('setGoalBtn');
+        const addAmountInput = document.getElementById('addAmount');
+        const addMoneyBtn = document.getElementById('addMoneyBtn');
+        const resetGoalBtn = document.getElementById('resetGoalBtn');
+
+        const setGoalSection = document.getElementById('setGoalSection');
+        const progressSection = document.getElementById('progressSection');
+        const addMoneySection = document.getElementById('addMoneySection');
+
+        const displayGoalName = document.getElementById('displayGoalName');
+        const displayGoalAmount = document.getElementById('displayGoalAmount');
+        const currentAmountDisplay = document.getElementById('currentAmountDisplay');
+        const remainingAmountDisplay = document.getElementById('remainingAmountDisplay');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercentage = document.getElementById('progressPercentage');
+        const animalFillRect = document.getElementById('animalFillRect');
+        const animalSVGPath = document.querySelector('.animal-svg path');
+
+        let goal = {
+            name: '',
+            amount: 0,
+            current: 0
+        };
+
+        const STORAGE_KEY = 'moneyAnimalGoal';
+
+        function loadGoal() {
+            const storedGoal = localStorage.getItem(STORAGE_KEY);
+            if (storedGoal) {
+                goal = JSON.parse(storedGoal);
+            }
+        }
+
+        function saveGoal() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(goal));
+        }
+
+        function updateUI() {
+            if (goal.amount > 0) {
+                setGoalSection.style.display = 'none';
+                progressSection.style.display = 'block';
+                addMoneySection.style.display = 'block';
+
+                displayGoalName.textContent = goal.name;
+                displayGoalAmount.textContent = goal.amount.toFixed(2);
+                currentAmountDisplay.textContent = goal.current.toFixed(2);
+                remainingAmountDisplay.textContent = (goal.amount - goal.current).toFixed(2);
+
+                const percentage = (goal.current / goal.amount) * 100;
+                progressBar.style.width = `${Math.min(percentage, 100)}%`;
+                progressPercentage.textContent = `${Math.min(percentage, 100).toFixed(0)}%`;
+
+                const newSvgHeight = 60;
+                const newSvgYOffset = 20;
+                const newFillHeight = (percentage / 100) * newSvgHeight;
+                const newFillY = newSvgYOffset + (newSvgHeight - newFillHeight);
+                
+                animalFillRect.setAttribute('x', '15');
+                animalFillRect.setAttribute('width', '70');
+                animalFillRect.setAttribute('height', newFillHeight);
+                animalFillRect.setAttribute('y', newFillY);
+                
+                if (percentage >= 100) {
+                    animalSVGPath.style.stroke = 'var(--secondary-color)';
+                    animalFillRect.style.fill = 'var(--secondary-color)';
+                } else {
+                    animalSVGPath.style.stroke = 'var(--primary-color)';
+                    animalFillRect.style.fill = 'var(--primary-color)';
+                }
+
+                addMoneyBtn.disabled = (goal.current >= goal.amount);
+                if (goal.current >= goal.amount) {
+                    addAmountInput.value = (0).toFixed(2);
+                    addAmountInput.disabled = true;
+                } else {
+                    addAmountInput.disabled = false;
+                }
+
+            } else {
+                setGoalSection.style.display = 'block';
+                progressSection.style.display = 'none';
+                addMoneySection.style.display = 'none';
+                goalNameInput.value = '';
+                goalAmountInput.value = '100.00';
+            }
+        }
+
+        function setGoal() {
+            const name = goalNameInput.value.trim();
+            const amount = parseFloat(goalAmountInput.value);
+
+            if (!name) {
+                alert('Please enter a goal name.');
+                return;
+            }
+            if (isNaN(amount) || amount <= 0) {
+                alert('Please enter a valid goal amount greater than 0.');
+                return;
+            }
+
+            goal = {
+                name: name,
+                amount: amount,
+                current: 0
+            };
+            saveGoal();
+            updateUI();
+        }
+
+        function addMoney() {
+            const amountToAdd = parseFloat(addAmountInput.value);
+
+            if (isNaN(amountToAdd) || amountToAdd <= 0) {
+                alert('Please enter a valid amount to add greater than 0.');
+                return;
+            }
+
+            goal.current = Math.min(goal.current + amountToAdd, goal.amount);
+            saveGoal();
+            updateUI();
+        }
+
+        function resetGoal() {
+            if (confirm('Are you sure you want to reset your goal? This will delete all progress.')) {
+                localStorage.removeItem(STORAGE_KEY);
+                goal = { name: '', amount: 0, current: 0 };
+                updateUI();
+            }
+        }
+
+        setGoalBtn.addEventListener('click', setGoal);
+        addMoneyBtn.addEventListener('click', addMoney);
+        resetGoalBtn.addEventListener('click', resetGoal);
+
+        loadGoal();
+        updateUI();
+    </script>
+</body>
+</html>

@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ludo - Local Pass & Play</title>
+    <style>
+        :root {
+            --red: #e74c3c;
+            --green: #2ecc71;
+            --blue: #3498db;
+            --yellow: #f1c40f;
+            --dark-gray: #34495e;
+            --light-gray: #ecf0f1;
+            --board-bg: #bdc3c7;
+            --path-bg: #fff;
+            --piece-size: 30px;
+            --cell-size: 40px; /* Each square on the board */
+            --home-base-size: calc(var(--cell-size) * 6);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--dark-gray);
+            color: var(--light-gray);
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: var(--light-gray);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            background-color: var(--board-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            min-width: 400px;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(15, var(--cell-size));
+            grid-template-rows: repeat(15, var(--cell-size));
+            background-color: var(--board-bg);
+            border: 2px solid var(--dark-gray);
+            position: relative;
+        }
+
+        .cell {
+            width: var(--cell-size);
+            height: var(--cell-size);
+            background-color: var(--path-bg);
+            border: 1px solid var(--dark-gray);
+            box-sizing: border-box;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Home bases */
+        .home-base {
+            position: absolute;
+            width: var(--home-base-size);
+            height: var(--home-base-size);
+            background-color: var(--path-bg);
+            border: 2px solid var(--dark-gray);
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            place-items: center; /* Centers items in grid cells */
+            z-index: 0; /* Behind path cells */
+        }
+
+        .home-base.red { top: 0; left: 0; background-color: var(--red); }
+        .home-base.green { top: 0; right: 0; background-color: var(--green); }
+        .home-base.blue { bottom: 0; right: 0; background-color: var(--blue); }
+        .home-base.yellow { bottom: 0; left: 0; background-color: var(--yellow); }
+
+        .home-base .piece-start-slot {
+            width: var(--piece-size);
+            height: var(--piece-size);
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 1px dashed var(--dark-gray);
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Center home */
+        .center-home {
+            position: absolute;
+            top: calc(var(--cell-size) * 6);
+            left: calc(var(--cell-size) * 6);
+            width: calc(var(--cell-size) * 3);
+            height: calc(var(--cell-size) * 3);
+            background-color: #eee;
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); /* Diamond shape */
+            z-index: 1; /* Above path cells */
+            border: 2px solid var(--dark-gray);
+        }
+
+        /* Start cells */
+        .cell.start.red { background-color: var(--red); }
+        .cell.start.green { background-color: var(--green); }
+        .cell.start.blue { background-color: var(--blue); }
+        .cell.start.yellow { background-color: var(--yellow); }
+
+        /* Safe cells (stars) */
+        .cell.safe::before {
+            content: '⭐';
+            position: absolute;
+            font-size: 1.2em;
+            pointer-events: none; /* Do not interfere with piece clicks */
+            z-index: 2;
+        }
+
+        /* Piece styling */
+        .piece {
+            width: var(--piece-size);
+            height: var(--piece-size);
+            border-radius: 50%;
+            border: 2px solid var(--dark-gray);
+            box-sizing: border-box;
+            cursor: grab;
+            transition: transform 0.1s ease-in-out;
+            position: relative; /* Default, adjusted by JS for stacking in cells */
+            z-index: 5;
+            flex-shrink: 0; /* Prevent piece from shrinking in flex/grid containers */
+        }
+
+        .piece.red { background-color: var(--red); }
+        .piece.green { background-color: var(--green); }
+        .piece.blue { background-color: var(--blue); }
+        .piece.yellow { background-color: var(--yellow); }
+
+        .piece.active {
+            box-shadow: 0 0 10px 5px rgba(255, 255, 0, 0.7);
+            cursor: pointer;
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        .piece.in-home-base {
+            position: relative; /* Stays relative to its home base slot */
+            left: auto; /* Ensure no absolute positioning carries over */
+            top: auto;
+        }
+
+        /* Dice area */
+        .dice-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: var(--light-gray);
+            border-radius: 10px;
+            color: var(--dark-gray);
+            width: 300px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .dice {
+            width: 80px;
+            height: 80px;
+            background-color: #fff;
+            border: 4px solid var(--dark-gray);
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3em;
+            font-weight: bold;
+            color: var(--dark-gray);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .roll-button {
+            padding: 12px 25px;
+            font-size: 1.2em;
+            background-color: var(--blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .roll-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .roll-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .player-turn {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .player-turn .color-indicator {
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            vertical-align: middle;
+            margin-left: 10px;
+            border: 2px solid var(--dark-gray);
+        }
+        .player-turn.red .color-indicator { background-color: var(--red); }
+        .player-turn.green .color-indicator { background-color: var(--green); }
+        .player-turn.blue .color-indicator { background-color: var(--blue); }
+        .player-turn.yellow .color-indicator { background-color: var(--yellow); }
+
+        .message {
+            margin-top: 15px;
+            font-size: 1.1em;
+            color: var(--dark-gray);
+            text-align: center;
+        }
+
+        .info-text {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <h1>Ludo - Local Pass & Play</h1>
+
+    <div class="game-container">
+        <div class="board" id="ludoBoard">
+            <!-- Home bases -->
+            <div class="home-base red" id="homeBaseRed">
+                <div class="piece-start-slot"></div>
+                <div class="piece-start-slot"></div>
+                <div class="piece-start-slot"></div>
+                <div class="piece-start-slot"></div>
+            </div>
+            <div class="home-base green" id="homeBaseGreen">
+                <div class="piece-start-slot"></div>
+                <div class="piece-start-slot"></div>
+                <div class="piece-start-slot"></div>
+                <div class="piece-start-slot"></div>
+            </div>
+            <div class="home-base blue" id="homeBaseBlue">
+                <div class="piece-start-slot"></div>
+                <div class="piece-start-slot"></div>
+                <div class="piece-start-slot"></div>
+                <div class="piece-start-slot"></div>
+            </div>
+            <div class="home-base yellow" id="homeBaseYellow">
+                <div class="piece-start-slot"></div>
+                <div class="piece-start-slot"></div>
+                <div class="piece-start-slot"></div>
+                <div class="piece-start-slot"></div>
+            </div>
+
+            <!-- Center Home -->
+            <div class="center-home"></div>
+        </div>
+
+        <div class="dice-area">
+            <div class="player-turn" id="playerTurn">
+                Player <span class="player-color-name">Red</span>'s Turn <span class="color-indicator"></span>
+            </div>
+            <div class="dice" id="dice">0</div>
+            <button class="roll-button" id="rollDiceBtn">Roll Dice</button>
+            <div class="message" id="gameMessage">Roll the dice to start!</div>
+        </div>
+    </div>
+
+    <p class="info-text">
+        This is a local pass-and-play Ludo game. For true online multiplayer and "join with code" functionality,<br>
+        a backend server with real-time communication (e.g., WebSockets) would be required.
+    </p>
+
+    <script>
+        const players = [
+            { id: 'red', color: 'red', startCell: 9, pieces: [] }, // Red's starting point on main path (index 9)
+            { id: 'green', color: 'green', startCell: 22, pieces: [] }, // Green's starting point (index 22)
+            { id: 'yellow', color: 'yellow', startCell: 35, pieces: [] }, // Yellow's starting point (index 35)
+            { id: 'blue', color: 'blue', startCell: 48, pieces: [] } // Blue's starting point (index 48)
+        ];
+
+        // Main path cells (52 cells, 0-51) in movement order
+        const mainPath = [
+            // Path segments (ordered clockwise, starting from Red's initial movement cells)
+            {r:6,c:1}, {r:6,c:2}, {r:6,c:3}, {r:6,c:4}, {r:6,c:5}, // 0-4
+            {r:5,c:6}, {r:4,c:6}, {r:3,c:6}, {r:2,c:6}, {r:1,c:6, safe:true}, // 5-9 (Red's actual start cell is index 9)
+            {r:0,c:6}, // 10
+            {r:0,c:7, safe:true}, {r:0,c:8}, // 11-12
+            {r:1,c:8}, {r:2,c:8}, {r:3,c:8}, {r:4,c:8}, {r:5,c:8}, // 13-17
+            {r:6,c:9}, {r:6,c:10}, {r:6,c:11}, {r:6,c:12}, {r:6,c:13, safe:true}, // 18-22 (Green's actual start cell is index 22)
+            {r:6,c:14}, // 23
+            {r:7,c:14, safe:true}, {r:8,c:14}, // 24-25
+            {r:8,c:13}, {r:8,c:12}, {r:8,c:11}, {r:8,c:10}, {r:8,c:9}, // 26-30
+            {r:9,c:8}, {r:10,c:8}, {r:11,c:8}, {r:12,c:8}, {r:13,c:8, safe:true}, // 31-35 (Yellow's actual start cell is index 35)
+            {r:14,c:8}, // 36
+            {r:14,c:7, safe:true}, {r:14,c:6}, // 37-38
+            {r:13,c:6}, {r:12,c:6}, {r:11,c:6}, {r:10,c:6}, {r:9,c:6}, // 39-43
+            {r:8,c:5}, {r:8,c:4}, {r:8,c:3}, {r:8,c:2}, {r:8,c:1, safe:true}, // 44-48 (Blue's actual start cell is index 48)
+            {r:8,c:0}, // 49
+            {r:7,c:0, safe:true}, {r:6,c:0} // 50-51 (last cell, connects back to index 0)
+        ];
+
+        let currentPlayerIndex = 0;
+        let currentDiceRoll = 0;
+        let canRoll = true;
+        let gameActive = true;
+        let hasRolledSix = false; // To manage extra turns on a roll of 6
+
+        const ludoBoard = document.getElementById('ludoBoard');
+        const diceElement = document.getElementById('dice');
+        const rollDiceBtn = document.getElementById('rollDiceBtn');
+        const playerTurnElement = document.getElementById('playerTurn');
+        const gameMessageElement = document.getElementById('gameMessage');
+
+        function initBoard() {
+            // Create 15x15 cells for the board grid
+            for (let r = 0; r < 15; r++) {
+                for (let c = 0; c < 15; c++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.style.gridRow = r + 1;
+                    cell.style.gridColumn = c + 1;
+
+                    // Find if this cell is part of the main path
+                    const pathCell = mainPath.find(coord => coord.r === r && coord.c === c);
+
+                    if (pathCell) {
+                        cell.dataset.pathIndex = mainPath.indexOf(pathCell);
+                        if (pathCell.safe) cell.classList.add('safe');
+                        // Add specific start cell visual indicators for each player
+                        if (pathCell.r === players[0].startCellCoords.r && pathCell.c === players[0].startCellCoords.c) cell.classList.add('start', 'red');
+                        if (pathCell.r === players[1].startCellCoords.r && pathCell.c === players[1].startCellCoords.c) cell.classList.add('start', 'green');
+                        if (pathCell.r === players[2].startCellCoords.r && pathCell.c === players[2].startCellCoords.c) cell.classList.add('start', 'yellow');
+                        if (pathCell.r === players[3].startCellCoords.r && pathCell.c === players[3].startCellCoords.c) cell.classList.add('start', 'blue');
+                    } else {
+                        // Cells not part of any main path (e.g., inner non-path areas)
+                        cell.style.backgroundColor = 'transparent';
+                        cell.style.border = 'none';
+                    }
+                    ludoBoard.appendChild(cell);
+                }
+            }
+        }
+
+        function createPieces() {
+            players.forEach(player => {
+                // Store actual coordinates of start cells for easier lookup
+                player.startCellCoords = mainPath[player.startCell];
+
+                const homeBase = document.getElementById(`homeBase${player.color.charAt(0).toUpperCase() + player.color.slice(1)}`);
+                for (let i = 0; i < 4; i++) {
+                    const piece = document.createElement('div');
+                    piece.classList.add('piece', player.color, 'in-home-base');
+                    piece.dataset.player = player.id;
+                    piece.dataset.pieceId = i;
+                    piece.dataset.position = 'home'; // 'home', or path index (0-51)
+                    piece.addEventListener('click', handlePieceClick);
+                    player.pieces.push({ element: piece, position: 'home', id: i });
+                    homeBase.querySelector(`.piece-start-slot:nth-child(${i + 1})`).appendChild(piece); // Place into specific slot
+                }
+            });
+        }
+
+        function updatePlayerTurnDisplay() {
+            const currentPlayer = players[currentPlayerIndex];
+            playerTurnElement.className = `player-turn ${currentPlayer.color}`;
+            playerTurnElement.querySelector('.player-color-name').textContent = currentPlayer.color.charAt(0).toUpperCase() + currentPlayer.color.slice(1);
+            playerTurnElement.querySelector('.color-indicator').style.backgroundColor = `var(--${currentPlayer.color})`;
+        }
+
+        function rollDice() {
+            if (!canRoll || !gameActive) return;
+
+            canRoll = false;
+            rollDiceBtn.disabled = true;
+            gameMessageElement.textContent = `Rolling...`;
+            diceElement.textContent = '';
+
+            let rollCount = 0;
+            const interval = setInterval(() => {
+                const roll = Math.floor(Math.random() * 6) + 1;
+                diceElement.textContent = roll;
+                rollCount++;
+                if (rollCount >= 10) { // Simulate animation with 10 rolls
+                    clearInterval(interval);
+                    currentDiceRoll = roll;
+                    gameMessageElement.textContent = `You rolled a ${currentDiceRoll}!`;
+                    hasRolledSix = (currentDiceRoll === 6);
+                    highlightMovablePieces();
+                }
+            }, 100);
+        }
+
+        function highlightMovablePieces() {
+            const currentPlayer = players[currentPlayerIndex];
+            let foundMovable = false;
+            let canMoveOutOfHome = (currentDiceRoll === 6 && currentPlayer.pieces.some(p => p.position === 'home'));
+
+            currentPlayer.pieces.forEach(piece => {
+                piece.element.classList.remove('active'); // Clear previous active states
+
+                const currentPos = piece.position;
+
+                if (currentPos === 'home') {
+                    if (currentDiceRoll === 6) {
+                        piece.element.classList.add('active'); // Piece can move out of home
+                        foundMovable = true;
+                    }
+                } else if (typeof currentPos === 'number') {
+                    // If a 6 was rolled and there are pieces in home, only those can be moved.
+                    // Otherwise, pieces on board can be moved.
+                    if (canMoveOutOfHome) {
+                        // Don't highlight pieces on board if a piece can move out of home
+                        return;
+                    }
+
+                    const targetPos = (currentPos + currentDiceRoll) % mainPath.length;
+                    const isTargetOccupiedByOwn = currentPlayer.pieces.some(p => typeof p.position === 'number' && p.position === targetPos);
+
+                    // A piece can move if the target is not occupied by its own piece, OR the target is a safe spot.
+                    // Simplified: cannot land on own piece (even safe spots, this is common rule variant).
+                    // Or, if safe spots, own pieces are allowed (more common). Let's go with can't land on own.
+                    if (!isTargetOccupiedByOwn) {
+                        piece.element.classList.add('active');
+                        foundMovable = true;
+                    }
+                }
+            });
+
+            if (!foundMovable) {
+                gameMessageElement.textContent = `No moves possible for ${currentPlayer.color.charAt(0).toUpperCase() + currentPlayer.color.slice(1)}.`;
+                setTimeout(endTurn, 1500); // No moves, end turn
+            } else {
+                gameMessageElement.textContent += ` Click a highlighted piece to move.`;
+            }
+        }
+
+        function handlePieceClick(event) {
+            if (!currentDiceRoll || !gameActive) return;
+
+            const clickedPiece = event.target;
+            // Check if the clicked piece is of the current player and is active
+            const playerId = clickedPiece.dataset.player;
+            const pieceId = parseInt(clickedPiece.dataset.pieceId);
+            const player = players.find(p => p.id === playerId);
+            const piece = player.pieces.find(p => p.id === pieceId);
+
+            if (player.id !== players[currentPlayerIndex].id) {
+                gameMessageElement.textContent = "It's not your turn!";
+                return;
+            }
+
+            if (!clickedPiece.classList.contains('active')) {
+                gameMessageElement.textContent = "That piece cannot be moved. Select a highlighted piece.";
+                return;
+            }
+            
+            movePiece(piece);
+        }
+
+        function movePiece(piece) {
+            const currentPlayer = players[currentPlayerIndex];
+            const currentPos = piece.position;
+            let newPosition;
+
+            // Determine the new position based on current state and dice roll
+            if (currentPos === 'home' && currentDiceRoll === 6) {
+                newPosition = currentPlayer.startCell;
+                piece.element.classList.remove('in-home-base');
+            } else if (typeof currentPos === 'number') {
+                newPosition = (currentPos + currentDiceRoll) % mainPath.length;
+            } else {
+                gameMessageElement.textContent = "Invalid move."; // This case should ideally not be reached
+                return;
+            }
+
+            // Remove piece from its old cell's piece list for repositioning
+            const oldCellElement = typeof currentPos === 'number' ? ludoBoard.querySelector(`.cell[data-path-index="${currentPos}"]`) : null;
+            if (oldCellElement) {
+                repositionPiecesInCell(oldCellElement); // Re-arrange pieces in the old cell
+            }
+
+            // Check for cutting an opponent's piece
+            const targetPathCell = mainPath[newPosition];
+            const piecesOnTargetCell = players.flatMap(p => p.pieces)
+                                            .filter(p => typeof p.position === 'number' && p.position === newPosition);
+
+            piecesOnTargetCell.forEach(otherPiece => {
+                if (otherPiece.element.dataset.player !== currentPlayer.id && !targetPathCell.safe) {
+                    // Cut opponent's piece if it's not on a safe spot
+                    otherPiece.position = 'home';
+                    const otherPlayerHomeBase = document.getElementById(`homeBase${otherPiece.element.dataset.player.charAt(0).toUpperCase() + otherPiece.element.dataset.player.slice(1)}`);
+                    otherPiece.element.classList.add('in-home-base');
+                    otherPlayerHomeBase.querySelector(`.piece-start-slot:nth-child(${otherPiece.id + 1})`).appendChild(otherPiece.element);
+                    gameMessageElement.textContent = `You cut ${otherPiece.element.dataset.player}'s piece!`;
+                }
+            });
+
+            // Update piece position in game state
+            piece.position = newPosition;
+
+            // Update piece position on board (DOM)
+            if (typeof newPosition === 'number') {
+                const targetCellElement = ludoBoard.querySelector(`.cell[data-path-index="${newPosition}"]`);
+                if (targetCellElement) {
+                    targetCellElement.appendChild(piece.element);
+                    repositionPiecesInCell(targetCellElement); // Re-arrange pieces in the new cell
+                }
+            }
+
+            // Clear highlights and reset dice
+            currentPlayer.pieces.forEach(p => p.element.classList.remove('active'));
+            currentDiceRoll = 0;
+            diceElement.textContent = '0';
+
+            // Check for extra turn (if 6 was rolled)
+            if (hasRolledSix) {
+                gameMessageElement.textContent = `Rolled a 6! Roll again, ${currentPlayer.color.charAt(0).toUpperCase() + currentPlayer.color.slice(1)}!`;
+                canRoll = true;
+                rollDiceBtn.disabled = false;
+                hasRolledSix = false; // Reset after granting one extra turn
+            } else {
+                endTurn();
+            }
+        }
+
+        // Helper to reposition pieces within a cell if multiple are present
+        function repositionPiecesInCell(cellElement) {
+            const piecesInCell = Array.from(cellElement.querySelectorAll('.piece:not(.in-home-base)'));
+            const numPieces = piecesInCell.length;
+            if (numPieces > 1) {
+                piecesInCell.forEach((piece, index) => {
+                    piece.style.position = 'absolute';
+                    const row = Math.floor(index / 2); // 0 or 1
+                    const col = index % 2;   // 0 or 1
+                    piece.style.left = `${col * (parseInt(getComputedStyle(cellElement).width) / 2 - 15) + 5}px`; // Adjust spacing
+                    piece.style.top = `${row * (parseInt(getComputedStyle(cellElement).height) / 2 - 15) + 5}px`; // Adjust spacing
+                });
+            } else if (numPieces === 1) {
+                 piecesInCell[0].style.position = 'relative'; // Reset to default if only one piece in cell
+                 piecesInCell[0].style.left = '';
+                 piecesInCell[0].style.top = '';
+            }
+        }
+
+        function endTurn() {
+            if (!gameActive) return;
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            updatePlayerTurnDisplay();
+            canRoll = true;
+            rollDiceBtn.disabled = false;
+            gameMessageElement.textContent = `Roll the dice, ${players[currentPlayerIndex].color.charAt(0).toUpperCase() + players[currentPlayerIndex].color.slice(1)}!`;
+        }
+
+        // Initialize game when the script loads
+        initBoard();
+        createPieces();
+        updatePlayerTurnDisplay();
+        rollDiceBtn.addEventListener('click', rollDice);
+    </script>
+</body>
+</html>

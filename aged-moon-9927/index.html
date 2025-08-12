@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introduction to Streamlit</title>
+    <style>
+        :root {
+            --primary-color: #6a05ad;
+            --secondary-color: #e0e0e0;
+            --background-color: #f7f7f7;
+            --text-color: #333;
+            --code-bg: #2d2d2d;
+            --code-text: #f8f8f2;
+            --border-color: #ddd;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem 0;
+            text-align: center;
+            box-shadow: 0 2px 4px var(--shadow-color);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        header p {
+            margin: 0.5rem 0 0;
+            font-size: 1.1em;
+        }
+
+        main {
+            flex-grow: 1;
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        section {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px var(--shadow-color);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: var(--text-color);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.3em;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        code {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            font-size: 0.95em;
+        }
+
+        .code-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .copy-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .copy-button:hover {
+            background-color: #550494;
+        }
+
+        .copy-button:active {
+            background-color: #440375;
+        }
+
+        .copy-button.copied {
+            background-color: #28a745;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem 0;
+            margin-top: 2rem;
+            color: #777;
+            font-size: 0.9em;
+            border-top: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+            main {
+                margin: 1rem auto;
+                padding: 0 1rem;
+            }
+            section {
+                padding: 1.5rem;
+            }
+            h2 {
+                font-size: 1.5em;
+            }
+            .copy-button {
+                position: static;
+                margin-top: 0.5rem;
+                display: block;
+                width: calc(100% - 2rem);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Introduction to Streamlit</h1>
+        <p>Build and share powerful data apps in minutes</p>
+    </header>
+
+    <main>
+        <section id="what-is-streamlit">
+            <h2>What is Streamlit?</h2>
+            <p>Streamlit is an open-source Python library that makes it easy to create beautiful, custom web apps for machine learning and data science.</p>
+            <p>It allows data scientists and engineers to turn data scripts into shareable web applications in minutes, all in pure Python, without needing front-end development experience.</p>
+        </section>
+
+        <section id="why-streamlit">
+            <h2>Why Use Streamlit?</h2>
+            <ul>
+                <li><strong>Simplicity:</strong> Build apps with simple Python scripts. No need for HTML, CSS, or JavaScript.</li>
+                <li><strong>Speed:</strong> Go from concept to a deployed app in minutes, not days.</li>
+                <li><strong>Interactive:</strong> Easily add widgets like sliders, text inputs, buttons, and checkboxes to make your apps dynamic.</li>
+                <li><strong>Data-centric:</strong> Designed specifically for data scientists and ML engineers, with built-in support for data visualization, caching, and more.</li>
+                <li><strong>Open Source:</strong> Free to use, with a vibrant community and active development.</li>
+            </ul>
+        </section>
+
+        <section id="how-it-works">
+            <h2>How Does It Work?</h2>
+            <p>You write Python scripts using Streamlit's intuitive API. Streamlit then handles the heavy lifting:</p>
+            <ul>
+                <li>It sets up a local web server.</li>
+                <li>It generates the user interface based on your Python code.</li>
+                <li>It re-runs your script from top to bottom every time a user interacts with a widget (e.g., changes a slider value, clicks a button). This reactive model simplifies development significantly.</li>
+                <li>It offers powerful caching mechanisms to optimize performance for data-intensive operations.</li>
+            </ul>
+        </section>
+
+        <section id="simple-example">
+            <h2>A Simple Streamlit Example</h2>
+            <p>Here's a basic Streamlit app that demonstrates a title, text, a slider, and a button.</p>
+            <div class="code-container">
+                <button class="copy-button" data-target="streamlit-code">Copy Code</button>
+                <pre><code id="streamlit-code">import streamlit as st
+
+st.set_page_config(layout="centered")
+
+st.title("My First Streamlit App")
+
+st.write("Hello, Streamlit! This is an introduction.")
+
+# Add a slider widget
+slider_value = st.slider("Select a number", 0, 100, 50)
+st.write(f"You selected: {slider_value}")
+
+# Add a button
+if st.button("Say Hello"):
+    st.success("Hello from the button!")
+
+st.markdown("---")
+st.write("This app demonstrates basic Streamlit widgets.")
+                </code></pre>
+            </div>
+            <p>Save this code as <code>my_app.py</code> (or any other <code>.py</code> file).</p>
+        </section>
+
+        <section id="running-the-app">
+            <h2>Running Your First Streamlit App</h2>
+            <p>Follow these simple steps to run the example app:</p>
+            <ol>
+                <li><strong>Install Streamlit:</strong> If you haven't already, open your terminal or command prompt and run:<br><code>pip install streamlit</code></li>
+                <li><strong>Save the code:</strong> Save the example Python code from above into a file named <code>my_app.py</code>.</li>
+                <li><strong>Navigate to directory:</strong> Open your terminal or command prompt, and navigate to the directory where you saved <code>my_app.py</code>.</li>
+                <li><strong>Run from terminal:</strong> Execute the following command:<br><code>streamlit run my_app.py</code></li>
+            </ol>
+            <p>Your Streamlit app will automatically open in your default web browser (usually at <code>http://localhost:8501</code>).</p>
+        </section>
+
+        <section id="what-it-looks-like">
+            <h2>What a Streamlit App Looks Like</h2>
+            <p>Streamlit applications are designed with a clean, responsive, and modern user interface by default. Key features of the UI include:</p>
+            <ul>
+                <li><strong>Main Content Area:</strong> This is where your main app content (text, charts, tables, images, etc.) appears.</li>
+                <li><strong>Sidebar (Optional):</strong> Many apps utilize a left-hand sidebar for input widgets (sliders, text inputs, selectors) to keep the main content clean.</li>
+                <li><strong>Automatic Updates:</strong> As you interact with widgets, the app content updates in real-time without needing full page reloads.</li>
+                <li><strong>The "Rerun" Button:</strong> In the top-right corner, you'll often see a "Rerun" button and menu for clearing cache or settings.</li>
+            </ul>
+            <p>The beauty of Streamlit is that you get this polished UI without writing any HTML or CSS – it's all generated from your Python code!</p>
+        </section>
+
+        <section id="data-visualization">
+            <h2>Data Visualization with Streamlit</h2>
+            <p>Streamlit makes integrating powerful data visualizations incredibly simple. It supports popular plotting libraries like Matplotlib, Plotly, Altair, and also provides its own native charting methods for quick visualizations.</p>
+            <p>Here's an example of creating a dynamic line chart directly within your Streamlit app using `st.line_chart`:</p>
+            <div class="code-container">
+                <button class="copy-button" data-target="data-viz-code">Copy Code</button>
+                <pre><code id="data-viz-code">import streamlit as st
+import pandas as pd
+import numpy as np
+
+st.subheader("Interactive Line Chart Example")
+
+# Create some dummy data for the chart
+chart_data = pd.DataFrame(
+    np.random.randn(20, 3), # 20 rows, 3 columns of random numbers
+    columns=['a', 'b', 'c'] # Column names
+)
+
+# Display the line chart
+st.line_chart(chart_data)
+
+st.write("This chart is interactive: you can pan, zoom, and hover over data points.")
+st.write("Streamlit intelligently renders charts from common data structures like Pandas DataFrames.")
+                </code></pre>
+            </div>
+            <p>This snippet demonstrates how easily you can turn numerical data into an interactive chart, a cornerstone of any data application.</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Introduction to Streamlit. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const copyButtons = document.querySelectorAll('.copy-button');
+
+            copyButtons.forEach(button => {
+                button.addEventListener('click', async () => {
+                    const targetId = button.dataset.target;
+                    const codeElement = document.getElementById(targetId);
+                    if (!codeElement) {
+                        console.error('Code element not found:', targetId);
+                        return;
+                    }
+
+                    const codeToCopy = codeElement.innerText;
+
+                    try {
+                        await navigator.clipboard.writeText(codeToCopy);
+                        const originalText = button.textContent;
+                        
+                        button.textContent = 'Copied!';
+                        button.classList.add('copied');
+
+                        setTimeout(() => {
+                            button.textContent = originalText;
+                            button.classList.remove('copied');
+                        }, 2000);
+                    } catch (err) {
+                        console.error('Failed to copy text: ', err);
+                        // Fallback for older browsers or non-secure contexts
+                        const textArea = document.createElement('textarea');
+                        textArea.value = codeToCopy;
+                        textArea.style.position = 'absolute';
+                        textArea.style.left = '-9999px';
+                        document.body.appendChild(textArea);
+                        textArea.focus();
+                        textArea.select();
+                        try {
+                            document.execCommand('copy');
+                            const originalText = button.textContent;
+
+                            button.textContent = 'Copied!';
+                            button.classList.add('copied');
+
+                            setTimeout(() => {
+                                button.textContent = originalText;
+                                button.classList.remove('copied');
+                            }, 2000);
+                        } catch (execErr) {
+                            console.error('Fallback copy failed: ', execErr);
+                            alert('Failed to copy code. Please copy it manually.');
+                        } finally {
+                            document.body.removeChild(textArea);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

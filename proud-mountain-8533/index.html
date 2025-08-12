@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Suggestion App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 35px 45px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: #4a90e2;
+            margin-bottom: 25px;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 40px);
+            padding: 14px 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.1em;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            max-width: 400px;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+
+        button {
+            background-color: #4a90e2;
+            color: white;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: #357ABD;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #suggestionBox {
+            margin-top: 30px;
+            padding: 25px;
+            background-color: #eaf3fe;
+            border-radius: 10px;
+            border: 1px dashed #a7d3ff;
+            text-align: left;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            color: #333;
+            line-height: 1.6;
+            transition: all 0.5s ease-in-out;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        #suggestionBox.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #suggestionBox h2 {
+            color: #2a6db0;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.6em;
+            font-weight: 600;
+        }
+
+        #suggestionBox p {
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        #suggestionBox ul {
+            list-style-type: disc;
+            margin: 10px 0 15px 25px;
+            padding: 0;
+            font-size: 1em;
+        }
+
+        #suggestionBox ul li {
+            margin-bottom: 5px;
+        }
+
+        #suggestionBox .quote {
+            font-style: italic;
+            border-top: 1px dashed #c3cfe2;
+            padding-top: 15px;
+            margin-top: 15px;
+            font-size: 1.0em;
+            color: #666;
+        }
+
+        .no-suggestion {
+            text-align: center;
+            color: #777;
+            font-style: italic;
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 25px 25px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            input[type="text"] {
+                width: calc(100% - 30px);
+                padding: 12px 15px;
+                font-size: 1em;
+            }
+            button {
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+            #suggestionBox {
+                padding: 20px;
+            }
+            #suggestionBox h2 {
+                font-size: 1.4em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>What's Your Mood Today?</h1>
+        <div class="input-group">
+            <label for="moodInput">Enter your current mood:</label>
+            <input type="text" id="moodInput" list="moods" placeholder="e.g., happy, sad, stressed">
+            <datalist id="moods">
+                <option value="happy">
+                <option value="sad">
+                <option value="stressed">
+                <option value="angry">
+                <option value="tired">
+                <option value="bored">
+                <option value="anxious">
+                <option value="excited">
+                <option value="calm">
+            </datalist>
+            <button id="getSuggestionBtn">Get Suggestion</button>
+        </div>
+        <div id="suggestionBox">
+            <p class="no-suggestion">Enter a mood and click "Get Suggestion" to see what might help!</p>
+        </div>
+    </div>
+
+    <script>
+        const moodSuggestions = {
+            "happy": {
+                "activities": ["Go for a walk in the park", "Listen to upbeat music", "Call a friend or loved one", "Work on a creative project", "Dance to your favorite tunes!"],
+                "music": ["Pop", "Upbeat Indie", "Funk", "Feel-good playlists"],
+                "quote": "Happiness is not something ready-made. It comes from your own actions."
+            },
+            "sad": {
+                "activities": ["Watch a comforting movie or show", "Listen to calming music", "Journal your thoughts and feelings", "Take a warm bath or shower", "Talk to someone you trust"],
+                "music": ["Acoustic", "Classical", "Lofi beats", "Emotional ballads (if you want to process)"],
+                "quote": "This too shall pass. Remember that even the darkest night will end and the sun will rise."
+            },
+            "stressed": {
+                "activities": ["Practice deep breathing exercises", "Do light stretching or yoga", "Declutter a small space", "Go for a walk in nature", "Meditate for 10 minutes"],
+                "music": ["Ambient", "Nature sounds", "Classical", "Relaxation playlists"],
+                "quote": "Give yourself permission to be exactly where you are. Breathe."
+            },
+            "angry": {
+                "activities": ["Take a deep breath and count to ten slowly", "Go for a brisk walk or run", "Punch a pillow or safely release energy", "Write down what's bothering you", "Engage in physical activity"],
+                "music": ["Heavy Metal (if it helps release)", "Instrumental rock", "Something with a strong beat to channel energy"],
+                "quote": "Holding onto anger is like drinking poison and expecting the other person to die."
+            },
+            "tired": {
+                "activities": ["Take a power nap (20-30 min)", "Drink some water and stretch gently", "Listen to an audiobook or podcast", "Go to bed early tonight", "Relax with a warm drink"],
+                "music": ["Lullabies", "Calm piano music", "White noise", "Nature sounds"],
+                "quote": "Rest is not idleness, and to lie sometimes on the grass under trees on a summer's day is by no means a waste of time."
+            },
+            "bored": {
+                "activities": ["Learn something new (online tutorial, documentary)", "Read a book or an interesting article", "Try a new recipe or cooking technique", "Start a small creative project", "Explore a new hobby or skill"],
+                "music": ["Discovery playlists", "Genres you don't usually listen to", "Upbeat instrumentals"],
+                "quote": "The only way to do great work is to love what you do. If you haven't found it yet, keep looking. Don't settle."
+            },
+            "anxious": {
+                "activities": ["Focus on your breath (e.g., 4-7-8 technique)", "Do a grounding exercise (5-4-3-2-1 senses)", "Listen to soothing sounds", "Pet a cat or dog if available", "Write down your worries to externalize them"],
+                "music": ["Calming instrumental", "Ambient nature sounds", "Lofi beats for focus"],
+                "quote": "Worrying doesn't take away tomorrow's troubles, it takes away today's peace."
+            },
+            "excited": {
+                "activities": ["Channel your energy into a productive task", "Plan something fun to do", "Share your excitement with someone", "Learn more about what excites you", "Engage in an energetic activity"],
+                "music": ["Upbeat Pop", "Dance", "High-energy Rock"],
+                "quote": "Optimism is the faith that leads to achievement. Nothing can be done without hope and confidence."
+            },
+            "calm": {
+                "activities": ["Enjoy a quiet moment with a cup of tea", "Read a relaxing book", "Take a leisurely walk", "Practice mindfulness", "Reflect on gratitude"],
+                "music": ["Ambient soundscapes", "Soft Jazz", "Classical piano", "Meditation music"],
+                "quote": "Peace comes from within. Do not seek it without."
+            }
+        };
+
+        const moodInput = document.getElementById('moodInput');
+        const getSuggestionBtn = document.getElementById('getSuggestionBtn');
+        const suggestionBox = document.getElementById('suggestionBox');
+
+        getSuggestionBtn.addEventListener('click', getSuggestions);
+        moodInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                getSuggestions();
+            }
+        });
+
+        function getSuggestions() {
+            const mood = moodInput.value.toLowerCase().trim();
+            let content = '';
+
+            if (moodSuggestions[mood]) {
+                const suggestions = moodSuggestions[mood];
+                content += `<h2>For When You're Feeling ${mood.charAt(0).toUpperCase() + mood.slice(1)}:</h2>`;
+
+                if (suggestions.activities.length > 0) {
+                    content += `<p><strong>Try these activities:</strong></p><ul>`;
+                    suggestions.activities.forEach(activity => {
+                        content += `<li>${activity}</li>`;
+                    });
+                    content += `</ul>`;
+                }
+
+                if (suggestions.music.length > 0) {
+                    content += `<p><strong>Listen to this music:</strong></p><ul>`;
+                    suggestions.music.forEach(music => {
+                        content += `<li>${music}</li>`;
+                    });
+                    content += `</ul>`;
+                }
+
+                if (suggestions.quote) {
+                    content += `<p class="quote">"${suggestions.quote}"</p>`;
+                }
+            } else if (mood === '') {
+                content = '<p class="no-suggestion">Please enter a mood to get suggestions.</p>';
+            } else {
+                content = `<h2>No specific suggestions for "${mood.charAt(0).toUpperCase() + mood.slice(1)}" yet.</h2>`;
+                content += `<p>Try one of these common moods: Happy, Sad, Stressed, Angry, Tired, Bored, Anxious, Excited, Calm.</p>`;
+                content += `<p class="quote">"Sometimes, the best way to find yourself is to lose yourself in the service of others."</p>`;
+            }
+
+            suggestionBox.innerHTML = content;
+            suggestionBox.classList.add('visible');
+        }
+    </script>
+</body>
+</html>

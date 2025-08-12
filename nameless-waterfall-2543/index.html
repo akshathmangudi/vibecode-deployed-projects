@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>watchtime</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #app-container {
+            background-color: #ffffff;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #4CAF50; /* A friendly green */
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        p {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        #timeDisplay {
+            font-weight: bold;
+            color: #007bff; /* A nice blue */
+            margin-bottom: 25px;
+        }
+
+        button {
+            background-color: #007bff; /* Blue button */
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+            background-color: #004085;
+        }
+
+        #counterDisplay {
+            font-size: 1em;
+            font-weight: bold;
+            color: #d9534f; /* Red for emphasis */
+            margin-top: 10px;
+        }
+
+        /* Calculator Specific Styles */
+        #calculator-section {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+        }
+
+        #calculator-section h2 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        #calculator-section input[type="number"] {
+            width: calc(50% - 10px); /* Two inputs side by side */
+            padding: 12px;
+            margin: 0 5px 15px 5px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            box-sizing: border-box; /* Include padding/border in width */
+            text-align: center;
+        }
+
+        .calc-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Allow buttons to wrap to next line on small screens */
+        }
+
+        .calc-buttons button {
+            width: 50px; /* Make buttons square */
+            height: 50px;
+            border-radius: 50%; /* Make them circular */
+            font-size: 1.5em;
+            padding: 0; /* Remove default padding for consistent sizing */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #4CAF50; /* Use a different color for calc buttons */
+        }
+
+        .calc-buttons button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .calc-buttons button:active {
+            transform: translateY(0);
+            background-color: #397d39;
+        }
+
+        #resultDisplay {
+            font-weight: bold;
+            color: #007bff;
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+
+        /* Browser Specific Styles */
+        #browser-section {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+            width: 100%; /* Ensure it takes full width of container */
+        }
+
+        #browser-section h2 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        #browser-section input[type="url"] {
+            width: calc(100% - 70px); /* Full width minus button */
+            padding: 12px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            box-sizing: border-box;
+            vertical-align: middle; /* Align with button */
+        }
+
+        #browser-section button {
+            padding: 12px 20px;
+            font-size: 1em;
+            border-radius: 8px;
+            vertical-align: middle; /* Align with input */
+        }
+
+        #browserFrame {
+            width: 100%;
+            height: 400px; /* Fixed height for the iframe */
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-top: 20px;
+            background-color: #f9f9f9;
+        }
+
+        /* Step Counter Specific Styles */
+        #step-counter-section {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+            width: 100%;
+        }
+
+        #step-counter-section h2 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        #stepsDisplay {
+            font-weight: bold;
+            color: #007bff;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .step-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px; /* Spacing between buttons */
+            flex-wrap: wrap;
+        }
+
+        .step-buttons button {
+            background-color: #28a745; /* Green color for step buttons */
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            min-width: 100px;
+        }
+
+        .step-buttons button:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        .step-buttons button:active {
+            transform: translateY(0);
+            background-color: #1e7e34;
+        }
+
+        /* India Map Specific Styles */
+        #india-map-section {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+            width: 100%;
+        }
+
+        #india-map-section h2 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        #indiaMapFrame { /* ID for the specific iframe */
+            width: 100%;
+            height: 400px; /* Fixed height for the iframe */
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-top: 20px;
+            background-color: #f9f9f9;
+        }
+
+        /* Small window / mobile responsiveness */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            #app-container {
+                padding: 20px 15px;
+                border-radius: 8px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            p {
+                font-size: 1em;
+            }
+
+            #calculator-section h2, #browser-section h2, #step-counter-section h2, #india-map-section h2 {
+                font-size: 1.5em;
+            }
+
+            #calculator-section input[type="number"] {
+                width: calc(100% - 10px); /* Stack inputs vertically */
+                margin: 5px 5px 10px 5px;
+            }
+
+            .calc-buttons button {
+                width: 45px;
+                height: 45px;
+                font-size: 1.2em;
+            }
+
+            #browser-section input[type="url"] {
+                width: 100%; /* Stack input and button vertically */
+                margin-right: 0;
+                margin-bottom: 10px;
+                display: block;
+            }
+
+            #browser-section button {
+                width: 100%; /* Make button full width */
+                display: block;
+            }
+
+            #browserFrame {
+                height: 300px; /* Smaller height on mobile */
+            }
+
+            .step-buttons button {
+                width: 100%; /* Stack buttons on small screens */
+                margin-bottom: 10px; /* Add margin between stacked buttons */
+                min-width: auto; /* Remove min-width to allow full width */
+            }
+
+            #indiaMapFrame {
+                height: 300px; /* Smaller height on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <h1>crazy hello</h1>
+        <p id="greetingMessage">Welcome to ganghello's simple page.</p>
+        <p id="timeDisplay">Loading time...</p>
+        <button id="updateGreetingButton">Click Me!</button>
+        <p id="counterDisplay">Clicks: 0</p>
+
+        <div id="calculator-section">
+            <h2>Simple Calci</h2>
+            <input type="number" id="num1" placeholder="Enter first number">
+            <input type="number" id="num2" placeholder="Enter second number">
+            <div class="calc-buttons">
+                <button id="addBtn">+</button>
+                <button id="subtractBtn">-</button>
+                <button id="multiplyBtn">*</button>
+                <button id="divideBtn">/</button>
+            </div>
+            <p id="resultDisplay">Result: </p>
+        </div>
+
+        <div id="browser-section">
+            <h2>Simple Browser</h2>
+            <input type="url" id="browserUrl" placeholder="Enter URL (e.g., https://example.com)">
+            <button id="goBtn">Go</button>
+            <iframe id="browserFrame" src="about:blank" frameborder="0"></iframe>
+        </div>
+
+        <div id="step-counter-section">
+            <h2>Step Counter</h2>
+            <p id="stepsDisplay">Steps: 0</p>
+            <div class="step-buttons">
+                <button id="incrementSteps">Add Step</button>
+                <button id="decrementSteps">Remove Step</button>
+                <button id="resetSteps">Reset</button>
+            </div>
+        </div>
+
+        <div id="india-map-section">
+            <h2>India Map</h2>
+            <iframe id="indiaMapFrame" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15228185.006093414!2d70.9703358988607!3d22.257007797746536!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30635ff06b9247d3%3A0x181f855cd2d63532!2sIndia!5e0!3m2!1sen!2sin!4v1708892400000!5m2!1sen!2sin" frameborder="0" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const greetingMessage = document.getElementById('greetingMessage');
+            const timeDisplay = document.getElementById('timeDisplay');
+            const updateGreetingButton = document.getElementById('updateGreetingButton');
+            const counterDisplay = document.getElementById('counterDisplay');
+
+            function updateTime() {
+                const now = new Date();
+                timeDisplay.textContent = `Current time: ${now.toLocaleTimeString()}`;
+            }
+
+            updateTime();
+            setInterval(updateTime, 1000);
+
+            let greetingClickCount = 0;
+            let totalClicks = 0; // New counter variable
+            const greetings = [
+                "Hello!",
+                "Hi there!",
+                "Nice to see you!",
+                "Click again!"
+            ];
+
+            updateGreetingButton.addEventListener('click', () => {
+                greetingClickCount++;
+                totalClicks++; // Increment total clicks
+                const newGreeting = greetings[(greetingClickCount - 1) % greetings.length];
+                greetingMessage.textContent = newGreeting;
+                counterDisplay.textContent = `Clicks: ${totalClicks}`; // Update counter display
+            });
+
+            // Calculator Logic
+            const num1Input = document.getElementById('num1');
+            const num2Input = document.getElementById('num2');
+            const addBtn = document.getElementById('addBtn');
+            const subtractBtn = document.getElementById('subtractBtn');
+            const multiplyBtn = document.getElementById('multiplyBtn');
+            const divideBtn = document.getElementById('divideBtn');
+            const resultDisplay = document.getElementById('resultDisplay');
+
+            function calculate(operation) {
+                const num1 = parseFloat(num1Input.value);
+                const num2 = parseFloat(num2Input.value);
+
+                if (isNaN(num1) || isNaN(num2)) {
+                    resultDisplay.textContent = "Result: Please enter valid numbers";
+                    return;
+                }
+
+                let result;
+                switch (operation) {
+                    case 'add':
+                        result = num1 + num2;
+                        break;
+                    case 'subtract':
+                        result = num1 - num2;
+                        break;
+                    case 'multiply':
+                        result = num1 * num2;
+                        break;
+                    case 'divide':
+                        if (num2 === 0) {
+                            resultDisplay.textContent = "Result: Cannot divide by zero";
+                            return;
+                        }
+                        result = num1 / num2;
+                        break;
+                    default:
+                        resultDisplay.textContent = "Result: Invalid operation";
+                        return;
+                }
+                resultDisplay.textContent = `Result: ${result}`;
+            }
+
+            addBtn.addEventListener('click', () => calculate('add'));
+            subtractBtn.addEventListener('click', () => calculate('subtract'));
+            multiplyBtn.addEventListener('click', () => calculate('multiply'));
+            divideBtn.addEventListener('click', () => calculate('divide'));
+
+            // Browser Logic
+            const browserUrlInput = document.getElementById('browserUrl');
+            const goBtn = document.getElementById('goBtn');
+            const browserFrame = document.getElementById('browserFrame');
+
+            goBtn.addEventListener('click', () => {
+                let url = browserUrlInput.value.trim();
+                if (url === '') {
+                    browserFrame.src = 'about:blank'; // Clear iframe if input is empty
+                    return;
+                }
+                // Prepend https:// if no protocol is specified
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    url = 'https://' + url;
+                }
+                browserFrame.src = url;
+            });
+
+            // Step Counter Logic
+            const stepsDisplay = document.getElementById('stepsDisplay');
+            const incrementStepsBtn = document.getElementById('incrementSteps');
+            const decrementStepsBtn = document.getElementById('decrementSteps');
+            const resetStepsBtn = document.getElementById('resetSteps');
+
+            let stepsCount = 0;
+
+            function updateStepsDisplay() {
+                stepsDisplay.textContent = `Steps: ${stepsCount}`;
+            }
+
+            incrementStepsBtn.addEventListener('click', () => {
+                stepsCount++;
+                updateStepsDisplay();
+            });
+
+            decrementStepsBtn.addEventListener('click', () => {
+                if (stepsCount > 0) { // Prevent negative steps
+                    stepsCount--;
+                }
+                updateStepsDisplay();
+            });
+
+            resetStepsBtn.addEventListener('click', () => {
+                stepsCount = 0;
+                updateStepsDisplay();
+            });
+
+            // Initial display update for steps
+            updateStepsDisplay();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Page</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f7fa;
+            color: #333;
+            text-align: center;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px 60px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            transition: transform 0.3s ease-in-out;
+        }
+        .container:hover {
+            transform: translateY(-5px);
+        }
+        h1 {
+            color: #007bff;
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        p {
+            font-size: 1.3em;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .time-display {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #28a745;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="greeting">Hello!</h1>
+        <p>Welcome to this simple, self-contained web page.</p>
+        <div id="timeDisplay" class="time-display"></div>
+    </div>
+
+    <script>
+        function updateGreetingAndCurrentTime() {
+            const greetingElement = document.getElementById('greeting');
+            const timeDisplayElement = document.getElementById('timeDisplay');
+            const now = new Date();
+            const hours = now.getHours();
+
+            let greeting = "Hello!";
+            if (hours < 12) {
+                greeting = "Good morning!";
+            } else if (hours < 18) {
+                greeting = "Good afternoon!";
+            } else {
+                greeting = "Good evening!";
+            }
+
+            greetingElement.textContent = greeting;
+
+            const formattedTime = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+            timeDisplayElement.textContent = `Current time: ${formattedTime}`;
+        }
+
+        // Update immediately on page load
+        updateGreetingAndCurrentTime();
+
+        // Update every second
+        setInterval(updateGreetingAndCurrentTime, 1000);
+    </script>
+</body>
+</html>

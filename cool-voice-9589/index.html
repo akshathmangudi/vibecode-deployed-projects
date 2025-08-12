@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Planner</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 300px;
+            border-right: 1px solid #eee;
+            padding: 20px;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        #trip-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        #trip-list li {
+            padding: 12px 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s ease;
+        }
+
+        #trip-list li:hover {
+            background-color: #f0f0f0;
+        }
+
+        #trip-list li.active {
+            background-color: #e0f2f7;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        #trip-list li:last-child {
+            border-bottom: none;
+        }
+
+        .trip-item-name {
+            flex-grow: 1;
+        }
+
+        .delete-trip-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-left: 10px;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        }
+
+        .delete-trip-btn:hover {
+            opacity: 1;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        #packing-list-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        #packing-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #packing-list li {
+            background-color: #fff;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        #packing-list li:last-child {
+            border-bottom: none;
+        }
+
+        #packing-list li.packed span {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        #packing-list li input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .item-controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .delete-item-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 10px;
+            opacity: 0.9;
+            transition: opacity 0.2s ease;
+        }
+
+        .delete-item-btn:hover {
+            opacity: 1;
+        }
+
+        form {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .sidebar form {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            margin-bottom: 0;
+        }
+
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #007bff;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .no-trip-selected {
+            text-align: center;
+            color: #666;
+            margin-top: 50px;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                margin: 10px;
+            }
+
+            .sidebar {
+                width: auto;
+                border-right: none;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 10px;
+            }
+
+            .sidebar form {
+                margin-top: 15px;
+            }
+
+            .main-content {
+                padding-top: 15px;
+            }
+
+            form {
+                flex-direction: column;
+            }
+
+            input[type="text"], button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>My Trips</h2>
+            <ul id="trip-list">
+            </ul>
+            <form id="add-trip-form">
+                <input type="text" id="new-trip-input" placeholder="New trip name" required>
+                <button type="submit">Add Trip</button>
+            </form>
+        </aside>
+
+        <main class="main-content">
+            <h2 id="current-trip-name">Select a Trip</h2>
+            <div id="packing-list-container">
+                <ul id="packing-list">
+                </ul>
+                <div id="no-trip-message" class="no-trip-selected">
+                    Please select a trip from the left or add a new one.
+                </div>
+            </div>
+            <form id="add-item-form">
+                <input type="text" id="new-item-input" placeholder="Add item to packing list" required disabled>
+                <button type="submit" id="add-item-btn" disabled>Add Item</button>
+            </form>
+        </main>
+    </div>
+
+    <script>
+        const tripListElement = document.getElementById('trip-list');
+        const addTripForm = document.getElementById('add-trip-form');
+        const newTripInput = document.getElementById('new-trip-input');
+        const currentTripNameElement = document.getElementById('current-trip-name');
+        const packingListElement = document.getElementById('packing-list');
+        const addItemForm = document.getElementById('add-item-form');
+        const newItemInput = document.getElementById('new-item-input');
+        const addItemBtn = document.getElementById('add-item-btn');
+        const noTripMessage = document.getElementById('no-trip-message');
+
+        let trips = [];
+        let currentTripId = null;
+
+        function saveData() {
+            localStorage.setItem('travelPlannerTrips', JSON.stringify(trips));
+        }
+
+        function loadData() {
+            const storedTrips = localStorage.getItem('travelPlannerTrips');
+            if (storedTrips) {
+                trips = JSON.parse(storedTrips);
+            }
+            renderTrips();
+            if (trips.length > 0) {
+                const storedCurrentTripId = localStorage.getItem('currentTripId');
+                if (storedCurrentTripId && trips.some(t => t.id === storedCurrentTripId)) {
+                    selectTrip(storedCurrentTripId);
+                } else {
+                    selectTrip(trips[0].id);
+                }
+            } else {
+                showNoTripSelectedState();
+            }
+        }
+
+        function showNoTripSelectedState() {
+            currentTripNameElement.textContent = 'Select a Trip';
+            packingListElement.innerHTML = '';
+            noTripMessage.style.display = 'block';
+            newItemInput.disabled = true;
+            addItemBtn.disabled = true;
+            currentTripId = null;
+            localStorage.removeItem('currentTripId');
+        }
+
+        function renderTrips() {
+            tripListElement.innerHTML = '';
+            trips.forEach(trip => {
+                const li = document.createElement('li');
+                li.setAttribute('data-id', trip.id);
+                li.classList.add('trip-item');
+                if (trip.id === currentTripId) {
+                    li.classList.add('active');
+                }
+
+                const spanName = document.createElement('span');
+                spanName.textContent = trip.name;
+                spanName.classList.add('trip-item-name');
+                spanName.addEventListener('click', () => selectTrip(trip.id));
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'x';
+                deleteBtn.classList.add('delete-trip-btn');
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteTrip(trip.id);
+                });
+
+                li.appendChild(spanName);
+                li.appendChild(deleteBtn);
+                tripListElement.appendChild(li);
+            });
+        }
+
+        function addTrip(name) {
+            const newTrip = {
+                id: crypto.randomUUID(),
+                name: name,
+                items: []
+            };
+            trips.push(newTrip);
+            saveData();
+            renderTrips();
+            selectTrip(newTrip.id);
+        }
+
+        function deleteTrip(id) {
+            const confirmDelete = confirm('Are you sure you want to delete this trip?');
+            if (!confirmDelete) return;
+
+            const wasCurrentTrip = currentTripId === id;
+            trips = trips.filter(trip => trip.id !== id);
+            saveData();
+            renderTrips();
+
+            if (wasCurrentTrip) {
+                if (trips.length > 0) {
+                    selectTrip(trips[0].id);
+                } else {
+                    showNoTripSelectedState();
+                }
+            }
+        }
+
+        function selectTrip(id) {
+            currentTripId = id;
+            localStorage.setItem('currentTripId', id);
+
+            document.querySelectorAll('.trip-item').forEach(li => {
+                li.classList.remove('active');
+                if (li.dataset.id === id) {
+                    li.classList.add('active');
+                }
+            });
+
+            const selectedTrip = trips.find(trip => trip.id === id);
+            if (selectedTrip) {
+                currentTripNameElement.textContent = selectedTrip.name;
+                noTripMessage.style.display = 'none';
+                newItemInput.disabled = false;
+                addItemBtn.disabled = false;
+                renderPackingList();
+            }
+        }
+
+        function renderPackingList() {
+            packingListElement.innerHTML = '';
+            const selectedTrip = trips.find(trip => trip.id === currentTripId);
+
+            if (!selectedTrip) {
+                showNoTripSelectedState();
+                return;
+            }
+
+            if (selectedTrip.items.length === 0) {
+                packingListElement.innerHTML = '<li style="text-align: center; color: #666; margin-top: 20px;">No items yet. Add some!</li>';
+                return;
+            }
+
+            selectedTrip.items.forEach(item => {
+                const li = document.createElement('li');
+                li.setAttribute('data-id', item.id);
+                if (item.isPacked) {
+                    li.classList.add('packed');
+                }
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = item.isPacked;
+                checkbox.addEventListener('change', () => togglePackedStatus(currentTripId, item.id));
+
+                const spanName = document.createElement('span');
+                spanName.textContent = item.name;
+                spanName.classList.add('item-name');
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.classList.add('delete-item-btn');
+                deleteBtn.addEventListener('click', () => deleteItem(currentTripId, item.id));
+
+                li.appendChild(checkbox);
+                li.appendChild(spanName);
+                li.appendChild(deleteBtn);
+                packingListElement.appendChild(li);
+            });
+        }
+
+        function addItem(tripId, itemName) {
+            const trip = trips.find(t => t.id === tripId);
+            if (trip) {
+                const newItem = {
+                    id: crypto.randomUUID(),
+                    name: itemName,
+                    isPacked: false
+                };
+                trip.items.push(newItem);
+                saveData();
+                renderPackingList();
+            }
+        }
+
+        function togglePackedStatus(tripId, itemId) {
+            const trip = trips.find(t => t.id === tripId);
+            if (trip) {
+                const item = trip.items.find(i => i.id === itemId);
+                if (item) {
+                    item.isPacked = !item.isPacked;
+                    saveData();
+                    renderPackingList();
+                }
+            }
+        }
+
+        function deleteItem(tripId, itemId) {
+            const confirmDelete = confirm('Are you sure you want to delete this item?');
+            if (!confirmDelete) return;
+
+            const trip = trips.find(t => t.id === tripId);
+            if (trip) {
+                trip.items = trip.items.filter(item => item.id !== itemId);
+                saveData();
+                renderPackingList();
+            }
+        }
+
+        addTripForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const tripName = newTripInput.value.trim();
+            if (tripName) {
+                addTrip(tripName);
+                newTripInput.value = '';
+            }
+        });
+
+        addItemForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const itemName = newItemInput.value.trim();
+            if (itemName && currentTripId) {
+                addItem(currentTripId, itemName);
+                newItemInput.value = '';
+            }
+        });
+
+        window.addEventListener('load', loadData);
+    </script>
+</body>
+</html>

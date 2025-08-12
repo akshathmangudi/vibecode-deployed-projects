@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personality Type Discoverer</title>
+    <style>
+        :root {
+            --primary-color: #6C63FF;
+            --primary-dark-color: #554EDD;
+            --secondary-color: #F8F8F2;
+            --text-color: #333;
+            --background-color: #f0f2f5;
+            --card-background: #ffffff;
+            --border-color: #ddd;
+            --accent-color: #FFD700;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        #app {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            padding: 30px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 25px;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin-top: 30px;
+        }
+
+        h3 {
+            font-size: 1.4em;
+            margin-top: 25px;
+            text-align: left;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+            color: var(--text-color);
+        }
+
+        .intro-text {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        #questions-container {
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .question-item {
+            background-color: #f9f9f9;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .question-item p {
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            color: var(--primary-color);
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+            font-size: 1em;
+            color: var(--text-color);
+        }
+
+        .option-label:hover {
+            background-color: #eef2f7;
+            border-color: var(--primary-color);
+        }
+
+        .option-label input[type="radio"] {
+            margin-right: 12px;
+            transform: scale(1.2);
+            accent-color: var(--primary-color);
+        }
+
+        .option-label input[type="radio"]:checked + span {
+            color: var(--primary-dark-color);
+            font-weight: bold;
+        }
+
+        .option-label input[type="radio"]:checked {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark-color);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #results {
+            text-align: left;
+        }
+
+        .type-badge {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #personality-type-description {
+            background-color: #f9f9f9;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            line-height: 1.8;
+            font-size: 1.1em;
+            color: #444;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Discover Your Personality Type</h1>
+        </header>
+
+        <section id="questionnaire">
+            <p class="intro-text">Answer the following questions to reveal your unique personality profile. There are no right or wrong answers, just pick what resonates most with you.</p>
+            <div id="questions-container">
+                <!-- Questions will be dynamically loaded here by JavaScript -->
+            </div>
+            <button id="submit-button">Reveal My Type</button>
+        </section>
+
+        <section id="results" class="hidden">
+            <h2>Your Personality Type: <span id="personality-type-name"></span></h2>
+            <p class="type-badge" id="personality-type-badge"></p>
+            <h3>Description:</h3>
+            <p id="personality-type-description"></p>
+            <button id="restart-button">Try Again</button>
+        </section>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                id: 'q1',
+                text: 'When you go to a social event, you usually feel:',
+                options: [
+                    { text: 'Energized and excited to meet new people.', impact: { E: 1 } },
+                    { text: 'A bit drained afterwards, preferring a quiet evening.', impact: { I: 1 } },
+                    { text: 'Neutral, depending on the people and activities.', impact: {} }
+                ]
+            },
+            {
+                id: 'q2',
+                text: 'When making decisions, you are more inclined to:',
+                options: [
+                    { text: 'Rely on logical analysis and objective facts.', impact: { T: 1 } },
+                    { text: 'Consider the impact on people and personal values.', impact: { F: 1 } }
+                ]
+            },
+            {
+                id: 'q3',
+                text: 'You are more interested in:',
+                options: [
+                    { text: 'Practical applications and tangible results.', impact: { S: 1 } },
+                    { text: 'Theories, future possibilities, and abstract concepts.', impact: { N: 1 } }
+                ]
+            },
+            {
+                id: 'q4',
+                text: 'Your preferred way of living is generally:',
+                options: [
+                    { text: 'Organized and planned, with a clear schedule.', impact: { J: 1 } },
+                    { text: 'Flexible and spontaneous, adapting as things come up.', impact: { P: 1 } }
+                ]
+            },
+            {
+                id: 'q5',
+                text: 'After a busy week, your ideal weekend involves:',
+                options: [
+                    { text: 'Attending parties or social gatherings.', impact: { E: 1 } },
+                    { text: 'Relaxing alone or with a close few.', impact: { I: 1 } }
+                ]
+            },
+            {
+                id: 'q6',
+                text: 'In a group discussion, you tend to:',
+                options: [
+                    { text: 'Speak up frequently and share your ideas.', impact: { E: 1 } },
+                    { text: 'Listen more than you speak, contributing when necessary.', impact: { I: 1 } }
+                ]
+            },
+            {
+                id: 'q7',
+                text: 'You gain energy from:',
+                options: [
+                    { text: 'Being around people and external activities.', impact: { E: 1 } },
+                    { text: 'Time spent in solitude and reflection.', impact: { I: 1 } }
+                ]
+            },
+            {
+                id: 'q8',
+                text: 'When learning something new, you prefer:',
+                options: [
+                    { text: 'Hands-on experience and real-world examples.', impact: { S: 1 } },
+                    { text: 'Exploring concepts, theories, and underlying meanings.', impact: { N: 1 } }
+                ]
+            },
+            {
+                id: 'q9',
+                text: 'You are more likely to notice:',
+                options: [
+                    { text: 'The specific details and facts of a situation.', impact: { S: 1 } },
+                    { text: 'The overall patterns and abstract implications.', impact: { N: 1 } }
+                ]
+            },
+            {
+                id: 'q10',
+                text: 'When describing an event, you focus on:',
+                options: [
+                    { text: 'What actually happened, the exact sequence of events.', impact: { S: 1 } },
+                    { text: 'The impressions, possibilities, and what it could mean.', impact: { N: 1 } }
+                ]
+            },
+            {
+                id: 'q11',
+                text: 'When faced with a difficult decision, you prioritize:',
+                options: [
+                    { text: 'Objectivity and rational principles.', impact: { T: 1 } },
+                    { text: 'Harmony and how it affects others.', impact: { F: 1 } }
+                ]
+            },
+            {
+                id: 'q12',
+                text: 'You are more likely to be described as:',
+                options: [
+                    { text: 'Fair and firm.', impact: { T: 1 } },
+                    { text: 'Compassionate and empathetic.', impact: { F: 1 } }
+                ]
+            },
+            {
+                id: 'q13',
+                text: 'When giving feedback, you are more likely to be:',
+                options: [
+                    { text: 'Direct and honest, even if it might be difficult to hear.', impact: { T: 1 } },
+                    { text: 'Gentle and diplomatic, trying to spare feelings.', impact: { F: 1 } }
+                ]
+            },
+            {
+                id: 'q14',
+                text: 'Your approach to tasks is typically:',
+                options: [
+                    { text: 'To plan thoroughly and work towards completion.', impact: { J: 1 } },
+                    { text: 'To keep options open and adapt as you go.', impact: { P: 1 } }
+                ]
+            },
+            {
+                id: 'q15',
+                text: 'You generally prefer:',
+                options: [
+                    { text: 'Having a clear structure and knowing what to expect.', impact: { J: 1 } },
+                    { text: 'Flexibility and spontaneous changes.', impact: { P: 1 } }
+                ]
+            },
+            {
+                id: 'q16',
+                text: 'Deadlines are for you:',
+                options: [
+                    { text: 'Firm commitments to be met.', impact: { J: 1 } },
+                    { text: 'Guidelines that can be adjusted if needed.', impact: { P: 1 } }
+                ]
+            }
+        ];
+
+        const personalityTypes = {
+            "ISTJ": { name: "The Logistician", description: "Practical and fact-minded individuals, whose reliability is unquestionable. They are responsible organizers, driven to create and enforce order in systems and institutions." },
+            "ISFJ": { name: "The Defender", description: "Warm, unassuming guardians who are dedicated and protective of their loved ones. They are altruists, exceptionally good at connecting with others and providing support." },
+            "INFJ": { name: "The Advocate", description: "Quiet and mystical, yet very inspiring and tireless idealists. They possess a deep sense of idealism and integrity, but they are not idle dreamers – they take concrete steps to achieve their goals." },
+            "INTJ": { name: "The Architect", description: "Imaginative and strategic thinkers, with a plan for everything. They are decisive, original, and driven by logical solutions, often designing complex systems or theories." },
+            "ISTP": { name: "The Virtuoso", description: "Bold and practical experimenters, masters of all kinds of tools. They are analytical, curious, and enjoy exploring with their hands and eyes, often excelling in fields requiring technical skill." },
+            "ISFP": { name: "The Adventurer", description: "Flexible and charming artists, always ready to explore and experience something new. They are true artists, not always in the conventional sense, but by making their lives a canvas of self-expression." },
+            "INFP": { name: "The Mediator", description: "Poetic, kind and altruistic people, always eager to help a good cause. They are guided by their pure intentions and values, often finding creative outlets for their deepest beliefs." },
+            "INTP": { name: "The Logician", description: "Innovative inventors with an unquenchable thirst for knowledge. They are philosophical, curious, and love to analyze complex problems, thriving on intellectual exploration." },
+            "ESTP": { name: "The Entrepreneur", description: "Smart, energetic and very perceptive people who truly enjoy living on the edge. They are action-oriented, quick-witted, and love to improvise and adapt to new challenges." },
+            "ESFP": { name: "The Entertainer", description: "Spontaneous, energetic and enthusiastic people – life is never boring around them. They love the spotlight, charming and engaging, bringing joy and excitement to any gathering." },
+            "ENFP": { name: "The Campaigner", description: "Enthusiastic, creative and sociable free spirits, who can always find a reason to smile. They are imaginative and adaptable, seeing life as a grand puzzle with endless possibilities." },
+            "ENTP": "The Debater", description: "Smart and curious thinkers who cannot resist an intellectual challenge. They are quick-witted and charismatic, enjoying verbal sparring and challenging existing norms with their innovative ideas." },
+            "ESTJ": { name: "The Executive", description: "Excellent administrators, unsurpassed at managing things or people. They are traditional, organized, and dedicated to upholding standards and bringing order to groups." },
+            "ESFJ": { name: "The Consul", description: "Extraordinarily caring, social and popular people, always eager to help others. They are warm, responsible, and thrive on social harmony, actively supporting their communities." },
+            "ENFJ": { name: "The Protagonist", description: "Charismatic and inspiring leaders, who are able to mesmerize their listeners. They are natural-born leaders, passionately inspiring others to achieve their full potential." },
+            "ENTJ": { name: "The Commander", description: "Bold, imaginative and strong-willed leaders, always finding a way – or making one. They are decisive and strategic, taking charge and motivating others towards ambitious goals." }
+        };
+
+        // DOM elements
+        const questionnaireSection = document.getElementById('questionnaire');
+        const resultsSection = document.getElementById('results');
+        const questionsContainer = document.getElementById('questions-container');
+        const submitButton = document.getElementById('submit-button');
+        const restartButton = document.getElementById('restart-button');
+        const personalityTypeName = document.getElementById('personality-type-name');
+        const personalityTypeBadge = document.getElementById('personality-type-badge');
+        const personalityTypeDescription = document.getElementById('personality-type-description');
+
+        function renderQuestions() {
+            questionsContainer.innerHTML = ''; // Clear previous questions
+            questions.forEach(q => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question-item');
+
+                const questionText = document.createElement('p');
+                questionText.textContent = q.text;
+                questionDiv.appendChild(questionText);
+
+                q.options.forEach((option, index) => {
+                    const label = document.createElement('label');
+                    label.classList.add('option-label');
+
+                    const input = document.createElement('input');
+                    input.type = 'radio';
+                    input.name = q.id;
+                    input.value = option.text;
+                    input.dataset.traitImpact = JSON.stringify(option.impact); // Store impact data
+
+                    const span = document.createElement('span');
+                    span.textContent = option.text;
+
+                    label.appendChild(input);
+                    label.appendChild(span);
+                    questionDiv.appendChild(label);
+                });
+                questionsContainer.appendChild(questionDiv);
+            });
+        }
+
+        function calculatePersonalityType() {
+            const scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            let answeredQuestionsCount = 0;
+
+            questions.forEach(q => {
+                const selectedOption = document.querySelector(`input[name="${q.id}"]:checked`);
+                if (selectedOption) {
+                    answeredQuestionsCount++;
+                    const impact = JSON.parse(selectedOption.dataset.traitImpact);
+                    for (const trait in impact) {
+                        if (scores.hasOwnProperty(trait)) {
+                            scores[trait] += impact[trait];
+                        }
+                    }
+                }
+            });
+
+            if (answeredQuestionsCount < questions.length) {
+                alert('Please answer all questions before submitting.');
+                return null;
+            }
+
+            const letterE_I = scores.E >= scores.I ? 'E' : 'I';
+            const letterS_N = scores.S >= scores.N ? 'S' : 'N';
+            const letterT_F = scores.T >= scores.F ? 'T' : 'F';
+            const letterJ_P = scores.J >= scores.P ? 'J' : 'P';
+
+            return letterE_I + letterS_N + letterT_F + letterJ_P;
+        }
+
+        function displayResults(type) {
+            const typeInfo = personalityTypes[type];
+            if (typeInfo) {
+                personalityTypeName.textContent = typeInfo.name;
+                personalityTypeBadge.textContent = type;
+                personalityTypeDescription.textContent = typeInfo.description;
+            } else {
+                personalityTypeName.textContent = 'Unknown Type';
+                personalityTypeBadge.textContent = 'N/A';
+                personalityTypeDescription.textContent = 'Could not find a description for this personality type.';
+            }
+
+            questionnaireSection.classList.add('hidden');
+            resultsSection.classList.remove('hidden');
+        }
+
+        function resetQuiz() {
+            const radioButtons = document.querySelectorAll('input[type="radio"]:checked');
+            radioButtons.forEach(radio => {
+                radio.checked = false;
+            });
+
+            resultsSection.classList.add('hidden');
+            questionnaireSection.classList.remove('hidden');
+            // Re-render questions if dynamic content changes, otherwise just show
+            renderQuestions();
+        }
+
+        // Event Listeners
+        submitButton.addEventListener('click', () => {
+            const finalType = calculatePersonalityType();
+            if (finalType) {
+                displayResults(finalType);
+            }
+        });
+
+        restartButton.addEventListener('click', resetQuiz);
+
+        // Initial render
+        document.addEventListener('DOMContentLoaded', renderQuestions);
+    </script>
+</body>
+</html>

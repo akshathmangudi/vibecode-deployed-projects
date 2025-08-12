@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronotype Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #app {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            margin-bottom: 25px;
+            color: #34495e;
+            font-weight: 600;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option-label {
+            display: block;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            text-align: left;
+            font-size: 1.05em;
+            position: relative;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .option-label:hover {
+            background-color: #e9ecef;
+            border-color: #ced4da;
+        }
+
+        .option-label input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .option-label input[type="radio"]:checked + span {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .option-label input[type="radio"]:checked {
+            outline: none; /* remove default focus outline for better custom styling */
+        }
+
+        .option-label input[type="radio"]:checked ~ .option-label { /* Target selected label */
+            background-color: #eaf3ff;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        .option-text {
+            display: block;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .navigation-buttons button {
+            width: 48%; /* Adjust for spacing if needed */
+        }
+
+        #submit-btn {
+            background-color: #28a745;
+        }
+
+        #submit-btn:hover {
+            background-color: #218838;
+        }
+
+        #restart-btn {
+            background-color: #6c757d;
+        }
+
+        #restart-btn:hover {
+            background-color: #5a6268;
+        }
+
+        #question-counter {
+            font-size: 0.9em;
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+        .result-description {
+            margin-top: 25px;
+            font-size: 1.15em;
+            line-height: 1.8;
+            color: #333;
+            text-align: left;
+            background-color: #f0f8ff;
+            border-left: 5px solid #007bff;
+            padding: 20px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="intro-screen" class="screen active">
+            <h1>Discover Your Chronotype</h1>
+            <p>A chronotype describes your natural inclination to sleep at a certain time, or the time of day you feel most productive and alert.</p>
+            <p>Take this quick test to find out if you're a Morning Lark, Night Owl, or somewhere in between!</p>
+            <button id="start-btn">Start Test</button>
+        </div>
+
+        <div id="test-screen" class="screen">
+            <p id="question-counter"></p>
+            <div class="question-container">
+                <p class="question-text" id="question-text"></p>
+                <div class="options-container" id="options-container">
+                    <!-- Options will be dynamically inserted here -->
+                </div>
+            </div>
+            <div class="navigation-buttons">
+                <button id="prev-btn" disabled>Previous</button>
+                <button id="next-btn">Next</button>
+                <button id="submit-btn" style="display: none;">Submit</button>
+            </div>
+        </div>
+
+        <div id="result-screen" class="screen">
+            <h2>Your Chronotype: <span id="chronotype-title"></span></h2>
+            <p class="result-description" id="chronotype-description"></p>
+            <button id="restart-btn">Take Test Again</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const questions = [
+                {
+                    question: "Considering your own feelings, at what time would you say you are at your peak?",
+                    options: [
+                        { text: "6 AM - 9 AM", score: 0 },
+                        { text: "9 AM - 12 PM", score: 1 },
+                        { text: "12 PM - 5 PM", score: 2 },
+                        { text: "5 PM - 10 PM", score: 3 },
+                        { text: "10 PM - 1 AM", score: 4 }
+                    ]
+                },
+                {
+                    question: "When do you typically wake up on a day you have no commitments?",
+                    options: [
+                        { text: "Before 6 AM", score: 0 },
+                        { text: "6 AM - 7 AM", score: 1 },
+                        { text: "7 AM - 8 AM", score: 2 },
+                        { text: "8 AM - 9 AM", score: 3 },
+                        { text: "After 9 AM", score: 4 }
+                    ]
+                },
+                {
+                    question: "When do you typically go to bed on a day you have no commitments?",
+                    options: [
+                        { text: "Before 10 PM", score: 0 },
+                        { text: "10 PM - 11 PM", score: 1 },
+                        { text: "11 PM - 12 AM", score: 2 },
+                        { text: "12 AM - 1 AM", score: 3 },
+                        { text: "After 1 AM", score: 4 }
+                    ]
+                },
+                {
+                    question: "How easy do you find it to get up in the morning (if you have to get up at a specific time)?",
+                    options: [
+                        { text: "Very easy", score: 0 },
+                        { text: "Fairly easy", score: 1 },
+                        { text: "Neither easy nor difficult", score: 2 },
+                        { text: "Fairly difficult", score: 3 },
+                        { text: "Very difficult", score: 4 }
+                    ]
+                },
+                {
+                    question: "How alert do you feel during the first half hour after waking up?",
+                    options: [
+                        { text: "Very alert", score: 0 },
+                        { text: "Fairly alert", score: 1 },
+                        { text: "Neither alert nor groggy", score: 2 },
+                        { text: "Fairly groggy", score: 3 },
+                        { text: "Very groggy", score: 4 }
+                    ]
+                },
+                {
+                    question: "At what time of day do you feel your best?",
+                    options: [
+                        { text: "Morning", score: 0 },
+                        { text: "Late morning/noon", score: 1 },
+                        { text: "Afternoon", score: 2 },
+                        { text: "Evening", score: 3 },
+                        { text: "Late evening/night", score: 4 }
+                    ]
+                },
+                {
+                    question: "If you had to do two hours of hard physical work, when would you prefer to do it?",
+                    options: [
+                        { text: "7 AM - 10 AM", score: 0 },
+                        { text: "10 AM - 1 PM", score: 1 },
+                        { text: "1 PM - 4 PM", score: 2 },
+                        { text: "4 PM - 7 PM", score: 3 },
+                        { text: "7 PM - 10 PM", score: 4 }
+                    ]
+                },
+                {
+                    question: "If you had to take an exam requiring mental alertness, when would you perform best?",
+                    options: [
+                        { text: "8 AM - 10 AM", score: 0 },
+                        { text: "10 AM - 12 PM", score: 1 },
+                        { text: "12 PM - 3 PM", score: 2 },
+                        { text: "3 PM - 6 PM", score: 3 },
+                        { text: "6 PM - 9 PM", score: 4 }
+                    ]
+                }
+            ];
+
+            const chronotypes = [
+                {
+                    title: "Definitely Morning Type (Morning Lark)",
+                    description: "You're at your best in the early hours. You wake up feeling refreshed and are most productive in the morning. Evening activities might not appeal as much, and you likely prefer early bedtimes."
+                },
+                {
+                    title: "Moderately Morning Type",
+                    description: "You generally feel good in the mornings, but your peak productivity might extend into late morning or early afternoon. You adapt more easily than extreme morning types but still lean towards earlier schedules."
+                },
+                {
+                    title: "Neither Type (Hummingbird)",
+                    description: "You don't strongly identify as a morning or evening person. You can adapt to different schedules and might find your energy levels are relatively stable throughout the day. This is the most common chronotype."
+                },
+                {
+                    title: "Moderately Evening Type",
+                    description: "You tend to feel more awake and productive in the afternoon and evening. Mornings might be a bit of a struggle, but you can manage. You often prefer later bedtimes and wake-up times."
+                },
+                {
+                    title: "Definitely Evening Type (Night Owl)",
+                    description: "You're truly a night owl! Your energy and alertness peak much later in the day, often into the evening or night. Mornings are typically difficult, and you thrive on late bedtimes and late wake-up times."
+                }
+            ];
+
+            const scoreRanges = [
+                { maxScore: 6, chronotypeIndex: 0 }, // 0-6: Definitely Morning
+                { maxScore: 12, chronotypeIndex: 1 }, // 7-12: Moderately Morning
+                { maxScore: 19, chronotypeIndex: 2 }, // 13-19: Neither
+                { maxScore: 25, chronotypeIndex: 3 }, // 20-25: Moderately Evening
+                { maxScore: 32, chronotypeIndex: 4 }  // 26-32: Definitely Evening
+            ];
+
+            let currentQuestionIndex = 0;
+            let userAnswers = new Array(questions.length).fill(null); // Stores the score of the selected option for each question
+
+            // DOM Elements
+            const introScreen = document.getElementById('intro-screen');
+            const testScreen = document.getElementById('test-screen');
+            const resultScreen = document.getElementById('result-screen');
+
+            const startBtn = document.getElementById('start-btn');
+            const questionCounter = document.getElementById('question-counter');
+            const questionText = document.getElementById('question-text');
+            const optionsContainer = document.getElementById('options-container');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const submitBtn = document.getElementById('submit-btn');
+            const chronotypeTitle = document.getElementById('chronotype-title');
+            const chronotypeDescription = document.getElementById('chronotype-description');
+            const restartBtn = document.getElementById('restart-btn');
+
+            function showScreen(screenToShow) {
+                const screens = [introScreen, testScreen, resultScreen];
+                screens.forEach(screen => {
+                    if (screen === screenToShow) {
+                        screen.classList.add('active');
+                    } else {
+                        screen.classList.remove('active');
+                    }
+                });
+            }
+
+            function loadQuestion() {
+                const q = questions[currentQuestionIndex];
+                questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+                questionText.textContent = q.question;
+                optionsContainer.innerHTML = ''; // Clear previous options
+
+                q.options.forEach((option, index) => {
+                    const label = document.createElement('label');
+                    label.className = 'option-label';
+                    label.innerHTML = `
+                        <input type="radio" name="question${currentQuestionIndex}" value="${option.score}" data-index="${index}">
+                        <span class="option-text">${option.text}</span>
+                    `;
+                    optionsContainer.appendChild(label);
+                });
+
+                // Pre-select if an answer was already chosen for this question
+                const storedAnswerScore = userAnswers[currentQuestionIndex];
+                if (storedAnswerScore !== null) {
+                    const radioInput = optionsContainer.querySelector(`input[value="${storedAnswerScore}"]`);
+                    if (radioInput) {
+                        radioInput.checked = true;
+                    }
+                }
+
+                updateNavigationButtons();
+            }
+
+            function updateNavigationButtons() {
+                prevBtn.disabled = currentQuestionIndex === 0;
+                nextBtn.style.display = currentQuestionIndex === questions.length - 1 ? 'none' : 'inline-block';
+                submitBtn.style.display = currentQuestionIndex === questions.length - 1 ? 'inline-block' : 'none';
+
+                // Disable next/submit if no option is selected for current question
+                const selectedOption = optionsContainer.querySelector(`input[name="question${currentQuestionIndex}"]:checked`);
+                nextBtn.disabled = !selectedOption && currentQuestionIndex < questions.length - 1;
+                submitBtn.disabled = !selectedOption && currentQuestionIndex === questions.length - 1;
+            }
+
+            function saveAnswer() {
+                const selectedOption = optionsContainer.querySelector(`input[name="question${currentQuestionIndex}"]:checked`);
+                if (selectedOption) {
+                    userAnswers[currentQuestionIndex] = parseInt(selectedOption.value);
+                } else {
+                    userAnswers[currentQuestionIndex] = null; // No answer selected
+                }
+            }
+
+            function calculateResult() {
+                let totalScore = userAnswers.reduce((sum, score) => sum + (score !== null ? score : 0), 0);
+
+                let chronotype = chronotypes[chronotypes.length - 1]; // Default to the last (Night Owl)
+                for (const range of scoreRanges) {
+                    if (totalScore <= range.maxScore) {
+                        chronotype = chronotypes[range.chronotypeIndex];
+                        break;
+                    }
+                }
+
+                chronotypeTitle.textContent = chronotype.title;
+                chronotypeDescription.textContent = chronotype.description;
+                showScreen(resultScreen);
+            }
+
+            // Event Listeners
+            startBtn.addEventListener('click', () => {
+                showScreen(testScreen);
+                currentQuestionIndex = 0;
+                userAnswers.fill(null); // Reset answers
+                loadQuestion();
+            });
+
+            nextBtn.addEventListener('click', () => {
+                saveAnswer();
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    loadQuestion();
+                }
+            });
+
+            prevBtn.addEventListener('click', () => {
+                saveAnswer();
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    loadQuestion();
+                }
+            });
+
+            submitBtn.addEventListener('click', () => {
+                saveAnswer();
+                calculateResult();
+            });
+
+            optionsContainer.addEventListener('change', () => {
+                // This event listener updates button state instantly when an option is selected
+                updateNavigationButtons();
+            });
+
+            restartBtn.addEventListener('click', () => {
+                showScreen(introScreen);
+                userAnswers.fill(null); // Ensure answers are reset for a new test
+            });
+
+            // Initial load state
+            showScreen(introScreen);
+        });
+    </script>
+</body>
+</html>

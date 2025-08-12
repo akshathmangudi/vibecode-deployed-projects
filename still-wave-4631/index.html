@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Portfolio</title>
+    <style>
+        /* Basic Reset & Global Styles */
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-color: #f8f9fa;
+            --text-color: #343a40;
+            --light-text-color: #ffffff;
+            --card-background: #ffffff;
+            --border-color: #e9ecef;
+            --hover-color: #0056b3;
+            --gradient-start: #007bff;
+            --gradient-end: #0056b3;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            scroll-behavior: smooth;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: var(--hover-color);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            margin-bottom: 0.5em;
+            color: var(--text-color);
+        }
+
+        p {
+            margin-bottom: 1em;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        section {
+            padding: 60px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        section:last-of-type {
+            border-bottom: none;
+        }
+
+        /* Header & Navigation */
+        .header {
+            background-color: var(--card-background);
+            padding: 15px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+        }
+
+        .nav ul li {
+            margin-left: 30px;
+        }
+
+        .nav ul li a {
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav ul li a:hover {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        /* Hero Section */
+        #home {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: var(--light-text-color);
+            text-align: center;
+            padding: 100px 0;
+            display: flex;
+            align-items: center;
+            min-height: calc(100vh - 70px); 
+            position: relative;
+            overflow: hidden;
+        }
+
+        #home .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            color: var(--light-text-color);
+            line-height: 1.2;
+        }
+
+        .hero-content p {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .profile-img {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 30px;
+            border: 5px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--card-background);
+            color: var(--primary-color);
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            margin: 0 10px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-color);
+            color: var(--light-text-color);
+            text-decoration: none;
+        }
+
+        .btn.btn-primary {
+            background-color: var(--primary-color);
+            color: var(--light-text-color);
+        }
+        .btn.btn-primary:hover {
+            background-color: var(--hover-color);
+        }
+
+        /* About Section */
+        #about .container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .about-text {
+            flex: 2;
+            min-width: 300px;
+        }
+
+        .about-text h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .about-text p {
+            font-size: 1.1em;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .about-image {
+            flex: 1;
+            min-width: 250px;
+            text-align: center;
+        }
+        .about-image img {
+            width: 100%;
+            max-width: 350px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Skills Section */
+        #skills {
+            background-color: var(--card-background);
+            text-align: center;
+        }
+
+        #skills h2 {
+            font-size: 2.5em;
+            margin-bottom: 40px;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .skill-item {
+            background-color: var(--background-color);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .skill-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .skill-item img {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 15px;
+        }
+
+        .skill-item .icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .skill-item h3 {
+            font-size: 1.2em;
+            margin-bottom: 0;
+            color: var(--text-color);
+        }
+
+        /* Projects Section */
+        #projects {
+            text-align: center;
+        }
+
+        #projects h2 {
+            font-size: 2.5em;
+            margin-bottom: 40px;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .project-card {
+            background-color: var(--card-background);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            text-align: left;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .project-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .project-content {
+            padding: 25px;
+        }
+
+        .project-content h3 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .project-content p {
+            font-size: 0.95em;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .project-links a {
+            margin-right: 15px;
+            font-weight: 600;
+        }
+
+        /* Contact Section */
+        #contact {
+            text-align: center;
+            background-color: var(--card-background);
+        }
+
+        #contact h2 {
+            font-size: 2.5em;
+            margin-bottom: 40px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .contact-item {
+            background-color: var(--background-color);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            flex: 1;
+            min-width: 280px;
+            max-width: 350px;
+            text-align: center;
+        }
+
+        .contact-item .icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .contact-item h3 {
+            font-size: 1.4em;
+            margin-bottom: 10px;
+        }
+
+        .contact-item p {
+            margin-bottom: 0;
+        }
+        .contact-item a {
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--text-color);
+            color: var(--light-text-color);
+            text-align: center;
+            padding: 30px 0;
+            font-size: 0.9em;
+        }
+
+        .footer p {
+            margin: 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header .container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .nav ul {
+                margin-top: 15px;
+                width: 100%;
+                justify-content: space-around;
+            }
+
+            .nav ul li {
+                margin: 0 10px;
+            }
+
+            #home {
+                padding: 80px 0;
+                min-height: auto;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5em;
+            }
+
+            .hero-content p {
+                font-size: 1.1em;
+            }
+
+            .btn {
+                margin: 10px 5px;
+            }
+
+            #about .container {
+                flex-direction: column;
+            }
+            .about-image {
+                order: -1; 
+            }
+
+            .skills-grid, .projects-grid, .contact-info {
+                grid-template-columns: 1fr;
+            }
+
+            .skill-item, .project-card, .contact-item {
+                max-width: 100%;
+            }
+
+            section {
+                padding: 40px 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 1.5em;
+            }
+            .nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .nav ul li {
+                margin: 5px 8px;
+            }
+            .hero-content h1 {
+                font-size: 2em;
+            }
+            .hero-content p {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">MyPortfolio</div>
+            <nav class="nav">
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#skills">Skills</a></li>
+                    <li><a href="#projects">Projects</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="home">
+            <div class="container">
+                <div class="hero-content">
+                    <img src="https://via.placeholder.com/180/007bff/FFFFFF?text=JP" alt="Profile Picture" class="profile-img">
+                    <h1>Hi, I'm Jane P. Doe, a Passionate Web Developer.</h1>
+                    <p>I build beautiful, responsive, and functional web applications with a focus on user experience.</p>
+                    <div>
+                        <a href="#projects" class="btn btn-primary">View My Work</a>
+                        <a href="#contact" class="btn">Get In Touch</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about">
+            <div class="container">
+                <div class="about-image">
+                    <img src="https://via.placeholder.com/400x300/007bff/FFFFFF?text=About+Me" alt="About Me Image">
+                </div>
+                <div class="about-text">
+                    <h2>About Me</h2>
+                    <p>Hello! I'm Jane P. Doe, a dedicated web developer with 5+ years of experience in crafting robust and scalable web solutions. My journey in web development started with a curiosity for how websites work, which quickly turned into a passion for building them.</p>
+                    <p>I specialize in front-end development, bringing designs to life with clean, efficient code, and ensuring a seamless user experience across all devices. I also have a solid understanding of back-end technologies, allowing me to work on full-stack projects.</p>
+                    <p>When I'm not coding, you can find me exploring new tech trends, contributing to open-source projects, or enjoying a good book.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills">
+            <div class="container">
+                <h2>My Skills</h2>
+                <div class="skills-grid">
+                    <div class="skill-item">
+                        <span class="icon">💻</span>
+                        <h3>HTML5 & CSS3</h3>
+                    </div>
+                    <div class="skill-item">
+                        <span class="icon">🚀</span>
+                        <h3>JavaScript (ES6+)</h3>
+                    </div>
+                    <div class="skill-item">
+                        <span class="icon">⚛️</span>
+                        <h3>React.js</h3>
+                    </div>
+                    <div class="skill-item">
+                        <span class="icon">🌿</span>
+                        <h3>Node.js</h3>
+                    </div>
+                    <div class="skill-item">
+                        <span class="icon">🗄️</span>
+                        <h3>Databases (SQL/NoSQL)</h3>
+                    </div>
+                    <div class="skill-item">
+                        <span class="icon">🔧</span>
+                        <h3>Git & GitHub</h3>
+                    </div>
+                    <div class="skill-item">
+                        <span class="icon">🎨</span>
+                        <h3>Responsive Design</h3>
+                    </div>
+                    <div class="skill-item">
+                        <span class="icon">☁️</span>
+                        <h3>Cloud Platforms (AWS)</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects">
+            <div class="container">
+                <h2>My Projects</h2>
+                <div class="projects-grid">
+                    <div class="project-card">
+                        <img src="https://via.placeholder.com/400x220/007bff/FFFFFF?text=Project+1" alt="Project 1 Image">
+                        <div class="project-content">
+                            <h3>E-commerce Store</h3>
+                            <p>A full-stack e-commerce application with user authentication, product listings, shopping cart, and payment gateway integration.</p>
+                            <p><strong>Technologies:</strong> React, Node.js, Express, MongoDB</p>
+                            <div class="project-links">
+                                <a href="#" target="_blank">Live Demo</a>
+                                <a href="#" target="_blank">GitHub Repo</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <img src="https://via.placeholder.com/400x220/6c757d/FFFFFF?text=Project+2" alt="Project 2 Image">
+                        <div class="project-content">
+                            <h3>Task Management App</h3>
+                            <p>A minimalist task management tool allowing users to create, organize, and track their daily tasks with progress indicators.</p>
+                            <p><strong>Technologies:</strong> HTML, CSS, JavaScript (Vanilla), Local Storage</p>
+                            <div class="project-links">
+                                <a href="#" target="_blank">Live Demo</a>
+                                <a href="#" target="_blank">GitHub Repo</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <img src="https://via.placeholder.com/400x220/28a745/FFFFFF?text=Project+3" alt="Project 3 Image">
+                        <div class="project-content">
+                            <h3>Portfolio Website Template</h3>
+                            <p>A reusable, responsive portfolio website template designed for developers and designers to showcase their work effectively.</p>
+                            <p><strong>Technologies:</strong> HTML5, CSS3, JavaScript (SCSS & Responsive Design)</p>
+                            <div class="project-links">
+                                <a href="#" target="_blank">Live Demo</a>
+                                <a href="#" target="_blank">GitHub Repo</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <img src="https://via.placeholder.com/400x220/dc3545/FFFFFF?text=Project+4" alt="Project 4 Image">
+                        <div class="project-content">
+                            <h3>Weather Forecast App</h3>
+                            <p>An application that provides real-time weather information based on user location or city search, using a public API.</p>
+                            <p><strong>Technologies:</strong> React, OpenWeatherMap API, CSS Modules</p>
+                            <div class="project-links">
+                                <a href="#" target="_blank">Live Demo</a>
+                                <a href="#" target="_blank">GitHub Repo</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact">
+            <div class="container">
+                <h2>Get In Touch</h2>
+                <p>I'm always open to new opportunities, collaborations, or just a friendly chat. Feel free to reach out!</p>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span class="icon">📧</span>
+                        <h3>Email</h3>
+                        <p><a href="mailto:jane.doe@example.com">jane.doe@example.com</a></p>
+                    </div>
+                    <div class="contact-item">
+                        <span class="icon">🌐</span>
+                        <h3>LinkedIn</h3>
+                        <p><a href="https://www.linkedin.com/in/janedoe" target="_blank">linkedin.com/in/janedoe</a></p>
+                    </div>
+                    <div class="contact-item">
+                        <span class="icon">🐙</span>
+                        <h3>GitHub</h3>
+                        <p><a href="https://github.com/janedoe" target="_blank">github.com/janedoe</a></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2023 MyPortfolio. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('nav ul li a').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        const headerOffset = document.querySelector('.header').offsetHeight;
+                        const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+                        const offsetPosition = elementPosition - headerOffset;
+
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

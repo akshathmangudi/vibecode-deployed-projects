@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Buddy Finder</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            box-sizing: border-box;
+            border: 1px solid #e0e0e0;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+            align-items: stretch;
+        }
+
+        .input-section label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .input-section input[type="date"] {
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 1rem;
+            flex-grow: 1;
+            outline: none;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .input-section input[type="date"]:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .input-section button {
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            align-self: center;
+            width: fit-content;
+        }
+
+        .input-section button:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .input-section button:active {
+            transform: translateY(0);
+        }
+
+        .results-section, .registered-birthdays-section {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+
+        .results-section p {
+            margin: 8px 0;
+            line-height: 1.6;
+            color: #343a40;
+        }
+
+        #buddyList {
+            margin-top: 10px;
+            padding-left: 20px;
+            color: #555;
+        }
+
+        #buddyList div {
+            margin-bottom: 5px;
+        }
+
+        #allRegisteredBirthdaysList {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background-color: #ffffff;
+        }
+
+        #allRegisteredBirthdaysList li {
+            padding: 10px 15px;
+            border-bottom: 1px dashed #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+        #allRegisteredBirthdaysList li:last-child {
+            border-bottom: none;
+        }
+
+        #allRegisteredBirthdaysList li span.birthday-date {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        #allRegisteredBirthdaysList li span.birthday-id {
+            font-size: 0.8em;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Birthday Buddy Finder</h1>
+        <div class="input-section">
+            <label for="birthdayInput">Enter your birthday:</label>
+            <input type="date" id="birthdayInput">
+            <button id="findButton">Find Birthday Buddies</button>
+        </div>
+        <div class="results-section">
+            <p id="yourBirthdayMessage">Enter your birthday above to find buddies!</p>
+            <p id="buddyCount"></p>
+            <div id="buddyList"></div>
+        </div>
+        <div class="registered-birthdays-section">
+            <h2>All Registered Birthdays</h2>
+            <ul id="allRegisteredBirthdaysList">
+                <li>Loading...</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const birthdayInput = document.getElementById('birthdayInput');
+            const findButton = document.getElementById('findButton');
+            const yourBirthdayMessage = document.getElementById('yourBirthdayMessage');
+            const buddyCount = document.getElementById('buddyCount');
+            const buddyListDiv = document.getElementById('buddyList');
+            const allRegisteredBirthdaysList = document.getElementById('allRegisteredBirthdaysList');
+
+            const LOCAL_STORAGE_KEY = 'birthdayBuddiesData';
+
+            // Function to load birthdays from localStorage
+            function loadBirthdays() {
+                try {
+                    const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+                    return data ? JSON.parse(data) : [];
+                } catch (e) {
+                    console.error("Error parsing birthdays from localStorage:", e);
+                    return [];
+                }
+            }
+
+            // Function to save birthdays to localStorage
+            function saveBirthdays(data) {
+                try {
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+                } catch (e) {
+                    console.error("Error saving birthdays to localStorage:", e);
+                }
+            }
+
+            // Function to render all registered birthdays
+            function renderAllRegisteredBirthdays() {
+                const allBirthdays = loadBirthdays();
+                allRegisteredBirthdaysList.innerHTML = ''; // Clear existing list
+
+                if (allBirthdays.length === 0) {
+                    const li = document.createElement('li');
+                    li.textContent = 'No birthdays registered yet.';
+                    allRegisteredBirthdaysList.appendChild(li);
+                    return;
+                }
+
+                // Sort birthdays for better readability (chronological by month-day)
+                allBirthdays.sort((a, b) => {
+                    const dateA = new Date(a.date);
+                    const dateB = new Date(b.date);
+                    const monthDayA = dateA.toISOString().substring(5, 10);
+                    const monthDayB = dateB.toISOString().substring(5, 10);
+                    if (monthDayA === monthDayB) {
+                        return dateA.getFullYear() - dateB.getFullYear();
+                    }
+                    return monthDayA.localeCompare(monthDayB);
+                });
+
+                allBirthdays.forEach(item => {
+                    const li = document.createElement('li');
+                    const dateSpan = document.createElement('span');
+                    dateSpan.classList.add('birthday-date');
+                    dateSpan.textContent = new Date(item.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                    li.appendChild(dateSpan);
+
+                    const idSpan = document.createElement('span');
+                    idSpan.classList.add('birthday-id');
+                    // Shorten ID for display
+                    idSpan.textContent = `(ID: ${item.id.substring(item.id.length - 4)})`;
+                    li.appendChild(idSpan);
+
+                    allRegisteredBirthdaysList.appendChild(li);
+                });
+            }
+
+            // Function to generate a simple unique ID
+            function generateUniqueId() {
+                return Date.now().toString(36) + Math.random().toString(36).substring(2, 7);
+            }
+
+            // Main function to find birthday buddies
+            findButton.addEventListener('click', () => {
+                const inputDateStr = birthdayInput.value;
+
+                if (!inputDateStr) {
+                    yourBirthdayMessage.textContent = 'Please select your birthday first!';
+                    buddyCount.textContent = '';
+                    buddyListDiv.innerHTML = '';
+                    return;
+                }
+
+                const currentUserId = generateUniqueId();
+                const inputDate = new Date(inputDateStr);
+                
+                // Get MM-DD format for consistent comparison across different years
+                const inputMonthDay = inputDate.toISOString().substring(5, 10); 
+
+                let allBirthdays = loadBirthdays();
+                
+                // Add the current user's birthday to the list
+                allBirthdays.push({ id: currentUserId, date: inputDateStr });
+                saveBirthdays(allBirthdays); // Save updated list immediately
+
+                // Filter for matching birthdays (month and day)
+                const matchingBirthdays = allBirthdays.filter(item => {
+                    const itemDate = new Date(item.date);
+                    return itemDate.toISOString().substring(5, 10) === inputMonthDay;
+                });
+
+                // Separate the current user from others
+                const otherBuddies = matchingBirthdays.filter(item => item.id !== currentUserId);
+
+                yourBirthdayMessage.textContent = `You registered your birthday as: ${inputDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+
+                if (matchingBirthdays.length === 1) {
+                    buddyCount.textContent = `You are currently the only registered user with a birthday on ${inputDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}.`;
+                    buddyListDiv.innerHTML = '';
+                } else {
+                    buddyCount.textContent = `You and ${otherBuddies.length} other(s) share a birthday on ${inputDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}!`;
+                    buddyListDiv.innerHTML = '<h3>Other Birthday Buddies:</h3>';
+                    otherBuddies.forEach(buddy => {
+                        const div = document.createElement('div');
+                        div.textContent = `- ${new Date(buddy.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+                        buddyListDiv.appendChild(div);
+                    });
+                }
+                
+                renderAllRegisteredBirthdays(); // Re-render the full list to include the new entry
+            });
+
+            // Initial render of all registered birthdays on page load
+            renderAllRegisteredBirthdays();
+        });
+    </script>
+</body>
+</html>

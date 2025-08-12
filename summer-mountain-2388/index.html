@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>umax Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        #app {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+            text-align: center;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        header h1 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+
+        .card {
+            background-color: #f9f9f9;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card h2 {
+            color: #34495e;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.6em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.1em;
+        }
+
+        .status-item > span:first-child {
+            font-weight: 500;
+            color: #555;
+            min-width: 120px; /* Aligns labels */
+        }
+
+        .progress-bar-container {
+            flex-grow: 1;
+            height: 12px;
+            background-color: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0; /* Initial width */
+            background-color: #4CAF50; /* Default green */
+            border-radius: 6px;
+            transition: width 0.5s ease-out, background-color 0.3s ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .status-item > span:last-child {
+            font-weight: 600;
+            color: #333;
+            min-width: 45px; /* Aligns percentages */
+            text-align: right;
+        }
+
+        .actions {
+            margin-top: 25px;
+        }
+
+        button {
+            padding: 12px 25px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+            font-weight: 500;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            background-color: #004085;
+            transform: translateY(0);
+        }
+
+        footer {
+            margin-top: 25px;
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>umax Dashboard</h1>
+        </header>
+        <main>
+            <div class="card">
+                <h2>System Status</h2>
+                <div class="status-item">
+                    <span>CPU Usage:</span>
+                    <div class="progress-bar-container">
+                        <div id="cpu-usage" class="progress-bar"></div>
+                    </div>
+                    <span id="cpu-percent">0%</span>
+                </div>
+                <div class="status-item">
+                    <span>Memory Usage:</span>
+                    <div class="progress-bar-container">
+                        <div id="memory-usage" class="progress-bar"></div>
+                    </div>
+                    <span id="memory-percent">0%</span>
+                </div>
+                <div class="status-item">
+                    <span>Disk Space:</span>
+                    <div class="progress-bar-container">
+                        <div id="disk-space" class="progress-bar"></div>
+                    </div>
+                    <span id="disk-percent">0%</span>
+                </div>
+            </div>
+            <div class="card">
+                <h2>Network Status</h2>
+                <div class="status-item">
+                    <span>Bandwidth Usage:</span>
+                    <div class="progress-bar-container">
+                        <div id="bandwidth-usage" class="progress-bar"></div>
+                    </div>
+                    <span id="bandwidth-percent">0%</span>
+                </div>
+                <div class="status-item">
+                    <span>Packet Loss:</span>
+                    <div class="progress-bar-container">
+                        <div id="packet-loss" class="progress-bar"></div>
+                    </div>
+                    <span id="packet-percent">0%</span>
+                </div>
+            </div>
+            <div class="actions">
+                <button id="refresh-button">Refresh Data</button>
+            </div>
+        </main>
+        <footer>
+            <p>&copy; 2023 umax App</p>
+        </footer>
+    </div>
+
+    <script>
+        const cpuBar = document.getElementById('cpu-usage');
+        const cpuPercent = document.getElementById('cpu-percent');
+        const memoryBar = document.getElementById('memory-usage');
+        const memoryPercent = document.getElementById('memory-percent');
+        const diskBar = document.getElementById('disk-space');
+        const diskPercent = document.getElementById('disk-percent');
+        const bandwidthBar = document.getElementById('bandwidth-usage');
+        const bandwidthPercent = document.getElementById('bandwidth-percent');
+        const packetLossBar = document.getElementById('packet-loss');
+        const packetLossPercent = document.getElementById('packet-percent');
+        const refreshButton = document.getElementById('refresh-button');
+
+        function updateData() {
+            const cpu = Math.floor(Math.random() * 70) + 20; // 20-90%
+            const memory = Math.floor(Math.random() * 60) + 30; // 30-90%
+            const disk = Math.floor(Math.random() * 40) + 50; // 50-90%
+            const bandwidth = Math.floor(Math.random() * 80) + 10; // 10-90%
+            const packetLoss = Math.floor(Math.random() * 10); // 0-9% (small numbers for packet loss)
+
+            function setStatus(bar, percentElem, value, warningThreshold, criticalThreshold) {
+                bar.style.width = `${value}%`;
+                percentElem.textContent = `${value}%`;
+                if (value >= criticalThreshold) {
+                    bar.style.backgroundColor = '#dc3545'; // Red
+                } else if (value >= warningThreshold) {
+                    bar.style.backgroundColor = '#ffc107'; // Yellow
+                } else {
+                    bar.style.backgroundColor = '#28a745'; // Green
+                }
+            }
+
+            setStatus(cpuBar, cpuPercent, cpu, 70, 85);
+            setStatus(memoryBar, memoryPercent, memory, 75, 90);
+            setStatus(diskBar, diskPercent, disk, 80, 95);
+            setStatus(bandwidthBar, bandwidthPercent, bandwidth, 70, 85); // Bandwidth thresholds similar to CPU
+            setStatus(packetLossBar, packetLossPercent, packetLoss, 3, 7); // Lower thresholds for packet loss
+        }
+
+        document.addEventListener('DOMContentLoaded', updateData);
+        refreshButton.addEventListener('click', updateData);
+    </script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Chat App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e0eafc, #cfdef3); /* More colourful, subtle 3D */
+            color: #333;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        #chat-container {
+            width: 100%;
+            max-width: 600px;
+            height: 90vh;
+            max-height: 800px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25); /* More pronounced 3D shadow */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.8); /* Subtle border for depth */
+        }
+
+        #chat-header {
+            padding: 15px 20px;
+            background: linear-gradient(90deg, #007bff, #6a00ff); /* Vibrant colourful gradient */
+            color: white;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: 600;
+            border-bottom: none; /* No solid border with gradient */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Stronger 3D shadow */
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); /* Text shadow for depth */
+        }
+
+        #chat-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            background-color: #f8f9fa; /* Slightly cleaner background */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: flex-end;
+        }
+
+        .message.sent {
+            justify-content: flex-end;
+        }
+
+        .message.received {
+            justify-content: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 25px; /* Softer, puffier look */
+            line-height: 1.4;
+            word-wrap: break-word;
+            font-size: 0.95em;
+        }
+
+        .message.sent .message-bubble {
+            background: linear-gradient(135deg, #007bff, #6a00ff); /* Vibrant colourful gradient */
+            color: white;
+            border-bottom-right-radius: 5px; /* Keep sharp corner for sender */
+            margin-right: 5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); /* Stronger 3D shadow */
+        }
+
+        .message.received .message-bubble {
+            background-color: #ffffff;
+            color: #333;
+            border: 1px solid rgba(220, 220, 220, 0.6); /* Subtle border for definition */
+            border-bottom-left-radius: 5px; /* Keep sharp corner for receiver */
+            margin-left: 5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), inset 0 1px 3px rgba(0, 0, 0, 0.05); /* Stronger 3D shadow with subtle inner shadow */
+        }
+
+        #chat-input-area {
+            display: flex;
+            padding: 15px 20px;
+            border-top: none; /* No solid border */
+            background-color: #ffffff; /* Clean white background */
+            align-items: center;
+            box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.1); /* Subtle 3D shadow to lift it */
+        }
+
+        #message-input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0; /* Lighter border */
+            border-radius: 25px;
+            font-size: 1em;
+            margin-right: 10px;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15); /* More pronounced inset for 3D */
+            resize: none;
+            min-height: 40px;
+            max-height: 100px;
+            overflow-y: auto;
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+
+        #message-input::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        #message-input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.35), inset 0 2px 6px rgba(0, 0, 0, 0.15); /* Combine focus shadow with inset */
+        }
+
+        #send-button {
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #28a745, #20c997); /* Vibrant colourful gradient */
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease; /* Transition background and shadow */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Stronger 3D shadow */
+        }
+
+        #send-button:hover {
+            background: linear-gradient(45deg, #218838, #17a2b8); /* Slightly darker/different gradient on hover */
+            transform: translateY(-2px); /* More pronounced lift */
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4); /* Larger shadow on hover */
+        }
+
+        #send-button:active {
+            background: linear-gradient(45deg, #1e7e34, #138496); /* Even darker/different gradient on active */
+            transform: translateY(0);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Smaller shadow on active */
+        }
+
+        @media (max-width: 768px) {
+            #chat-container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+                border: none;
+            }
+            body {
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="chat-header">
+            Simple Chat Bot
+        </div>
+        <div id="chat-messages">
+            <!-- Initial message from bot -->
+            <div class="message received">
+                <div class="message-bubble">Hello! How can I assist you today?</div>
+            </div>
+        </div>
+        <div id="chat-input-area">
+            <textarea id="message-input" placeholder="Type your message..." rows="1"></textarea>
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+
+        const botReplies = [
+            "That's interesting! Can you tell me more?",
+            "I see. How does that make you feel?",
+            "Fascinating! What else comes to mind?",
+            "Ah, I understand. Please continue.",
+            "Indeed. What are your thoughts on that?",
+            "I'm not sure I follow. Could you elaborate?",
+            "Thank you for sharing that.",
+            "That's a common sentiment. Anything specific about it?",
+            "Right. Is there anything else you'd like to discuss?",
+            "I'm here to listen. What's next on your mind?"
+        ];
+
+        function addMessage(text, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', type);
+
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.classList.add('message-bubble');
+            bubbleDiv.textContent = text;
+
+            messageDiv.appendChild(bubbleDiv);
+            chatMessages.appendChild(messageDiv);
+
+            // Scroll to the bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function sendMessage() {
+            const messageText = messageInput.value.trim();
+
+            if (messageText) {
+                addMessage(messageText, 'sent');
+                messageInput.value = ''; // Clear the input
+
+                // Simulate bot reply
+                setTimeout(() => {
+                    const randomReply = botReplies[Math.floor(Math.random() * botReplies.length)];
+                    addMessage(randomReply, 'received');
+                }, 500 + Math.random() * 1000); // Random delay between 0.5 and 1.5 seconds
+            }
+
+            // Reset textarea height after sending
+            messageInput.style.height = 'auto';
+            messageInput.rows = 1;
+        }
+
+        // Event listener for send button
+        sendButton.addEventListener('click', sendMessage);
+
+        // Event listener for Enter key in textarea
+        messageInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault(); // Prevent new line
+                sendMessage();
+            }
+        });
+
+        // Auto-resize textarea based on content
+        messageInput.addEventListener('input', () => {
+            messageInput.style.height = 'auto'; // Reset height
+            messageInput.style.height = (messageInput.scrollHeight) + 'px'; // Set to scroll height
+        });
+
+        // Initialize textarea height
+        messageInput.style.height = (messageInput.scrollHeight) + 'px';
+    </script>
+</body>
+</html>

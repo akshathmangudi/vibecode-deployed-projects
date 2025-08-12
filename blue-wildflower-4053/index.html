@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybersecurity Professional Portfolio</title>
+    <style>
+        /* Variables */
+        :root {
+            --bg-color: #1a1a2e;
+            --text-color: #e0e0e0;
+            --primary-color: #0f3460;
+            --accent-color: #e94560;
+            --card-bg: #2c2c47;
+            --border-color: #0a1c3e;
+            --font-family: 'Arial', sans-serif;
+        }
+
+        /* Base Styles */
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1, h2, h3 {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            text-align: center;
+            padding-bottom: 20px;
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 5px;
+        }
+
+        a {
+            color: var(--accent-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--primary-color);
+        }
+
+        section {
+            padding: 60px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        section:last-of-type {
+            border-bottom: none;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        header h1 {
+            margin: 0;
+            color: var(--text-color);
+            font-size: 1.8em;
+        }
+
+        header nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        header nav ul li {
+            margin-left: 20px;
+        }
+
+        header nav ul li a {
+            color: var(--text-color);
+            font-weight: bold;
+            font-size: 1.1em;
+            padding: 5px 0;
+            position: relative;
+        }
+
+        header nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent-color);
+            transition: width 0.3s ease-in-out;
+        }
+
+        header nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            background-color: var(--primary-color);
+            text-align: center;
+            padding: 100px 20px;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero h2 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+
+        .hero p {
+            font-size: 1.2em;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* About Section */
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            padding-top: 20px;
+        }
+
+        .profile-pic {
+            border-radius: 50%;
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border: 5px solid var(--accent-color);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            flex-shrink: 0;
+        }
+
+        .about-content p {
+            flex-grow: 1;
+            text-align: justify;
+        }
+
+        /* Skills Section */
+        .skill-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            padding-top: 20px;
+        }
+
+        .skill-card {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .skill-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .skill-card h3 {
+            color: var(--accent-color);
+            margin-top: 0;
+            font-size: 1.4em;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .skill-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .skill-card ul li {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .skill-card ul li::before {
+            content: '✓';
+            color: var(--accent-color);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        /* Experience Section */
+        .experience-item {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease;
+        }
+
+        .experience-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .experience-item h3 {
+            color: var(--accent-color);
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+
+        .experience-item p {
+            color: var(--text-color);
+            font-style: italic;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .experience-item ul {
+            list-style: disc;
+            margin-left: 20px;
+            padding: 0;
+        }
+
+        .experience-item ul li {
+            margin-bottom: 5px;
+        }
+
+        /* Projects Section */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            padding-top: 20px;
+        }
+
+        .project-card {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .project-card h3 {
+            color: var(--accent-color);
+            margin-top: 0;
+            font-size: 1.3em;
+        }
+
+        .project-card p {
+            flex-grow: 1;
+            margin-bottom: 15px;
+        }
+
+        .project-card a {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            padding: 8px 15px;
+            border-radius: 5px;
+            align-self: flex-start;
+            transition: background-color 0.3s ease;
+        }
+
+        .project-card a:hover {
+            background-color: var(--accent-color);
+            color: #fff;
+        }
+
+        /* Contact Section */
+        .contact form {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            margin: 20px auto 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group textarea {
+            width: calc(100% - 20px);
+            padding: 12px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="email"]:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent-color);
+            background-color: #3d3d5c;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+        }
+
+        form button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--accent-color);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        form button:hover {
+            background-color: #c43c52;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 40px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            header .container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            header nav ul {
+                margin-top: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            header nav ul li {
+                margin: 0 10px 10px 10px;
+            }
+
+            .hero h2 {
+                font-size: 2.5em;
+            }
+
+            .about-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-pic {
+                margin-bottom: 20px;
+            }
+
+            .skill-grid,
+            .project-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact form {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .hero h2 {
+                font-size: 2em;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            section {
+                padding: 40px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>[Your Name]</h1>
+            <nav>
+                <ul>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#skills">Skills</a></li>
+                    <li><a href="#experience">Experience</a></li>
+                    <li><a href="#projects">Projects</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="hero">
+            <div class="container">
+                <h2>Cybersecurity Professional</h2>
+                <p>Protecting digital assets with expertise in network security, incident response, and ethical hacking.</p>
+            </div>
+        </section>
+
+        <section id="about" class="about">
+            <div class="container">
+                <h2>About Me</h2>
+                <div class="about-content">
+                    <img src="https://via.placeholder.com/180/e94560/FFFFFF?text=PROFILE" alt="Profile Picture" class="profile-pic">
+                    <p>Highly motivated and results-oriented Cybersecurity Professional with X years of experience in safeguarding critical infrastructure and sensitive data. Proven ability to identify vulnerabilities, mitigate risks, and respond to security incidents effectively. Possessing strong analytical skills and a deep understanding of various security frameworks and technologies. Eager to contribute to a secure digital environment and stay ahead of evolving cyber threats.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills" class="skills">
+            <div class="container">
+                <h2>Skills</h2>
+                <div class="skill-grid">
+                    <div class="skill-card">
+                        <h3>Network Security</h3>
+                        <ul>
+                            <li>Firewall Management (Palo Alto, Cisco ASA)</li>
+                            <li>IDS/IPS Deployment & Monitoring</li>
+                            <li>VPN Configuration & Troubleshooting</li>
+                            <li>Network Segmentation & Zero Trust</li>
+                        </ul>
+                    </div>
+                    <div class="skill-card">
+                        <h3>Incident Response</h3>
+                        <ul>
+                            <li>Log Analysis (SIEM: Splunk, ELK)</li>
+                            <li>Malware Analysis & Reversal</li>
+                            <li>Digital Forensics Investigations</li>
+                            <li>Threat Hunting & Containment</li>
+                        </ul>
+                    </div>
+                    <div class="skill-card">
+                        <h3>Vulnerability Management</h3>
+                        <ul>
+                            <li>Penetration Testing (Web, Network)</li>
+                            <li>Vulnerability Scanning (Nessus, Qualys)</li>
+                            <li>OWASP Top 10 Remediation</li>
+                            <li>Security Audits & Compliance</li>
+                        </ul>
+                    </div>
+                    <div class="skill-card">
+                        <h3>Cloud Security</h3>
+                        <ul>
+                            <li>AWS Security (IAM, Security Groups)</li>
+                            <li>Azure Security Center</li>
+                            <li>Container Security (Docker, Kubernetes)</li>
+                            <li>Cloud Access Security Brokers (CASB)</li>
+                        </ul>
+                    </div>
+                    <div class="skill-card">
+                        <h3>Compliance & Governance</h3>
+                        <ul>
+                            <li>GDPR, HIPAA, ISO 27001</li>
+                            <li>Risk Management Frameworks (NIST)</li>
+                            <li>Security Policy Development</li>
+                            <li>DR/BCP Planning & Testing</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="experience" class="experience">
+            <div class="container">
+                <h2>Experience</h2>
+                <div class="experience-item">
+                    <h3>Senior Security Analyst</h3>
+                    <p>TechProtect Solutions | Jan 2020 - Present</p>
+                    <ul>
+                        <li>Led incident response efforts for critical security breaches, reducing resolution time by 20% through efficient analysis and coordination.</li>
+                        <li>Implemented and managed SIEM solutions, significantly improving threat detection and alerting capabilities.</li>
+                        <li>Conducted regular vulnerability assessments and penetration tests on enterprise systems, identifying and remediating high-risk issues.</li>
+                        <li>Mentored junior analysts and developed security awareness training programs for employees.</li>
+                    </ul>
+                </div>
+                <div class="experience-item">
+                    <h3>Junior Cybersecurity Engineer</h3>
+                    <p>SecureNet Corp | Jun 2017 - Dec 2019</p>
+                    <ul>
+                        <li>Monitored security systems and analyzed security logs for suspicious activity and potential threats.</li>
+                        <li>Assisted in the development and enforcement of security policies and procedures across the organization.</li>
+                        <li>Participated in security infrastructure deployments and conducted initial configurations of firewalls and intrusion prevention systems.</li>
+                        <li>Supported security operations center (SOC) with alert triage and basic incident handling.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="projects">
+            <div class="container">
+                <h2>Projects</h2>
+                <div class="project-grid">
+                    <div class="project-card">
+                        <h3>Home Lab SIEM Implementation</h3>
+                        <p>Set up a comprehensive Security Information and Event Management (SIEM) system using the ELK stack (Elasticsearch, Logstash, Kibana) for personal learning and threat analysis on a simulated network environment. Developed custom dashboards for real-time monitoring.</p>
+                        <a href="#" target="_blank">View Details (Dummy Link)</a>
+                    </div>
+                    <div class="project-card">
+                        <h3>Web Application Penetration Test Simulation</h3>
+                        <p>Performed a simulated penetration test on a vulnerable web application (e.g., OWASP Juice Shop), identifying and exploiting common vulnerabilities such as SQL injection, Cross-Site Scripting (XSS), and Broken Authentication. Documented findings and suggested remediation steps.</p>
+                        <a href="#" target="_blank">View Details (Dummy Link)</a>
+                    </div>
+                    <div class="project-card">
+                        <h3>Automated Phishing Campaign Detector</h3>
+                        <p>Developed a Python script that analyzes email headers and content, flagging potential phishing attempts based on a combination of predefined rules, domain reputation checks, and simple natural language processing (NLP) techniques. Integrated with a local mail server for testing.</p>
+                        <a href="#" target="_blank">View Details (Dummy Link)</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="contact">
+            <div class="container">
+                <h2>Contact Me</h2>
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Subject:</label>
+                        <input type="text" id="subject" name="subject" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message:</label>
+                        <textarea id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit">Send Message</button>
+                    <p id="formStatus" style="margin-top: 15px; text-align: center; font-weight: bold;"></p>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 [Your Name]. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('nav a').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Contact form handling
+            const contactForm = document.getElementById('contactForm');
+            const formStatus = document.getElementById('formStatus');
+
+            contactForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const name = document.getElementById('name').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const subject = document.getElementById('subject').value.trim();
+                const message = document.getElementById('message').value.trim();
+
+                if (!name || !email || !subject || !message) {
+                    formStatus.style.color = '#e94560'; /* Accent red for error */
+                    formStatus.textContent = 'Please fill in all fields.';
+                    return;
+                }
+
+                if (!/\S+@\S+\.\S+/.test(email)) {
+                    formStatus.style.color = '#e94560'; /* Accent red for error */
+                    formStatus.textContent = 'Please enter a valid email address.';
+                    return;
+                }
+
+                // Simulate form submission
+                console.log('Form Submitted:');
+                console.log('Name:', name);
+                console.log('Email:', email);
+                console.log('Subject:', subject);
+                console.log('Message:', message);
+
+                formStatus.style.color = '#6EEB83'; /* Light green for success */
+                formStatus.textContent = 'Message sent successfully! (This is a demo. No actual email was sent.)';
+
+                // Clear the form
+                contactForm.reset();
+            });
+        });
+    </script>
+</body>
+</html>

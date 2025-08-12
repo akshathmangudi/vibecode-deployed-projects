@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Engineer | Data to Intelligence</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --dark-color: #343a40;
+            --light-color: #f8f9fa;
+            --white-color: #ffffff;
+            --accent-color: #28a745;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            --max-width: 1100px;
+            --section-padding: 80px 0;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Base Styles */
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #0056b3;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 0;
+            margin-bottom: 0.5em;
+            color: var(--dark-color);
+            line-height: 1.2;
+        }
+
+        p {
+            margin-top: 0;
+            margin-bottom: 1em;
+        }
+
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--primary-color);
+            color: var(--white-color);
+            padding: 12px 25px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: var(--white-color);
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--white-color);
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+
+        .header .logo span {
+            color: var(--primary-color);
+        }
+
+        .header .nav-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        .header .nav-menu ul li {
+            margin-left: 30px;
+        }
+
+        .header .nav-menu ul li a {
+            color: var(--dark-color);
+            font-weight: 500;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+        
+        .header .nav-menu ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://via.placeholder.com/1500x800/212529/ffffff?text=AI+Background') no-repeat center center/cover;
+            color: var(--white-color);
+            text-align: center;
+            padding: var(--section-padding);
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 0.5em;
+            color: var(--white-color);
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero .btn-group .btn {
+            margin: 0 10px;
+        }
+
+        /* Section Styling */
+        .section {
+            padding: var(--section-padding);
+            background-color: var(--white-color);
+            margin-bottom: 20px;
+            box-shadow: var(--box-shadow);
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .section:nth-of-type(odd) {
+            background-color: #f0f0f0;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5em;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+            width: 80px;
+            height: 4px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+        
+        .section-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* About Section */
+        .about .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 4px solid var(--primary-color);
+            box-shadow: 0 0 0 5px rgba(0, 123, 255, 0.2);
+        }
+
+        .about p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1.5em;
+            text-align: left;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Expertise Section */
+        .expertise-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .expertise-item {
+            background-color: var(--white-color);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .expertise-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .expertise-item h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .expertise-item p {
+            font-size: 0.95rem;
+            color: var(--secondary-color);
+        }
+
+        /* Projects Section */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .project-card {
+            background-color: var(--white-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            text-align: left;
+            transition: transform 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .project-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .project-card-content {
+            padding: 25px;
+        }
+
+        .project-card-content h3 {
+            font-size: 1.4rem;
+            color: var(--dark-color);
+            margin-bottom: 10px;
+        }
+
+        .project-card-content p {
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .project-card-content .tech-tags {
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        /* Call to Action (Contact Section) */
+        .contact {
+            background: var(--primary-color);
+            color: var(--white-color);
+            text-align: center;
+            padding: 60px 0;
+            border-radius: var(--border-radius);
+            margin-top: 40px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .contact h2 {
+            color: var(--white-color);
+            margin-bottom: 0.8em;
+        }
+
+        .contact p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--dark-color);
+            color: var(--light-color);
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 40px;
+        }
+
+        .footer p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .footer .social-links a {
+            color: var(--light-color);
+            font-size: 1rem;
+            margin: 0 10px;
+            transition: color 0.3s ease;
+        }
+
+        .footer .social-links a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header .container {
+                flex-direction: column;
+            }
+
+            .header .nav-menu ul {
+                margin-top: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .header .nav-menu ul li {
+                margin: 0 15px 10px;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .hero .btn-group {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .hero .btn-group .btn {
+                margin: 0;
+            }
+
+            .section {
+                padding: 60px 20px;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+            }
+
+            .expertise-grid, .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact {
+                padding: 40px 20px;
+            }
+
+            .contact h2 {
+                font-size: 1.8rem;
+            }
+
+            .contact p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                ML<span>Engineer</span>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#expertise">Expertise</a></li>
+                    <li><a href="#projects">Projects</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Transforming Data into Intelligent Solutions</h1>
+            <p>Experienced ML Engineer specializing in cutting-edge AI, Machine Learning, and Data Science, building scalable and impactful products.</p>
+            <div class="btn-group">
+                <a href="#projects" class="btn">Explore My Work</a>
+                <a href="#contact" class="btn btn-outline">Get in Touch</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="section about">
+        <div class="container">
+            <h2>About Me</h2>
+            <div class="section-content">
+                <img src="https://via.placeholder.com/150/007bff/ffffff?text=ML" alt="Profile Picture" class="profile-img">
+                <p>Hello! I'm an enthusiastic Machine Learning Engineer with a deep passion for building intelligent systems that solve real-world problems. With a background in data science and software engineering, I bridge the gap between complex algorithms and practical applications.</p>
+                <p>My expertise spans across various domains of Artificial Intelligence, from developing robust predictive models and natural language processing solutions to implementing computer vision algorithms. I thrive on bringing innovative ideas to life, ensuring models are not only accurate but also scalable, efficient, and deployable in production environments.</p>
+                <p>I am always eager to learn new technologies, explore challenging datasets, and contribute to projects that push the boundaries of AI. Let's connect and build the future, one intelligent solution at a time!</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="expertise" class="section expertise">
+        <div class="container">
+            <h2>My Expertise</h2>
+            <div class="expertise-grid">
+                <div class="expertise-item">
+                    <h3>Deep Learning</h3>
+                    <p>Building and training neural networks for complex pattern recognition, including CNNs, RNNs, and Transformers.</p>
+                </div>
+                <div class="expertise-item">
+                    <h3>Natural Language Processing (NLP)</h3>
+                    <p>Developing solutions for text classification, sentiment analysis, named entity recognition, and language generation.</p>
+                </div>
+                <div class="expertise-item">
+                    <h3>Computer Vision</h3>
+                    <p>Implementing algorithms for object detection, image classification, facial recognition, and image segmentation.</p>
+                </div>
+                <div class="expertise-item">
+                    <h3>MLOps & Deployment</h3>
+                    <p>Designing and implementing end-to-end MLOps pipelines for model versioning, training, deployment, and monitoring.</p>
+                </div>
+                <div class="expertise-item">
+                    <h3>Predictive Modeling</h3>
+                    <p>Creating robust predictive models using various supervised and unsupervised learning techniques.</p>
+                </div>
+                <div class="expertise-item">
+                    <h3>Cloud AI Platforms</h3>
+                    <p>Leveraging AWS SageMaker, Google AI Platform, and Azure ML for scalable ML workflows.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects" class="section projects">
+        <div class="container">
+            <h2>Featured Projects</h2>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <img src="https://via.placeholder.com/400x200/007bff/ffffff?text=Project+1" alt="Project 1">
+                    <div class="project-card-content">
+                        <h3>Automated Customer Support Chatbot</h3>
+                        <p>Developed an AI-powered chatbot to handle common customer inquiries, reducing support ticket volume by 30%.</p>
+                        <p class="tech-tags">Tech Stack: Python, TensorFlow, NLTK, FastAPI</p>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <img src="https://via.placeholder.com/400x200/28a745/ffffff?text=Project+2" alt="Project 2">
+                    <div class="project-card-content">
+                        <h3>Medical Image Diagnosis System</h3>
+                        <p>Built a deep learning model for early detection of diseases from medical scans with 95% accuracy.</p>
+                        <p class="tech-tags">Tech Stack: Python, PyTorch, scikit-learn, OpenCV</p>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <img src="https://via.placeholder.com/400x200/6c757d/ffffff?text=Project+3" alt="Project 3">
+                    <div class="project-card-content">
+                        <h3>Real-time Fraud Detection System</h3>
+                        <p>Implemented a low-latency fraud detection system using anomaly detection techniques on transactional data.</p>
+                        <p class="tech-tags">Tech Stack: Python, Spark, Kafka, XGBoost</p>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 40px;">
+                <a href="mailto:your.email@example.com?subject=Inquiry+About+Projects" class="btn btn-outline">View More Projects</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="section contact">
+        <div class="container">
+            <h2>Ready to Build Something Intelligent?</h2>
+            <p>I'm available for challenging projects and new opportunities. Let's collaborate and bring your data-driven ideas to life!</p>
+            <a href="mailto:youremail@example.com" class="btn btn-outline" style="background: var(--white-color); color: var(--primary-color);">Email Me</a>
+            <a href="https://linkedin.com/in/yourprofile" target="_blank" class="btn" style="background: #0077B5; margin-left: 20px;">LinkedIn</a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2023 ML Engineer. All rights reserved.</p>
+            <div class="social-links" style="margin-top: 10px;">
+                <a href="https://linkedin.com/in/yourprofile" target="_blank">LinkedIn</a> |
+                <a href="https://github.com/yourprofile" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.nav-menu ul li a');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+
+                    if (targetSection) {
+                        const headerOffset = document.querySelector('.header').offsetHeight;
+                        const elementPosition = targetSection.getBoundingClientRect().top + window.pageYOffset;
+                        const offsetPosition = elementPosition - headerOffset;
+
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

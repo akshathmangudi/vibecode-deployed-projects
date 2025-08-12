@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMI Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            width: 320px;
+            max-width: 90%;
+        }
+
+        h1 {
+            color: #007bff;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        /* New style for inline feet/inches inputs */
+        .height-input-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px; /* Space between inputs */
+            margin-bottom: 20px;
+        }
+
+        .height-input-group .input-field {
+            flex: 1; /* Distribute space evenly */
+        }
+
+        .height-input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+
+        input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:active {
+            transform: scale(0.99);
+        }
+
+        .result-area {
+            margin-top: 30px;
+            padding: 18px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            font-size: 1.1em;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .result-area strong {
+            color: #007bff;
+            font-size: 1.2em;
+        }
+
+        /* New styles for BMI info */
+        .bmi-ranges-info {
+            margin-top: 25px; /* Space from the result area */
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            text-align: left;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .bmi-ranges-info h2 {
+            font-size: 1.15em;
+            color: #007bff;
+            margin-top: 0;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .bmi-ranges-info ul {
+            list-style: none; /* Remove default bullet points */
+            padding: 0;
+            margin: 0;
+        }
+
+        .bmi-ranges-info ul li {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .bmi-ranges-info ul li strong {
+            color: #333; /* Make the range bold and slightly darker */
+            min-width: 120px; /* Align text better */
+            display: inline-block;
+        }
+
+        /* Styles for BMI Suggestions/Precautions */
+        .bmi-suggestions-info {
+            margin-top: 25px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            text-align: left;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .bmi-suggestions-info h2 {
+            font-size: 1.15em;
+            color: #007bff;
+            margin-top: 0;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .bmi-suggestions-info p {
+            margin: 0;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BMI Calculator</h1>
+        <!-- Height input group for feet and inches -->
+        <div class="height-input-group">
+            <div class="input-field">
+                <label for="feet">Height (feet):</label>
+                <input type="number" id="feet" placeholder="e.g., 5" min="0" step="1">
+            </div>
+            <div class="input-field">
+                <label for="inches">Height (inches):</label>
+                <input type="number" id="inches" placeholder="e.g., 10" min="0" step="1">
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="weight">Weight (kg):</label>
+            <input type="number" id="weight" placeholder="e.g., 70" min="1" step="0.1">
+        </div>
+        <button id="calculateBtn">Calculate BMI</button>
+        <div id="result" class="result-area">
+            Enter your height and weight to calculate your BMI.
+        </div>
+        <!-- New section for BMI suggestions -->
+        <div id="suggestions" class="bmi-suggestions-info">
+            <h2>Precautions & Suggestions</h2>
+            <p>Calculate your BMI to receive personalized suggestions.</p>
+        </div>
+        <!-- New section for BMI ranges -->
+        <div class="bmi-ranges-info">
+            <h2>BMI Categories</h2>
+            <ul>
+                <li><strong>Below 18.5:</strong> Underweight</li>
+                <li><strong>18.5 – 24.9:</strong> Normal weight</li>
+                <li><strong>25 – 29.9:</strong> Overweight</li>
+                <li><strong>30 or greater:</strong> Obese</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const feetInput = document.getElementById('feet');
+            const inchesInput = document.getElementById('inches');
+            const weightInput = document.getElementById('weight');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resultDiv = document.getElementById('result');
+            const suggestionsDiv = document.getElementById('suggestions');
+            const suggestionsParagraph = suggestionsDiv.querySelector('p');
+
+            calculateBtn.addEventListener('click', () => {
+                const weightKg = parseFloat(weightInput.value);
+                const feet = parseFloat(feetInput.value) || 0; // Treat empty or NaN as 0
+                const inches = parseFloat(inchesInput.value) || 0; // Treat empty or NaN as 0
+
+                // Validate inputs
+                if (isNaN(weightKg) || weightKg <= 0 || (feet < 0 || inches < 0) || (feet === 0 && inches === 0)) {
+                    resultDiv.innerHTML = '<span style="color: red; font-weight: normal;">Please enter valid positive numbers for weight, and positive height (feet/inches).</span>';
+                    suggestionsParagraph.textContent = 'Please correct your input to receive suggestions.';
+                    return;
+                }
+
+                // Convert feet and inches to total inches, then to meters
+                const totalInches = (feet * 12) + inches;
+                const heightM = totalInches * 0.0254; // 1 inch = 0.0254 meters
+
+                const bmi = weightKg / (heightM * heightM);
+                const roundedBmi = bmi.toFixed(2); // Round to 2 decimal places
+
+                let status = '';
+                let suggestionsText = '';
+
+                if (bmi < 18.5) {
+                    status = 'Underweight';
+                    suggestionsText = 'It is advisable to consult a doctor or a nutritionist. Focus on increasing calorie intake with nutrient-dense foods and consider strength training.';
+                } else if (bmi >= 18.5 && bmi < 24.9) {
+                    status = 'Normal weight';
+                    suggestionsText = 'Maintain a balanced diet, regular physical activity, and a healthy lifestyle to stay in this range.';
+                } else if (bmi >= 25 && bmi < 29.9) {
+                    status = 'Overweight';
+                    suggestionsText = 'Consider incorporating more regular exercise and making dietary changes, such as reducing processed foods and increasing fruit/vegetable intake. Consulting a professional can be beneficial.';
+                } else {
+                    status = 'Obese';
+                    suggestionsText = 'It is highly recommended to consult a doctor and a dietitian for a personalized plan. Significant lifestyle changes, including diet and exercise, are crucial. Medical supervision may be necessary.';
+                }
+
+                resultDiv.innerHTML = `Your BMI: <strong>${roundedBmi}</strong><br>Status: <strong>${status}</strong>`;
+                suggestionsParagraph.textContent = suggestionsText;
+            });
+        });
+    </script>
+</body>
+</html>

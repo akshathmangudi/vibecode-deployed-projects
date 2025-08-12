@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dumb Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        #calculator {
+            background-color: #333;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            width: 300px;
+        }
+        #display {
+            width: calc(100% - 20px); /* Account for padding */
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-align: right;
+            border: none;
+            border-radius: 5px;
+            background-color: #eee;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.5em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+            color: white;
+            box-sizing: border-box;
+        }
+        .button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Number buttons */
+        .button.number {
+            background-color: #555;
+        }
+        .button.number:hover {
+            background-color: #777;
+        }
+
+        /* Operator buttons */
+        .button.operator {
+            background-color: #f90;
+        }
+        .button.operator:hover {
+            background-color: #ffa500;
+        }
+
+        /* Clear and delete buttons */
+        .button.clear, .button.del {
+            background-color: #d9534f; /* Red */
+        }
+        .button.clear:hover, .button.del:hover {
+            background-color: #c9302c;
+        }
+        .button.equals {
+            background-color: #5cb85c; /* Green */
+            grid-column: span 2;
+        }
+        .button.equals:hover {
+            background-color: #4cae4c;
+        }
+        .button.zero {
+            grid-column: span 2;
+        }
+    </style>
+</head>
+<body>
+    <div id="calculator">
+        <input type="text" id="display" readonly value="0">
+        <div class="buttons-grid">
+            <button class="button del" data-value="DEL">DEL</button>
+            <button class="button clear" data-value="AC">AC</button>
+            <button class="button operator" data-value="%">%</button>
+            <button class="button operator" data-value="/">/</button>
+
+            <button class="button number" data-value="7">7</button>
+            <button class="button number" data-value="8">8</button>
+            <button class="button number" data-value="9">9</button>
+            <button class="button operator" data-value="*">*</button>
+
+            <button class="button number" data-value="4">4</button>
+            <button class="button number" data-value="5">5</button>
+            <button class="button number" data-value="6">6</button>
+            <button class="button operator" data-value="-">-</button>
+
+            <button class="button number" data-value="1">1</button>
+            <button class="button number" data-value="2">2</button>
+            <button class="button number" data-value="3">3</button>
+            <button class="button operator" data-value="+">+</button>
+
+            <button class="button number zero" data-value="0">0</button>
+            <button class="button number" data-value=".">.</button>
+            <button class="button equals" data-value="=">=</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+        const buttons = document.querySelectorAll('.button');
+        let currentInput = '0';
+        let operatorClicked = false; // Flag to indicate if the last input was an operator
+        let equalsPressed = false;   // Flag to indicate if '=' was pressed, for starting new calculation
+
+        function updateDisplay() {
+            display.value = currentInput;
+        }
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const value = button.dataset.value;
+
+                if (value === 'AC') {
+                    currentInput = '0';
+                    operatorClicked = false;
+                    equalsPressed = false;
+                } else if (value === 'DEL') {
+                    if (currentInput.includes('Error')) {
+                        currentInput = '0'; // Clear error state on DEL
+                    } else if (currentInput.length === 1 || (currentInput.length === 2 && currentInput[0] === '-')) {
+                        currentInput = '0';
+                    } else {
+                        currentInput = currentInput.slice(0, -1);
+                    }
+                    operatorClicked = false; // Reset operator flag as last char might have been an operator
+                    equalsPressed = false;
+                } else if (value === '=') {
+                    if (currentInput.includes('Error')) return;
+                    try {
+                        // Replace % with / 100 for evaluation, e.g., '10%' becomes '10/100'
+                        // This handles 100 * 10% as 100 * (10/100) = 10
+                        // And 10% as 10/100 = 0.1
+                        let expression = currentInput.replace(/%/g, '/100');
+                        
+                        // Prevent expressions ending with an operator
+                        const lastChar = expression[expression.length - 1];
+                        if (['+', '-', '*', '/', '%', '.'].includes(lastChar)) {
+                            expression = expression.slice(0, -1);
+                        }
+                        
+                        // Evaluate the expression
+                        const result = eval(expression);
+
+                        // Handle cases like division by zero or invalid expressions
+                        if (isNaN(result) || !isFinite(result)) {
+                            currentInput = 'Error';
+                        } else {
+                            // Ensure display doesn't become excessively long for floats
+                            currentInput = String(parseFloat(result.toFixed(10)));
+                        }
+                    } catch (e) {
+                        currentInput = 'Error';
+                    }
+                    operatorClicked = false;
+                    equalsPressed = true;
+                } else if (['+', '-', '*', '/', '%'].includes(value)) {
+                    if (currentInput.includes('Error')) return; // Cannot add operator to Error state
+                    
+                    if (currentInput === '0' && value === '-') { // Allow starting with a negative sign
+                        currentInput = '-';
+                    } else if (operatorClicked) {
+                        // If the last character was an operator, replace it with the new one
+                        const lastChar = currentInput[currentInput.length - 1];
+                        if (['+', '-', '*', '/', '%'].includes(lastChar)) {
+                            currentInput = currentInput.slice(0, -1) + value;
+                        } else {
+                             // This case happens if you have '123' then 'DEL' removes '3', last char not operator, but previous was
+                             // This is complex, for a "dumb" calc, let's keep it simple and just append if not a new operator
+                             currentInput += value;
+                        }
+                    } else {
+                        currentInput += value;
+                    }
+                    operatorClicked = true;
+                    equalsPressed = false;
+                } else if (value === '.') {
+                    if (currentInput.includes('Error')) return;
+
+                    // Split the current input by operators to check the last number part
+                    const parts = currentInput.split(/[\+\-\*\/%]/);
+                    const lastPart = parts[parts.length - 1];
+                    
+                    // Only add a decimal if the current number part doesn't already have one
+                    if (!lastPart.includes('.')) {
+                        if (operatorClicked || equalsPressed) {
+                            // If last input was an operator or equals, start a new '0.' number
+                            currentInput += '0.';
+                        } else if (currentInput === '0') {
+                            // If display is '0', change to '0.'
+                            currentInput = '0.';
+                        } else {
+                            currentInput += '.';
+                        }
+                    }
+                    operatorClicked = false;
+                    equalsPressed = false;
+                } else { // Number buttons (0-9)
+                    if (currentInput.includes('Error')) {
+                        currentInput = value; // If in error state, start new calculation
+                    } else if (currentInput === '0' && value !== '0') {
+                        currentInput = value; // Replace initial '0' with the first digit
+                    } else if (currentInput === '0' && value === '0') {
+                        // Do nothing if trying to add '0' to '0'
+                    } else if (operatorClicked || equalsPressed) {
+                        // Start a new number if an operator was just pressed or after '='
+                        currentInput = value;
+                    } else {
+                        currentInput += value;
+                    }
+                    operatorClicked = false;
+                    equalsPressed = false;
+                }
+                updateDisplay();
+            });
+        });
+
+        // Initialize display on load
+        updateDisplay();
+    </script>
+</body>
+</html>

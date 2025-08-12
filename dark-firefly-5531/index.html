@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Recommendation Engine</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        #app {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2em;
+            font-weight: 600;
+        }
+
+        p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            resize: vertical;
+            min-height: 100px;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-bottom: 25px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #recommendationOutput {
+            background-color: #eaf6fd;
+            border: 1px solid #cceeff;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: left;
+            margin-top: 30px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        #recommendationOutput.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #recommendationOutput h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        #recommendationOutput p {
+            margin: 5px 0;
+            color: #444;
+        }
+
+        #recommendationOutput strong {
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Find Your Next Read!</h1>
+        <p>Tell us what you're looking for in a book:</p>
+        <textarea id="preferenceInput" placeholder="e.g., 'something mysterious and dark', 'a classic romance', 'a grand fantasy adventure with magic', 'a thrilling sci-fi adventure'" rows="5"></textarea>
+        <button id="recommendButton">Get Recommendation</button>
+        <div id="recommendationOutput">
+            <h2>Your Recommended Book:</h2>
+            <p><strong>Title:</strong> <span id="recTitle">Not yet recommended</span></p>
+            <p><strong>Author:</strong> <span id="recAuthor"></span></p>
+            <p><strong>Genre:</strong> <span id="recGenre"></span></p>
+            <p><strong>Description:</strong> <span id="recDescription"></span></p>
+        </div>
+    </div>
+
+    <script>
+        const bookData = [
+            {
+                title: "The Hobbit",
+                author: "J.R.R. Tolkien",
+                genre: "Fantasy, Adventure",
+                description: "A quest adventure with dwarves, elves, and a dragon, set in Middle-earth.",
+                keywords: ["fantasy", "adventure", "elves", "dwarves", "dragon", "quest", "magic", "classic", "epic", "middle-earth"]
+            },
+            {
+                title: "Dune",
+                author: "Frank Herbert",
+                genre: "Science Fiction, Epic",
+                description: "An epic saga of political intrigue, ecology, and religion on a desert planet.",
+                keywords: ["science fiction", "sci-fi", "space", "desert", "politics", "ecology", "religion", "epic", "future", "aliens"]
+            },
+            {
+                title: "And Then There Were None",
+                author: "Agatha Christie",
+                genre: "Mystery, Thriller",
+                description: "Ten strangers are lured to a remote island and murdered one by one.",
+                keywords: ["mystery", "thriller", "crime", "detective", "suspense", "island", "murder", "classic", "dark"]
+            },
+            {
+                title: "Pride and Prejudice",
+                author: "Jane Austen",
+                genre: "Romance, Classic",
+                description: "A classic story of love, class, and societal expectations in 19th-century England.",
+                keywords: ["romance", "classic", "historical", "love", "society", "england", "drama", "relationships", "regency"]
+            },
+            {
+                title: "1984",
+                author: "George Orwell",
+                genre: "Dystopian, Political",
+                description: "A chilling look at a totalitarian future where thought is controlled.",
+                keywords: ["dystopian", "political", "future", "totalitarian", "classic", "government", "surveillance", "thriller", "dark"]
+            },
+            {
+                title: "The Hitchhiker's Guide to the Galaxy",
+                author: "Douglas Adams",
+                genre: "Comedy, Science Fiction",
+                description: "A hilarious space adventure featuring aliens, absurdism, and the answer to life, the universe, and everything.",
+                keywords: ["comedy", "humor", "sci-fi", "science fiction", "space", "funny", "adventure", "absurd", "aliens"]
+            },
+            {
+                title: "To Kill a Mockingbird",
+                author: "Harper Lee",
+                genre: "Classic, Drama",
+                description: "A powerful story addressing racial injustice in the American South.",
+                keywords: ["classic", "drama", "justice", "racism", "historical", "south", "courtroom", "social"]
+            },
+            {
+                title: "Project Hail Mary",
+                author: "Andy Weir",
+                genre: "Science Fiction",
+                description: "An amnesiac astronaut must save humanity, with a little help from an unexpected alien ally.",
+                keywords: ["science fiction", "sci-fi", "space", "mystery", "alien", "humor", "survival", "adventure", "puzzle"]
+            },
+            {
+                title: "Circe",
+                author: "Madeline Miller",
+                genre: "Mythology, Fantasy",
+                description: "The story of the sorceress Circe, an outcast goddess in ancient Greece.",
+                keywords: ["mythology", "fantasy", "goddess", "ancient", "greece", "magic", "sorceress", "historical", "drama"]
+            }
+        ];
+
+        const preferenceInput = document.getElementById('preferenceInput');
+        const recommendButton = document.getElementById('recommendButton');
+        const recommendationOutput = document.getElementById('recommendationOutput');
+        const recTitle = document.getElementById('recTitle');
+        const recAuthor = document.getElementById('recAuthor');
+        const recGenre = document.getElementById('recGenre');
+        const recDescription = document.getElementById('recDescription');
+
+        recommendButton.addEventListener('click', () => {
+            const input = preferenceInput.value.toLowerCase().trim();
+            const inputKeywords = input.split(/\s+/)
+                                        .filter(word => word.length > 2 && /^[a-z0-9]+$/.test(word))
+                                        .map(word => word.replace(/[^a-z0-9]/g, ''));
+
+            let recommendedBook = null;
+            let maxMatches = 0;
+
+            if (inputKeywords.length === 0) {
+                recommendedBook = bookData[Math.floor(Math.random() * bookData.length)];
+            } else {
+                bookData.forEach(book => {
+                    let currentMatches = 0;
+                    inputKeywords.forEach(inputKw => {
+                        if (book.keywords.some(bookKw => bookKw.includes(inputKw) || inputKw.includes(bookKw))) {
+                            currentMatches++;
+                        }
+                    });
+
+                    if (currentMatches > maxMatches) {
+                        maxMatches = currentMatches;
+                        recommendedBook = book;
+                    }
+                });
+
+                if (!recommendedBook) {
+                    recommendedBook = bookData[Math.floor(Math.random() * bookData.length)];
+                }
+            }
+
+            if (recommendedBook) {
+                recTitle.textContent = recommendedBook.title;
+                recAuthor.textContent = recommendedBook.author;
+                recGenre.textContent = recommendedBook.genre;
+                recDescription.textContent = recommendedBook.description;
+                recommendationOutput.classList.add('show');
+            } else {
+                recTitle.textContent = "Oops! We couldn't find a perfect match.";
+                recAuthor.textContent = "Please try different keywords.";
+                recGenre.textContent = "";
+                recDescription.textContent = "";
+                recommendationOutput.classList.add('show');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            recTitle.textContent = "Your recommended book will appear here.";
+            recAuthor.textContent = "";
+            recGenre.textContent = "";
+            recDescription.textContent = "";
+        });
+    </script>
+</body>
+</html>

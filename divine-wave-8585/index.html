@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Search Engine</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        #searchInput {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        #searchInput:focus {
+            border-color: #3498db;
+        }
+
+        #searchButton {
+            padding: 12px 25px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        #searchButton:hover {
+            background-color: #2980b9;
+        }
+
+        #searchButton:active {
+            transform: translateY(1px);
+        }
+
+        .results-container {
+            width: 100%;
+            max-width: 700px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            min-height: 150px;
+            box-sizing: border-box;
+        }
+
+        .result-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .result-item h3 {
+            color: #3498db;
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-size: 1.25rem;
+        }
+
+        .result-item p {
+            color: #555;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+        }
+
+        .result-item a {
+            color: #27ae60;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .result-item a:hover {
+            text-decoration: underline;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #777;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple Search Engine</h1>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Enter your search query...">
+        <button id="searchButton">Search</button>
+    </div>
+
+    <div id="searchResults" class="results-container">
+        <p class="no-results">Type a query and press Search to find results.</p>
+    </div>
+
+    <script>
+        const documents = [
+            {
+                title: "Introduction to Web Development",
+                content: "This document provides a basic introduction to web development, covering HTML, CSS, and JavaScript fundamentals.",
+                url: "#intro-web-dev"
+            },
+            {
+                title: "Understanding CSS Flexbox",
+                content: "Learn how to use CSS Flexbox to create flexible and responsive layouts. This guide covers core concepts and properties.",
+                url: "#css-flexbox"
+            },
+            {
+                title: "JavaScript ES6 Features",
+                content: "Explore modern JavaScript ES6 features like arrow functions, template literals, destructuring, and classes.",
+                url: "#javascript-es6"
+            },
+            {
+                title: "Building a Single-Page Application",
+                content: "A guide on building single-page applications (SPAs) using vanilla JavaScript, covering routing and component management.",
+                url: "#spa-guide"
+            },
+            {
+                title: "Optimizing Website Performance",
+                content: "Tips and techniques for optimizing website performance, including image optimization, lazy loading, and caching strategies.",
+                url: "#web-performance"
+            },
+            {
+                title: "Accessibility in Web Design",
+                content: "Understanding the importance of web accessibility and how to make your websites usable for people with disabilities. Includes ARIA roles and semantic HTML.",
+                url: "#web-accessibility"
+            },
+            {
+                title: "Version Control with Git",
+                content: "An essential guide to using Git for version control in your development projects. Covers basic commands like commit, push, pull, and branching.",
+                url: "#git-version-control"
+            }
+        ];
+
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const searchResultsDiv = document.getElementById('searchResults');
+
+        function performSearch() {
+            const query = searchInput.value.toLowerCase().trim();
+            searchResultsDiv.innerHTML = ''; // Clear previous results
+
+            if (query === '') {
+                searchResultsDiv.innerHTML = '<p class="no-results">Type a query and press Search to find results.</p>';
+                return;
+            }
+
+            const results = documents.filter(doc =>
+                doc.title.toLowerCase().includes(query) ||
+                doc.content.toLowerCase().includes(query)
+            );
+
+            if (results.length === 0) {
+                searchResultsDiv.innerHTML = '<p class="no-results">No results found for "' + query + '".</p>';
+                return;
+            }
+
+            results.forEach(doc => {
+                const resultItem = document.createElement('div');
+                resultItem.classList.add('result-item');
+
+                const title = document.createElement('h3');
+                title.textContent = doc.title;
+
+                const content = document.createElement('p');
+                content.textContent = doc.content;
+
+                const link = document.createElement('a');
+                link.href = doc.url;
+                link.textContent = 'Read More';
+                link.target = '_blank'; // Open in new tab
+
+                resultItem.appendChild(title);
+                resultItem.appendChild(content);
+                resultItem.appendChild(link);
+                searchResultsDiv.appendChild(resultItem);
+            });
+        }
+
+        searchButton.addEventListener('click', performSearch);
+
+        searchInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // Initial rendering or placeholder
+        performSearch();
+    </script>
+</body>
+</html>

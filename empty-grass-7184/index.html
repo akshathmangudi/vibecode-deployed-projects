@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Mario Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #87CEEB; /* Sky blue background for the page */
+        }
+        canvas {
+            background-color: #a0cffc; /* Lighter sky blue for the game background */
+            border: 2px solid #333;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = 800;
+        canvas.height = 400;
+
+        const player = {
+            x: 50,
+            y: 0,
+            width: 30,
+            height: 50,
+            velX: 0,
+            velY: 0,
+            speed: 4,
+            jumpForce: -10,
+            grounded: false
+        };
+
+        const gravity = 0.5;
+        const groundY = canvas.height - 50; // Y-coordinate for the top of the ground
+
+        const keys = {};
+
+        window.addEventListener('keydown', (e) => {
+            keys[e.code] = true;
+        });
+
+        window.addEventListener('keyup', (e) => {
+            keys[e.code] = false;
+        });
+
+        function drawPlayer() {
+            ctx.fillStyle = 'red'; // Simple Mario color
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
+
+        function drawGround() {
+            ctx.fillStyle = 'green'; // Ground color
+            ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+        }
+
+        function update() {
+            // Horizontal movement
+            if (keys.ArrowLeft) {
+                player.velX = -player.speed;
+            } else if (keys.ArrowRight) {
+                player.velX = player.speed;
+            } else {
+                player.velX = 0;
+            }
+
+            player.x += player.velX;
+
+            // Apply gravity if not grounded
+            if (!player.grounded) {
+                player.velY += gravity;
+            }
+
+            player.y += player.velY;
+
+            // Boundary check for horizontal movement
+            if (player.x < 0) {
+                player.x = 0;
+            }
+            if (player.x + player.width > canvas.width) {
+                player.x = canvas.width - player.width;
+            }
+
+            // Ground collision
+            if (player.y + player.height >= groundY) {
+                player.y = groundY - player.height; // Snap to ground
+                player.velY = 0;
+                player.grounded = true;
+            } else {
+                player.grounded = false; // Player is in the air
+            }
+
+            // Jumping
+            if (keys.Space && player.grounded) {
+                player.velY = player.jumpForce;
+                player.grounded = false;
+            }
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+
+            update();
+            drawGround();
+            drawPlayer();
+
+            requestAnimationFrame(gameLoop); // Loop the game
+        }
+
+        // Initialize player position to be on the ground at start
+        player.y = groundY - player.height;
+
+        // Start the game loop
+        gameLoop();
+    </script>
+</body>
+</html>

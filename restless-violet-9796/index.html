@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ludo with Friends</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0f4f8, #c8d3e0);
+            margin: 0;
+            color: #333;
+            overflow: hidden;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #4a5568;
+            margin-bottom: 25px;
+            font-size: 2.5em;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin: 10px 5px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1.1em;
+            width: calc(100% - 24px);
+            max-width: 300px;
+            box-sizing: border-box;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        #room-selection {
+            padding: 20px;
+        }
+
+        #game-screen {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            text-align: left;
+            padding: 20px;
+        }
+
+        #game-info {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
+        }
+
+        #game-board {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .player-list {
+            margin-top: 20px;
+        }
+
+        .player-card {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background-color: #e9eff5;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            font-weight: bold;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .player-card.current-turn {
+            outline: 3px solid #ffab00;
+            background-color: #fffde7;
+            transform: scale(1.02);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .player-color-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid #ccc;
+        }
+
+        .player-name {
+            flex-grow: 1;
+        }
+
+        .player-position {
+            margin-left: 15px;
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        .dice-area {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .dice {
+            width: 80px;
+            height: 80px;
+            background-color: #fff;
+            border: 5px solid #4a5568;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            color: #4a5568;
+            transition: transform 0.1s ease;
+        }
+
+        .dice.rolled {
+            animation: diceRoll 0.5s ease-out forwards;
+        }
+
+        @keyframes diceRoll {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(360deg) scale(1.1); }
+            100% { transform: rotate(720deg) scale(1); }
+        }
+
+        .board-path {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
+            justify-content: center;
+        }
+
+        .board-cell {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #bbb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #e0e7ee;
+            position: relative;
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #666;
+            box-sizing: border-box;
+            border-radius: 5px;
+            margin: 2px;
+            box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .board-cell.start { background-color: #d1f7d3; }
+        .board-cell.end { background-color: #f7d1d1; }
+        .board-cell.safe { background-color: #d1d3f7; }
+
+        .piece {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 2px solid rgba(0,0,0,0.2);
+            position: absolute;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.7em;
+            color: white;
+            text-shadow: 0 0 2px rgba(0,0,0,0.5);
+            font-weight: bold;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            #game-screen {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loading-screen" class="screen active">
+            <h1>Loading...</h1>
+            <p>Please wait while the game initializes.</p>
+        </div>
+
+        <div id="room-selection" class="screen">
+            <h1>Ludo with Friends</h1>
+            <input type="text" id="room-code-input" placeholder="Enter Room Code">
+            <button id="join-room-btn">Join Room</button>
+            <button id="create-room-btn">Create New Room</button>
+        </div>
+
+        <div id="game-screen" class="screen">
+            <div id="game-info">
+                <h2>Room: <span id="current-room-code"></span></h2>
+                <p>Your Name: <span id="player-name-display"></span></p>
+                <h3>Players (<span id="player-count">0</span>/4)</h3>
+                <div id="player-list" class="player-list">
+                    <!-- Player cards will be rendered here -->
+                </div>
+                <div class="dice-area">
+                    <h3>Current Turn: <span id="current-turn-player">Nobody</span></h3>
+                    <div class="dice" id="dice-display">0</div>
+                    <button id="roll-dice-btn">Roll Dice</button>
+                </div>
+            </div>
+
+            <div id="game-board">
+                <h3>Game Board (Reach 50!)</h3>
+                <div class="board-path" id="board-path">
+                    <!-- Board cells will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script>
+        // Firebase Configuration - REPLACE WITH YOUR OWN CONFIG!
+        // You'll need to create a Firebase project at console.firebase.google.com
+        // and enable Firestore Database.
+        // Then, copy your project's config object here.
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        let db;
+        let currentRoomCode = null;
+        let currentPlayerId = null;
+        let currentPlayerName = null;
+        let unsubscribeFromRoom = null; // To stop listening when leaving room
+
+        const totalBoardCells = 50;
+        const maxPlayers = 4;
+        const playerColors = ['#FF0000', '#0000FF', '#008000', '#FFA500']; // Red, Blue, Green, Orange
+
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        function initApp() {
+            try {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                console.log("Firebase initialized.");
+                loadPlayerInfo();
+                showScreen('room-selection');
+            } catch (error) {
+                console.error("Error initializing Firebase. Please check your config:", error);
+                document.getElementById('loading-screen').innerHTML = `<h1>Firebase Error!</h1><p>Check console for details. Ensure your 'firebaseConfig' is correct and Firebase is set up.</p><p>Remember to set Firestore rules:</p><pre>rules_version = '2';<br/>service cloud.firestore {<br/>  match /databases/{database}/documents {<br/>    match /rooms/{roomId} {<br/>      allow read, write: if true;<br/>    }<br/>  }<br/>}</pre>`;
+                showScreen('loading-screen'); // Keep loading screen to show error
+            }
+
+            document.getElementById('create-room-btn').addEventListener('click', createRoom);
+            document.getElementById('join-room-btn').addEventListener('click', joinRoom);
+            document.getElementById('roll-dice-btn').addEventListener('click', rollDice);
+
+            renderBoard();
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function loadPlayerInfo() {
+            currentPlayerId = localStorage.getItem('ludoPlayerId');
+            currentPlayerName = localStorage.getItem('ludoPlayerName');
+
+            if (!currentPlayerId) {
+                currentPlayerId = 'player_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('ludoPlayerId', currentPlayerId);
+            }
+            if (!currentPlayerName) {
+                currentPlayerName = prompt("Welcome! What's your name?", "Player " + Math.floor(Math.random() * 100));
+                if (!currentPlayerName) currentPlayerName = "Anonymous";
+                localStorage.setItem('ludoPlayerName', currentPlayerName);
+            }
+            document.getElementById('player-name-display').textContent = currentPlayerName;
+        }
+
+        function generateRoomCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 6; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        async function createRoom() {
+            const newRoomCode = generateRoomCode();
+            currentRoomCode = newRoomCode;
+
+            try {
+                await db.collection('rooms').doc(currentRoomCode).set({
+                    players: [],
+                    currentTurnPlayerId: '',
+                    lastDiceRoll: 0,
+                    gameStarted: false,
+                    playerCounter: 0 // For future use if needed, e.g., to assign player numbers
+                });
+                console.log("Room created:", currentRoomCode);
+                joinGame(currentRoomCode);
+            } catch (e) {
+                console.error("Error creating room: ", e);
+                alert("Failed to create room. Please try again. Check console for Firebase errors.");
+            }
+        }
+
+        async function joinRoom() {
+            const roomCode = document.getElementById('room-code-input').value.toUpperCase().trim();
+            if (!roomCode) {
+                alert("Please enter a room code.");
+                return;
+            }
+
+            try {
+                const roomRef = db.collection('rooms').doc(roomCode);
+                const doc = await roomRef.get();
+
+                if (doc.exists) {
+                    currentRoomCode = roomCode;
+                    console.log("Joining room:", currentRoomCode);
+                    joinGame(currentRoomCode);
+                } else {
+                    alert("Room not found. Please check the code or create a new room.");
+                }
+            } catch (e) {
+                console.error("Error joining room: ", e);
+                alert("Failed to join room. Please try again. Check console for Firebase errors.");
+            }
+        }
+
+        async function joinGame(roomCode) {
+            showScreen('game-screen');
+            document.getElementById('current-room-code').textContent = roomCode;
+
+            // Stop listening to previous room if any
+            if (unsubscribeFromRoom) {
+                unsubscribeFromRoom();
+            }
+
+            const roomRef = db.collection('rooms').doc(roomCode);
+
+            // Add current player to the room if not already there
+            const roomDoc = await roomRef.get();
+            const roomData = roomDoc.data();
+            let players = roomData.players || [];
+            let existingPlayer = players.find(p => p.id === currentPlayerId);
+
+            if (!existingPlayer) {
+                if (players.length >= maxPlayers) {
+                    alert("Room is full! Cannot join.");
+                    showScreen('room-selection');
+                    return;
+                }
+
+                const assignedColor = getNextAvailableColor(players.map(p => p.color));
+                const newPlayer = {
+                    id: currentPlayerId,
+                    name: currentPlayerName,
+                    color: assignedColor,
+                    position: 0 // Starting position
+                };
+                players.push(newPlayer);
+
+                // Set initial turn if this is the first player in the room
+                if (roomData.currentTurnPlayerId === '') {
+                    roomData.currentTurnPlayerId = newPlayer.id;
+                }
+
+                await roomRef.update({
+                    players: players,
+                    currentTurnPlayerId: roomData.currentTurnPlayerId
+                });
+            }
+
+            // Listen for real-time updates
+            unsubscribeFromRoom = roomRef.onSnapshot(doc => {
+                if (doc.exists) {
+                    updateUI(doc.data());
+                } else {
+                    alert("The room was deleted or does not exist anymore.");
+                    showScreen('room-selection');
+                    if (unsubscribeFromRoom) {
+                        unsubscribeFromRoom();
+                        unsubscribeFromRoom = null;
+                    }
+                }
+            }, error => {
+                console.error("Error getting real-time updates:", error);
+                alert("Lost connection to the room. Please try rejoining.");
+                showScreen('room-selection');
+            });
+        }
+
+        function getNextAvailableColor(usedColors) {
+            for (const color of playerColors) {
+                if (!usedColors.includes(color)) {
+                    return color;
+                }
+            }
+            return '#808080'; // Default gray if all colors are used, should not happen with maxPlayers
+        }
+
+        async function rollDice() {
+            const roomRef = db.collection('rooms').doc(currentRoomCode);
+            const roomDoc = await roomRef.get();
+            const roomData = roomDoc.data();
+
+            if (roomData.currentTurnPlayerId !== currentPlayerId) {
+                alert("It's not your turn!");
+                return;
+            }
+
+            const diceValue = Math.floor(Math.random() * 6) + 1;
+
+            const players = roomData.players;
+            const currentPlayerIndex = players.findIndex(p => p.id === currentPlayerId);
+            
+            // Move player's piece
+            let currentPlayerState = players[currentPlayerIndex];
+            let newPosition = currentPlayerState.position + diceValue;
+            if (newPosition > totalBoardCells) {
+                newPosition = totalBoardCells; // Cap at max cells (game end)
+            }
+            currentPlayerState.position = newPosition;
+
+            // Determine next player
+            const nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            const nextPlayerId = players[nextPlayerIndex].id;
+
+            // Update Firestore
+            await roomRef.update({
+                lastDiceRoll: diceValue,
+                currentTurnPlayerId: nextPlayerId,
+                players: players // Update the entire players array with new positions
+            });
+        }
+
+        function updateUI(roomData) {
+            const players = roomData.players || [];
+            document.getElementById('player-count').textContent = players.length;
+
+            const playerListDiv = document.getElementById('player-list');
+            playerListDiv.innerHTML = '';
+            players.forEach(player => {
+                const playerCard = document.createElement('div');
+                playerCard.classList.add('player-card');
+                if (player.id === roomData.currentTurnPlayerId) {
+                    playerCard.classList.add('current-turn');
+                }
+
+                const colorDot = document.createElement('div');
+                colorDot.classList.add('player-color-dot');
+                colorDot.style.backgroundColor = player.color;
+                colorDot.style.borderColor = player.color;
+
+                const playerName = document.createElement('span');
+                playerName.classList.add('player-name');
+                playerName.textContent = player.name + (player.id === currentPlayerId ? " (You)" : "");
+
+                const playerPosition = document.createElement('span');
+                playerPosition.classList.add('player-position');
+                playerPosition.textContent = `Pos: ${player.position}`;
+
+                playerCard.appendChild(colorDot);
+                playerCard.appendChild(playerName);
+                playerCard.appendChild(playerPosition);
+                playerListDiv.appendChild(playerCard);
+            });
+
+            document.getElementById('current-turn-player').textContent = players.find(p => p.id === roomData.currentTurnPlayerId)?.name || 'Nobody';
+
+            const diceDisplay = document.getElementById('dice-display');
+            diceDisplay.textContent = roomData.lastDiceRoll === 0 ? '0' : roomData.lastDiceRoll;
+            // Trigger animation reset
+            diceDisplay.classList.remove('rolled');
+            if (roomData.lastDiceRoll !== 0) {
+                 void diceDisplay.offsetWidth; // Trigger reflow
+                diceDisplay.classList.add('rolled');
+            }
+           
+            const rollDiceBtn = document.getElementById('roll-dice-btn');
+            rollDiceBtn.disabled = (roomData.currentTurnPlayerId !== currentPlayerId) || (players.length === 0);
+
+            renderPiecesOnBoard(players);
+        }
+
+        function renderBoard() {
+            const boardPath = document.getElementById('board-path');
+            boardPath.innerHTML = '';
+            for (let i = 1; i <= totalBoardCells; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('board-cell');
+                cell.id = `cell-${i}`;
+                cell.textContent = i;
+                if (i === 1) cell.classList.add('start');
+                if (i === totalBoardCells) cell.classList.add('end');
+                if (i % 5 === 0 && i < totalBoardCells) cell.classList.add('safe'); // Example safe spots
+                boardPath.appendChild(cell);
+            }
+        }
+
+        function renderPiecesOnBoard(players) {
+            // Clear existing pieces
+            document.querySelectorAll('.piece').forEach(piece => piece.remove());
+
+            players.forEach(player => {
+                // Adjust position to 1 for starting point if internal position is 0
+                const actualPosition = player.position === 0 ? 1 : player.position; 
+                
+                if (actualPosition >= 1 && actualPosition <= totalBoardCells) {
+                    const targetCell = document.getElementById(`cell-${actualPosition}`);
+
+                    if (targetCell) {
+                        const piece = document.createElement('div');
+                        piece.classList.add('piece');
+                        piece.style.backgroundColor = player.color;
+                        piece.textContent = player.name[0].toUpperCase(); // First letter of name
+
+                        // Offset pieces if multiple are on the same cell for visibility
+                        const existingPiecesCount = targetCell.querySelectorAll('.piece').length;
+                        // Use a slightly different offset for each player
+                        const offsetMultiplier = 10; 
+                        const offsetX = (existingPiecesCount % 2 === 0 ? 1 : -1) * Math.floor(existingPiecesCount / 2) * offsetMultiplier;
+                        const offsetY = (existingPiecesCount % 2 === 1 ? 1 : -1) * Math.floor(existingPiecesCount / 2) * offsetMultiplier;
+                        
+                        piece.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+
+                        targetCell.appendChild(piece);
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

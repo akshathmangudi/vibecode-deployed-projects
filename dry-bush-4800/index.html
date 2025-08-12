@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greeting Page</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #e0f2f7; /* Light blue background */
+            color: #333;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 45px 60px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            max-width: 550px;
+            width: 90%;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: #007bff; /* Vibrant blue for heading */
+            margin-bottom: 20px;
+            font-size: 2.8em;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.3em;
+            margin-bottom: 25px;
+            color: #555;
+        }
+
+        #dynamicGreeting {
+            font-size: 1.6em;
+            font-weight: 600;
+            color: #28a745; /* A pleasant green */
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome!</h1>
+        <p>It's wonderful to have you here. We hope you have a fantastic experience on our site.</p>
+        <div id="dynamicGreeting"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dynamicGreetingElement = document.getElementById('dynamicGreeting');
+            const date = new Date();
+            const hour = date.getHours();
+            let greetingMessage = "Have a great day!";
+
+            if (hour >= 5 && hour < 12) {
+                greetingMessage = "Good Morning!";
+            } else if (hour >= 12 && hour < 18) {
+                greetingMessage = "Good Afternoon!";
+            } else if (hour >= 18 || hour < 5) {
+                greetingMessage = "Good Evening!";
+            }
+
+            dynamicGreetingElement.textContent = greetingMessage;
+        });
+    </script>
+</body>
+</html>

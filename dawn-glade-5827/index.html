@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Awesome Product - Landing Page</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50; /* Green */
+            --secondary-color: #2196F3; /* Blue */
+            --text-color: #333;
+            --light-text-color: #fff;
+            --bg-light: #f9f9f9;
+            --bg-white: #fff;
+            --accent-color: #FFC107; /* Amber */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-light);
+            overflow-x: hidden;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5em;
+        }
+
+        h1 { font-size: 2.8em; }
+        h2 { font-size: 2.2em; }
+        h3 { font-size: 1.6em; }
+
+        p {
+            margin-bottom: 1em;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .cta-button {
+            background-color: var(--primary-color);
+            color: var(--light-text-color);
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .cta-button:hover {
+            background-color: #43A047; /* slightly darker green */
+        }
+
+        /* Header */
+        header {
+            background-color: var(--bg-white);
+            padding: 20px 40px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            flex-wrap: wrap; /* Allows wrapping on smaller screens */
+        }
+
+        nav .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-grow: 1; /* Allows ul to take available space */
+            justify-content: flex-end; /* Pushes links to the right */
+            align-items: center;
+        }
+
+        nav ul li {
+            margin-left: 30px;
+        }
+
+        nav ul li a {
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-cta {
+            background-color: var(--secondary-color);
+            color: var(--light-text-color);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-left: 30px; /* Space between last nav item and CTA */
+        }
+
+        .nav-cta:hover {
+            background-color: #1976D2; /* slightly darker blue */
+        }
+
+        /* Menu Toggle for Mobile */
+        .menu-toggle {
+            display: none; /* Hidden by default on larger screens */
+            background: none;
+            border: none;
+            font-size: 2em;
+            cursor: pointer;
+            color: var(--primary-color);
+            padding: 5px 10px;
+            margin-left: auto; /* Pushes toggle to the right */
+        }
+
+        /* Main sections */
+        section {
+            padding: 80px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        /* Hero Section */
+        #hero {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            text-align: left;
+            background: linear-gradient(to right, var(--bg-white) 60%, var(--bg-light) 40%);
+            gap: 40px;
+        }
+
+        #hero .hero-content {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        #hero .hero-content h1 {
+            font-size: 3.5em;
+            margin-bottom: 0.2em;
+            line-height: 1.2;
+        }
+
+        #hero .hero-content p {
+            font-size: 1.3em;
+            color: #555;
+            margin-bottom: 1.5em;
+        }
+
+        #hero .hero-image {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #hero .hero-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Features Section */
+        #features {
+            background-color: var(--bg-white);
+            padding-top: 60px;
+            padding-bottom: 60px;
+        }
+
+        #features h2 {
+            margin-bottom: 60px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            text-align: left;
+        }
+
+        .feature-item {
+            background-color: var(--bg-light);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .feature-item h3 {
+            color: var(--secondary-color);
+            margin-top: 0;
+        }
+
+        /* Testimonials Section */
+        #testimonials {
+            background-color: var(--primary-color);
+            color: var(--light-text-color);
+            padding-top: 60px;
+            padding-bottom: 60px;
+        }
+
+        #testimonials h2 {
+            color: var(--light-text-color);
+            margin-bottom: 60px;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            text-align: center;
+        }
+
+        .testimonial-item {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .testimonial-item p {
+            font-style: italic;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .testimonial-item .author {
+            font-weight: bold;
+            margin-top: auto;
+        }
+
+        /* CTA Section */
+        #cta {
+            background-color: var(--bg-white);
+            padding-top: 80px;
+            padding-bottom: 80px;
+            text-align: center;
+        }
+
+        #cta h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        #cta p {
+            font-size: 1.2em;
+            margin-bottom: 40px;
+            color: #555;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--text-color);
+            color: var(--light-text-color);
+            padding: 40px 20px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        footer p {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: var(--light-text-color);
+            margin: 0 15px;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* Media Queries for Responsiveness */
+        @media (max-width: 768px) {
+            header {
+                padding: 15px 20px;
+            }
+
+            nav {
+                flex-wrap: nowrap; /* Prevent immediate wrapping of logo/toggle */
+            }
+            
+            nav .logo {
+                margin-right: auto; /* Pushes logo to left, toggle to right */
+            }
+
+            nav ul {
+                display: none; /* Hide by default on mobile */
+                flex-direction: column;
+                width: 100%;
+                text-align: center;
+                background-color: var(--bg-white);
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                margin-top: 15px;
+                position: absolute; /* Position relative to nav parent */
+                top: 70px; /* Below header */
+                left: 0;
+                max-height: 0; /* For smooth transition */
+                overflow: hidden;
+                transition: max-height 0.3s ease-out;
+                z-index: 10;
+            }
+
+            nav ul.active {
+                display: flex; /* Show when active */
+                max-height: 300px; /* Adjust based on content height */
+            }
+
+            nav ul li {
+                margin: 10px 0;
+            }
+
+            .nav-cta {
+                margin-left: 15px; /* Adjust spacing */
+            }
+
+            .menu-toggle {
+                display: block; /* Show hamburger icon */
+            }
+
+            #hero {
+                flex-direction: column;
+                text-align: center;
+                background: var(--bg-white); /* Remove gradient for smaller screens */
+                padding-top: 40px;
+                padding-bottom: 40px;
+            }
+
+            #hero .hero-content h1 {
+                font-size: 2.5em;
+            }
+
+            #hero .hero-content p {
+                font-size: 1.1em;
+            }
+
+            #hero .hero-image {
+                margin-top: 30px;
+            }
+
+            section {
+                padding: 60px 20px;
+            }
+
+            h1 { font-size: 2.2em; }
+            h2 { font-size: 1.8em; }
+            h3 { font-size: 1.4em; }
+
+            .features-grid, .testimonial-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .cta-button {
+                padding: 12px 25px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">AwesomeCo</div>
+            <button class="menu-toggle" aria-label="Toggle navigation" aria-controls="main-navigation" aria-expanded="false">&#9776;</button>
+            <ul id="main-navigation">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#testimonials">Testimonials</a></li>
+                <li><a href="#cta">Get Started</a></li>
+            </ul>
+            <button class="nav-cta">Sign Up</button>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero">
+            <div class="hero-content">
+                <h1>Unlock Your Potential with AwesomeCo</h1>
+                <p>The ultimate solution for boosting productivity and achieving your goals. Simple, powerful, effective.</p>
+                <button class="cta-button">Get Started Now</button>
+            </div>
+            <div class="hero-image">
+                <img src="https://via.placeholder.com/600x400?text=Product+Screenshot" alt="Awesome Product Screenshot">
+            </div>
+        </section>
+
+        <section id="features">
+            <h2>Key Features</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <h3>🚀 Blazing Fast</h3>
+                    <p>Experience unparalleled speed and efficiency in all your tasks.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>💡 Intuitive Design</h3>
+                    <p>Easy to learn and use, designed for maximum user satisfaction.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>🔒 Secure & Reliable</h3>
+                    <p>Your data is safe with us. Built with enterprise-grade security.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>💬 24/7 Support</h3>
+                    <p>Our dedicated team is always here to help you succeed.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="testimonials">
+            <h2>What Our Users Say</h2>
+            <div class="testimonial-grid">
+                <div class="testimonial-item">
+                    <p>"AwesomeCo transformed how I work. Highly recommend it!"</p>
+                    <div class="author">- Jane Doe, CEO of TechCorp</div>
+                </div>
+                <div class="testimonial-item">
+                    <p>"The best tool I've used in years. Simple yet powerful."</p>
+                    <div class="author">- John Smith, Marketing Manager</div>
+                </div>
+                <div class="testimonial-item">
+                    <p>"Customer support is fantastic. They truly care about users."</p>
+                    <div class="author">- Emily White, Freelancer</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cta">
+            <h2>Ready to Get Started?</h2>
+            <p>Join thousands of happy users who are already benefiting from AwesomeCo.</p>
+            <button class="cta-button">Sign Up for Free</button>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 AwesomeCo. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navUl = document.getElementById('main-navigation');
+
+            if (menuToggle && navUl) {
+                menuToggle.addEventListener('click', () => {
+                    const isExpanded = navUl.classList.toggle('active');
+                    menuToggle.setAttribute('aria-expanded', isExpanded);
+                });
+
+                navUl.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (navUl.classList.contains('active')) {
+                            navUl.classList.remove('active');
+                            menuToggle.setAttribute('aria-expanded', 'false');
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

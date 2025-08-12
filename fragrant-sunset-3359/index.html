@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin: -20px -20px 20px -20px;
+        }
+
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        nav button {
+            background-color: #f0f0f0;
+            color: #555;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            border-radius: 5px;
+            margin: 0 5px;
+        }
+
+        nav button.active {
+            background-color: #4CAF50;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        nav button:hover:not(.active) {
+            background-color: #e0e0e0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        form {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+        }
+
+        form input[type="text"],
+        form input[type="number"],
+        form select {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-width: 150px;
+        }
+        
+        form button[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        form button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        table tr:hover {
+            background-color: #ddd;
+        }
+
+        table td button {
+            background-color: #f44336;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        table td button.edit-btn {
+            background-color: #2196F3;
+        }
+        table td button.enroll-btn,
+        table td button.assign-btn {
+            background-color: #ff9800;
+        }
+
+        table td button:hover {
+            opacity: 0.9;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 25px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: #4CAF50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-content p {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .modal-content select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: block;
+        }
+
+        .modal-content button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 0 auto;
+            transition: background-color 0.3s ease;
+        }
+
+        .modal-content button:hover {
+            background-color: #45a049;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            right: 15px;
+            top: 10px;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 10px;
+            }
+            nav {
+                flex-wrap: wrap;
+            }
+            nav button {
+                flex: 1 1 auto;
+                margin-bottom: 5px;
+            }
+            form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            form input[type="text"],
+            form input[type="number"],
+            form select,
+            form button[type="submit"] {
+                width: 100%;
+                min-width: unset;
+            }
+            table th, table td {
+                padding: 8px;
+                font-size: 0.9em;
+            }
+            table td button {
+                padding: 6px 10px;
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>School Management System</h1>
+        </header>
+        <nav>
+            <button data-tab="students" class="active">Students</button>
+            <button data-tab="teachers">Teachers</button>
+            <button data-tab="courses">Courses</button>
+        </nav>
+        <main>
+            <section id="students" class="tab-content active">
+                <h2>Students</h2>
+                <form id="student-form">
+                    <input type="hidden" id="student-id">
+                    <input type="text" id="student-name" placeholder="Name" required>
+                    <input type="text" id="student-grade" placeholder="Grade" required>
+                    <button type="submit" id="add-student-btn">Add Student</button>
+                </form>
+                <table id="student-list">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Grade</th>
+                            <th>Enrolled Courses</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Student rows will be injected here -->
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="teachers" class="tab-content">
+                <h2>Teachers</h2>
+                <form id="teacher-form">
+                    <input type="hidden" id="teacher-id">
+                    <input type="text" id="teacher-name" placeholder="Name" required>
+                    <input type="text" id="teacher-subject" placeholder="Subject" required>
+                    <button type="submit" id="add-teacher-btn">Add Teacher</button>
+                </form>
+                <table id="teacher-list">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Subject</th>
+                            <th>Assigned Courses</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Teacher rows will be injected here -->
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="courses" class="tab-content">
+                <h2>Courses</h2>
+                <form id="course-form">
+                    <input type="hidden" id="course-id">
+                    <input type="text" id="course-name" placeholder="Course Name" required>
+                    <button type="submit" id="add-course-btn">Add Course</button>
+                </form>
+                <table id="course-list">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Teacher</th>
+                            <th>Enrolled Students</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Course rows will be injected here -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+
+        <!-- Modals for Enroll/Assign -->
+        <div id="enroll-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-button" data-modal="enroll-modal">&times;</span>
+                <h3>Enroll Student in Course</h3>
+                <p>Enrolling <strong id="enroll-student-display-name"></strong></p>
+                <select id="enroll-course-select"></select>
+                <button id="confirm-enroll-button">Enroll</button>
+            </div>
+        </div>
+
+        <div id="assign-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-button" data-modal="assign-modal">&times;</span>
+                <h3>Assign Teacher to Course</h3>
+                <p>Assigning teacher to course: <strong id="assign-course-display-name"></strong></p>
+                <select id="assign-teacher-select"></select>
+                <button id="confirm-assign-button">Assign</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let students = [];
+        let teachers = [];
+        let courses = [];
+
+        const studentForm = document.getElementById('student-form');
+        const studentIdInput = document.getElementById('student-id');
+        const studentNameInput = document.getElementById('student-name');
+        const studentGradeInput = document.getElementById('student-grade');
+        const addStudentBtn = document.getElementById('add-student-btn');
+        const studentListBody = document.querySelector('#student-list tbody');
+
+        const teacherForm = document.getElementById('teacher-form');
+        const teacherIdInput = document.getElementById('teacher-id');
+        const teacherNameInput = document.getElementById('teacher-name');
+        const teacherSubjectInput = document.getElementById('teacher-subject');
+        const addTeacherBtn = document.getElementById('add-teacher-btn');
+        const teacherListBody = document.querySelector('#teacher-list tbody');
+
+        const courseForm = document.getElementById('course-form');
+        const courseIdInput = document.getElementById('course-id');
+        const courseNameInput = document.getElementById('course-name');
+        const addCourseBtn = document.getElementById('add-course-btn');
+        const courseListBody = document.querySelector('#course-list tbody');
+
+        const tabButtons = document.querySelectorAll('nav button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        const enrollModal = document.getElementById('enroll-modal');
+        const enrollStudentDisplayName = document.getElementById('enroll-student-display-name');
+        const enrollCourseSelect = document.getElementById('enroll-course-select');
+        const confirmEnrollButton = document.getElementById('confirm-enroll-button');
+        let currentStudentIdToEnroll = null;
+
+        const assignModal = document.getElementById('assign-modal');
+        const assignCourseDisplayName = document.getElementById('assign-course-display-name');
+        const assignTeacherSelect = document.getElementById('assign-teacher-select');
+        const confirmAssignButton = document.getElementById('confirm-assign-button');
+        let currentCourseIdToAssign = null;
+
+        const closeButtons = document.querySelectorAll('.close-button');
+
+        function generateId(prefix) {
+            return prefix + Date.now().toString(36) + Math.random().toString(36).substr(2, 5).toUpperCase();
+        }
+
+        function saveData() {
+            localStorage.setItem('schoolManagementStudents', JSON.stringify(students));
+            localStorage.setItem('schoolManagementTeachers', JSON.stringify(teachers));
+            localStorage.setItem('schoolManagementCourses', JSON.stringify(courses));
+        }
+
+        function loadData() {
+            const storedStudents = localStorage.getItem('schoolManagementStudents');
+            const storedTeachers = localStorage.getItem('schoolManagementTeachers');
+            const storedCourses = localStorage.getItem('schoolManagementCourses');
+            if (storedStudents) students = JSON.parse(storedStudents);
+            if (storedTeachers) teachers = JSON.parse(storedTeachers);
+            if (storedCourses) courses = JSON.parse(storedCourses);
+        }
+
+        function clearForm(formId) {
+            const form = document.getElementById(formId);
+            form.reset();
+            const idInput = form.querySelector('input[type="hidden"]');
+            if (idInput) idInput.value = '';
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (formId === 'student-form') submitBtn.textContent = 'Add Student';
+            else if (formId === 'teacher-form') submitBtn.textContent = 'Add Teacher';
+            else if (formId === 'course-form') submitBtn.textContent = 'Add Course';
+        }
+
+        function renderStudents() {
+            studentListBody.innerHTML = '';
+            students.forEach(student => {
+                const row = studentListBody.insertRow();
+                row.insertCell().textContent = student.id;
+                row.insertCell().textContent = student.name;
+                row.insertCell().textContent = student.grade;
+                const enrolledCourseNames = student.enrolledCourses.map(courseId => {
+                    const course = courses.find(c => c.id === courseId);
+                    return course ? course.name : 'Unknown Course';
+                }).join(', ');
+                row.insertCell().textContent = enrolledCourseNames || 'None';
+
+                const actionsCell = row.insertCell();
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'Edit';
+                editBtn.className = 'edit-btn';
+                editBtn.dataset.id = student.id;
+                editBtn.dataset.type = 'student';
+                actionsCell.appendChild(editBtn);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.dataset.id = student.id;
+                deleteBtn.dataset.type = 'student';
+                actionsCell.appendChild(deleteBtn);
+
+                const enrollBtn = document.createElement('button');
+                enrollBtn.textContent = 'Enroll';
+                enrollBtn.className = 'enroll-btn';
+                enrollBtn.dataset.id = student.id;
+                enrollBtn.dataset.name = student.name;
+                actionsCell.appendChild(enrollBtn);
+            });
+        }
+
+        function renderTeachers() {
+            teacherListBody.innerHTML = '';
+            teachers.forEach(teacher => {
+                const row = teacherListBody.insertRow();
+                row.insertCell().textContent = teacher.id;
+                row.insertCell().textContent = teacher.name;
+                row.insertCell().textContent = teacher.subject;
+                const assignedCourseNames = teacher.assignedCourses.map(courseId => {
+                    const course = courses.find(c => c.id === courseId);
+                    return course ? course.name : 'Unknown Course';
+                }).join(', ');
+                row.insertCell().textContent = assignedCourseNames || 'None';
+
+                const actionsCell = row.insertCell();
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'Edit';
+                editBtn.className = 'edit-btn';
+                editBtn.dataset.id = teacher.id;
+                editBtn.dataset.type = 'teacher';
+                actionsCell.appendChild(editBtn);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.dataset.id = teacher.id;
+                deleteBtn.dataset.type = 'teacher';
+                actionsCell.appendChild(deleteBtn);
+            });
+        }
+
+        function renderCourses() {
+            courseListBody.innerHTML = '';
+            courses.forEach(course => {
+                const row = courseListBody.insertRow();
+                row.insertCell().textContent = course.id;
+                row.insertCell().textContent = course.name;
+                const teacher = teachers.find(t => t.id === course.teacherId);
+                row.insertCell().textContent = teacher ? teacher.name : 'Unassigned';
+                const enrolledStudentNames = course.enrolledStudentIds.map(studentId => {
+                    const student = students.find(s => s.id === studentId);
+                    return student ? student.name : 'Unknown Student';
+                }).join(', ');
+                row.insertCell().textContent = enrolledStudentNames || 'None';
+
+                const actionsCell = row.insertCell();
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'Edit';
+                editBtn.className = 'edit-btn';
+                editBtn.dataset.id = course.id;
+                editBtn.dataset.type = 'course';
+                actionsCell.appendChild(editBtn);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.dataset.id = course.id;
+                deleteBtn.dataset.type = 'course';
+                actionsCell.appendChild(deleteBtn);
+
+                const assignBtn = document.createElement('button');
+                assignBtn.textContent = 'Assign Teacher';
+                assignBtn.className = 'assign-btn';
+                assignBtn.dataset.id = course.id;
+                assignBtn.dataset.name = course.name;
+                actionsCell.appendChild(assignBtn);
+            });
+        }
+
+        function refreshAllLists() {
+            renderStudents();
+            renderTeachers();
+            renderCourses();
+        }
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                button.classList.add('active');
+                document.getElementById(button.dataset.tab).classList.add('active');
+            });
+        });
+
+        studentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = studentIdInput.value;
+            const name = studentNameInput.value.trim();
+            const grade = studentGradeInput.value.trim();
+
+            if (id) {
+                const student = students.find(s => s.id === id);
+                if (student) {
+                    student.name = name;
+                    student.grade = grade;
+                }
+            } else {
+                const newStudent = {
+                    id: generateId('S'),
+                    name,
+                    grade,
+                    enrolledCourses: []
+                };
+                students.push(newStudent);
+            }
+            saveData();
+            refreshAllLists();
+            clearForm('student-form');
+        });
+
+        teacherForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = teacherIdInput.value;
+            const name = teacherNameInput.value.trim();
+            const subject = teacherSubjectInput.value.trim();
+
+            if (id) {
+                const teacher = teachers.find(t => t.id === id);
+                if (teacher) {
+                    teacher.name = name;
+                    teacher.subject = subject;
+                }
+            } else {
+                const newTeacher = {
+                    id: generateId('T'),
+                    name,
+                    subject,
+                    assignedCourses: []
+                };
+                teachers.push(newTeacher);
+            }
+            saveData();
+            refreshAllLists();
+            clearForm('teacher-form');
+        });
+
+        courseForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = courseIdInput.value;
+            const name = courseNameInput.value.trim();
+
+            if (id) {
+                const course = courses.find(c => c.id === id);
+                if (course) {
+                    course.name = name;
+                }
+            } else {
+                const newCourse = {
+                    id: generateId('C'),
+                    name,
+                    teacherId: null,
+                    enrolledStudentIds: []
+                };
+                courses.push(newCourse);
+            }
+            saveData();
+            refreshAllLists();
+            clearForm('course-form');
+        });
+
+        document.addEventListener('click', (e) => {
+            const target = e.target;
+            if (target.classList.contains('edit-btn')) {
+                const id = target.dataset.id;
+                const type = target.dataset.type;
+
+                if (type === 'student') {
+                    const student = students.find(s => s.id === id);
+                    if (student) {
+                        studentIdInput.value = student.id;
+                        studentNameInput.value = student.name;
+                        studentGradeInput.value = student.grade;
+                        addStudentBtn.textContent = 'Update Student';
+                        document.querySelector('nav button[data-tab="students"]').click();
+                    }
+                } else if (type === 'teacher') {
+                    const teacher = teachers.find(t => t.id === id);
+                    if (teacher) {
+                        teacherIdInput.value = teacher.id;
+                        teacherNameInput.value = teacher.name;
+                        teacherSubjectInput.value = teacher.subject;
+                        addTeacherBtn.textContent = 'Update Teacher';
+                        document.querySelector('nav button[data-tab="teachers"]').click();
+                    }
+                } else if (type === 'course') {
+                    const course = courses.find(c => c.id === id);
+                    if (course) {
+                        courseIdInput.value = course.id;
+                        courseNameInput.value = course.name;
+                        addCourseBtn.textContent = 'Update Course';
+                        document.querySelector('nav button[data-tab="courses"]').click();
+                    }
+                }
+            } else if (target.classList.contains('delete-btn')) {
+                const id = target.dataset.id;
+                const type = target.dataset.type;
+
+                if (confirm(`Are you sure you want to delete this ${type}?`)) {
+                    if (type === 'student') {
+                        students = students.filter(s => s.id !== id);
+                        courses.forEach(course => {
+                            course.enrolledStudentIds = course.enrolledStudentIds.filter(sid => sid !== id);
+                        });
+                    } else if (type === 'teacher') {
+                        teachers = teachers.filter(t => t.id !== id);
+                        courses.forEach(course => {
+                            if (course.teacherId === id) {
+                                course.teacherId = null;
+                            }
+                        });
+                    } else if (type === 'course') {
+                        courses = courses.filter(c => c.id !== id);
+                        students.forEach(student => {
+                            student.enrolledCourses = student.enrolledCourses.filter(cid => cid !== id);
+                        });
+                        teachers.forEach(teacher => {
+                            teacher.assignedCourses = teacher.assignedCourses.filter(cid => cid !== id);
+                        });
+                    }
+                    saveData();
+                    refreshAllLists();
+                }
+            } else if (target.classList.contains('enroll-btn')) {
+                currentStudentIdToEnroll = target.dataset.id;
+                enrollStudentDisplayName.textContent = target.dataset.name;
+                enrollCourseSelect.innerHTML = '';
+                courses.forEach(course => {
+                    const option = document.createElement('option');
+                    option.value = course.id;
+                    option.textContent = course.name;
+                    enrollCourseSelect.appendChild(option);
+                });
+                enrollModal.style.display = 'flex';
+            } else if (target.classList.contains('assign-btn')) {
+                currentCourseIdToAssign = target.dataset.id;
+                assignCourseDisplayName.textContent = target.dataset.name;
+                assignTeacherSelect.innerHTML = '';
+
+                const unassignOption = document.createElement('option');
+                unassignOption.value = '';
+                unassignOption.textContent = 'Unassign Teacher';
+                assignTeacherSelect.appendChild(unassignOption);
+
+                teachers.forEach(teacher => {
+                    const option = document.createElement('option');
+                    option.value = teacher.id;
+                    option.textContent = teacher.name;
+                    assignTeacherSelect.appendChild(option);
+                });
+
+                const currentCourse = courses.find(c => c.id === currentCourseIdToAssign);
+                if (currentCourse && currentCourse.teacherId) {
+                    assignTeacherSelect.value = currentCourse.teacherId;
+                } else {
+                    assignTeacherSelect.value = '';
+                }
+                assignModal.style.display = 'flex';
+            }
+        });
+
+        closeButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const modalId = e.target.dataset.modal;
+                document.getElementById(modalId).style.display = 'none';
+            });
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === enrollModal) {
+                enrollModal.style.display = 'none';
+            }
+            if (e.target === assignModal) {
+                assignModal.style.display = 'none';
+            }
+        });
+
+        confirmEnrollButton.addEventListener('click', () => {
+            const courseId = enrollCourseSelect.value;
+            if (!currentStudentIdToEnroll || !courseId) {
+                alert('Please select a student and a course.');
+                return;
+            }
+
+            const student = students.find(s => s.id === currentStudentIdToEnroll);
+            const course = courses.find(c => c.id === courseId);
+
+            if (student && course) {
+                if (!student.enrolledCourses.includes(courseId)) {
+                    student.enrolledCourses.push(courseId);
+                }
+                if (!course.enrolledStudentIds.includes(currentStudentIdToEnroll)) {
+                    course.enrolledStudentIds.push(currentStudentIdToEnroll);
+                }
+                saveData();
+                refreshAllLists();
+                enrollModal.style.display = 'none';
+            } else {
+                alert('Student or course not found.');
+            }
+        });
+
+        confirmAssignButton.addEventListener('click', () => {
+            const teacherId = assignTeacherSelect.value || null;
+            if (!currentCourseIdToAssign) {
+                alert('No course selected for assignment.');
+                return;
+            }
+
+            const course = courses.find(c => c.id === currentCourseIdToAssign);
+            if (!course) {
+                alert('Course not found.');
+                return;
+            }
+
+            if (course.teacherId) {
+                const oldTeacher = teachers.find(t => t.id === course.teacherId);
+                if (oldTeacher) {
+                    oldTeacher.assignedCourses = oldTeacher.assignedCourses.filter(cid => cid !== course.id);
+                }
+            }
+
+            course.teacherId = teacherId;
+            if (teacherId) {
+                const newTeacher = teachers.find(t => t.id === teacherId);
+                if (newTeacher && !newTeacher.assignedCourses.includes(course.id)) {
+                    newTeacher.assignedCourses.push(course.id);
+                }
+            }
+
+            saveData();
+            refreshAllLists();
+            assignModal.style.display = 'none';
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            refreshAllLists();
+        });
+    </script>
+</body>
+</html>

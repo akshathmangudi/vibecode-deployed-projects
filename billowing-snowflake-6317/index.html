@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purrfect Brews - Cat Cafe</title>
+    <style>
+        :root {
+            --primary-color: #8B4513; /* SaddleBrown */
+            --secondary-color: #FFD700; /* Gold */
+            --accent-color: #A0522D; /* Sienna */
+            --light-color: #F5DEB3; /* Wheat */
+            --dark-color: #4A2B1A; /* Darker Brown */
+            --text-color: #333;
+            --background-color: #FFF8DC; /* Cornsilk */
+            --footer-bg: #2C1A10;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            scroll-behavior: smooth;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--light-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            color: var(--secondary-color);
+            text-shadow: 2px 2px var(--dark-color);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-left: 25px;
+        }
+
+        nav ul li a {
+            color: var(--light-color);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover,
+        nav ul li a.active {
+            color: var(--secondary-color);
+        }
+
+        .nav-toggle {
+            display: none;
+            font-size: 2rem;
+            background: none;
+            border: none;
+            color: var(--light-color);
+            cursor: pointer;
+        }
+
+        #hero {
+            background: url('https://source.unsplash.com/random/1200x600/?cat-cafe,coffee') no-repeat center center/cover;
+            color: white;
+            text-align: center;
+            padding: 100px 20px;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        #hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 1;
+        }
+
+        #hero h2 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 5px rgba(0,0,0,0.6);
+            color: var(--secondary-color);
+            z-index: 2;
+        }
+
+        #hero p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+            z-index: 2;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: var(--dark-color);
+            padding: 12px 25px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            z-index: 2;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .button:hover {
+            background-color: var(--light-color);
+            transform: translateY(-2px);
+        }
+
+        section {
+            padding: 60px 0;
+        }
+
+        section:nth-of-type(even) {
+            background-color: var(--light-color);
+        }
+
+        h3 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        #about p {
+            font-size: 1.1rem;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        #menu .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .menu-item {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding: 25px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+
+        .menu-item h4 {
+            color: var(--accent-color);
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+        }
+
+        .menu-item p {
+            font-size: 1rem;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .menu-item .price {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 1.3rem;
+        }
+
+        #cats .cat-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .cat-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .cat-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--light-color);
+        }
+
+        .cat-card h4 {
+            font-size: 1.3rem;
+            color: var(--accent-color);
+            margin: 15px 0 10px;
+        }
+
+        .cat-card p {
+            font-size: 0.95rem;
+            padding: 0 15px 15px;
+            color: #555;
+        }
+
+        #contact .contact-info {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .info-box {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            flex: 1 1 300px;
+            min-width: 280px;
+        }
+
+        .info-box h4 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .info-box p {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        #contact .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .contact-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+
+        .contact-form input[type="text"],
+        .contact-form input[type="email"],
+        .contact-form textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .contact-form input[type="text"]:focus,
+        .contact-form input[type="email"]:focus,
+        .contact-form textarea:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+        }
+
+        .contact-form textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .contact-form button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        .contact-form button:hover {
+            background-color: var(--dark-color);
+        }
+
+        footer {
+            background-color: var(--footer-bg);
+            color: var(--light-color);
+            text-align: center;
+            padding: 30px 0;
+            font-size: 0.9rem;
+        }
+
+        footer p {
+            margin-bottom: 10px;
+        }
+
+        .social-links a {
+            color: var(--light-color);
+            font-size: 1.5rem;
+            margin: 0 10px;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--secondary-color);
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            header h1 {
+                margin-bottom: 15px;
+                text-align: center;
+                width: 100%;
+            }
+
+            .nav-toggle {
+                display: block;
+                position: absolute;
+                right: 20px;
+                top: 1rem;
+            }
+
+            nav {
+                width: 100%;
+            }
+
+            nav ul {
+                flex-direction: column;
+                display: none;
+                width: 100%;
+                text-align: center;
+                background-color: var(--primary-color);
+                padding-bottom: 10px;
+            }
+
+            nav ul.nav-open {
+                display: flex;
+            }
+
+            nav ul li {
+                margin: 10px 0;
+            }
+
+            #hero h2 {
+                font-size: 2.5rem;
+            }
+
+            #hero p {
+                font-size: 1.2rem;
+            }
+
+            h3 {
+                font-size: 2rem;
+            }
+
+            .menu-grid, .cat-gallery {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-info {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            #hero {
+                padding: 60px 15px;
+                height: 400px;
+            }
+
+            #hero h2 {
+                font-size: 2rem;
+            }
+
+            #hero p {
+                font-size: 1rem;
+            }
+
+            .button {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+
+            section {
+                padding: 40px 0;
+            }
+
+            h3 {
+                font-size: 1.8rem;
+            }
+
+            .contact-form {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <h1>Purrfect Brews Cafe</h1>
+            <button class="nav-toggle" aria-label="Toggle navigation">&#9776;</button>
+            <nav>
+                <ul>
+                    <li><a href="#hero" class="active">Home</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#menu">Menu</a></li>
+                    <li><a href="#cats">Our Cats</a></li>
+                    <li><a href="#contact">Visit Us</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero">
+            <h2>Where Every Sip is Purr-fection!</h2>
+            <p>Enjoy delicious coffee and delightful company with our resident feline friends.</p>
+            <a href="#menu" class="button">View Our Menu</a>
+        </section>
+
+        <section id="about">
+            <div class="container">
+                <h3>Welcome to Purrfect Brews</h3>
+                <p>
+                    Nestled in the heart of the city, Purrfect Brews is more than just a coffee shop – it's a cozy haven where the rich aroma of freshly brewed coffee mingles with the gentle purrs of our adorable resident cats. We believe in creating a relaxing environment where you can unwind, enjoy premium beverages and pastries, and spend quality time with our friendly feline companions. Whether you're looking for a peaceful work spot, a unique social experience, or simply a dose of cat therapy, you'll find your happy place here.
+                </p>
+            </div>
+        </section>
+
+        <section id="menu">
+            <div class="container">
+                <h3>Our Purrfect Menu</h3>
+                <div class="menu-grid">
+                    <div class="menu-item">
+                        <h4>Espresso & Coffee</h4>
+                        <p>Classic Espresso, Americano, Latte, Cappuccino</p>
+                        <span class="price">From $3.50</span>
+                    </div>
+                    <div class="menu-item">
+                        <h4>Signature Cat Drinks</h4>
+                        <p>Catpuccino, Meowcha Latte, Purr-Over Coffee</p>
+                        <span class="price">From $5.00</span>
+                    </div>
+                    <div class="menu-item">
+                        <h4>Teas & Other Drinks</h4>
+                        <p>Green Tea, Black Tea, Herbal Infusions, Hot Chocolate</p>
+                        <span class="price">From $3.00</span>
+                    </div>
+                    <div class="menu-item">
+                        <h4>Fresh Pastries</h4>
+                        <p>Croissants, Muffins, Cookies, Cat-shaped Shortbread</p>
+                        <span class="price">From $2.50</span>
+                    </div>
+                    <div class="menu-item">
+                        <h4>Sweet Treats</h4>
+                        <p>Cheesecake Slice, Brownies, Seasonal Desserts</p>
+                        <span class="price">From $4.00</span>
+                    </div>
+                    <div class="menu-item">
+                        <h4>Light Bites</h4>
+                        <p>Vegan Energy Balls, Fruit Salad, Yogurt Parfait</p>
+                        <span class="price">From $4.50</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cats">
+            <div class="container">
+                <h3>Meet Our Feline Friends</h3>
+                <p style="text-align: center; margin-bottom: 40px; font-size: 1.1rem;">
+                    Our cafe is home to a delightful crew of friendly cats who love to play, nap, and receive gentle pets. They are well-socialized and regularly monitored to ensure their happiness and health. Come make a new furry friend!
+                </p>
+                <div class="cat-gallery">
+                    <div class="cat-card">
+                        <img src="https://source.unsplash.com/random/300x200/?cat-portrait,sleep" alt="Sleeping Cat">
+                        <h4>Whiskers</h4>
+                        <p>Loves naps and gentle head scratches. A true connoisseur of comfort.</p>
+                    </div>
+                    <div class="cat-card">
+                        <img src="https://source.unsplash.com/random/300x200/?cat-portrait,play" alt="Playful Cat">
+                        <h4>Mittens</h4>
+                        <p>Energetic and playful, always ready for a toy or a chase.</p>
+                    </div>
+                    <div class="cat-card">
+                        <img src="https://source.unsplash.com/random/300x200/?cat-portrait,curious" alt="Curious Cat">
+                        <h4>Shadow</h4>
+                        <p>A curious explorer who enjoys observing the world from high places.</p>
+                    </div>
+                    <div class="cat-card">
+                        <img src="https://source.unsplash.com/random/300x200/?cat-portrait,friendly" alt="Friendly Cat">
+                        <h4>Luna</h4>
+                        <p>The queen of cuddles, always seeking a warm lap or a comforting hand.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact">
+            <div class="container">
+                <h3>Visit Us</h3>
+                <div class="contact-info">
+                    <div class="info-box">
+                        <h4>Location</h4>
+                        <p>123 Whisker Lane</p>
+                        <p>Catville, CA 90210</p>
+                    </div>
+                    <div class="info-box">
+                        <h4>Hours</h4>
+                        <p>Mon - Fri: 8:00 AM - 6:00 PM</p>
+                        <p>Sat - Sun: 9:00 AM - 7:00 PM</p>
+                    </div>
+                    <div class="info-box">
+                        <h4>Contact</h4>
+                        <p>Phone: (555) CAT-CAFE</p>
+                        <p>Email: info@purrfectbrews.com</p>
+                    </div>
+                </div>
+
+                <h3>Send Us a Message</h3>
+                <form id="contact-form" class="contact-form">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
+
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+
+                    <label for="message">Message:</label>
+                    <textarea id="message" name="message" required></textarea>
+
+                    <button type="submit">Send Message</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 Purrfect Brews Cafe. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#" aria-label="Facebook">🐈</a>
+                <a href="#" aria-label="Instagram">☕</a>
+                <a href="#" aria-label="Twitter">🐾</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navToggle = document.querySelector('.nav-toggle');
+            const navMenu = document.querySelector('nav ul');
+            const navLinks = document.querySelectorAll('nav ul li a');
+            const header = document.querySelector('header');
+            const sections = document.querySelectorAll('main section');
+
+            // Mobile Navigation Toggle
+            navToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('nav-open');
+            });
+
+            // Close mobile nav when a link is clicked
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    navMenu.classList.remove('nav-open');
+                });
+            });
+
+            // Contact Form Submission (Basic client-side handling)
+            const contactForm = document.getElementById('contact-form');
+            if (contactForm) {
+                contactForm.addEventListener('submit', (event) => {
+                    event.preventDefault(); // Prevent actual form submission
+
+                    const name = document.getElementById('name').value;
+                    const email = document.getElementById('email').value;
+                    const message = document.getElementById('message').value;
+
+                    alert(`Thank you for your message, ${name}!\n\nWe have received your inquiry and will respond to ${email} shortly.\n\nYour message:\n"${message}"`);
+
+                    // Clear the form
+                    contactForm.reset();
+                });
+            }
+
+            // Smooth scrolling for navigation links
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        const headerOffset = header.offsetHeight;
+                        const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+                        const offsetPosition = elementPosition - headerOffset;
+
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: "smooth"
+                        });
+                    }
+                });
+            });
+
+            // Active link highlighting on scroll
+            const observerOptions = {
+                root: null,
+                rootMargin: `-${header.offsetHeight}px 0px 0px 0px`, // Adjust margin to offset header height
+                threshold: 0.3
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${entry.target.id}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            // Set initial active link based on current scroll position
+            const setInitialActiveLink = () => {
+                const scrollPos = window.pageYOffset + header.offsetHeight + 1; // Add a small offset
+                sections.forEach(section => {
+                    if (scrollPos >= section.offsetTop && scrollPos < (section.offsetTop + section.offsetHeight)) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${section.id}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            };
+
+            window.addEventListener('scroll', setInitialActiveLink);
+            setInitialActiveLink(); // Call on load
+        });
+    </script>
+</body>
+</html>

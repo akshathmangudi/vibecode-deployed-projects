@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwipeMatch Dating App</title>
+    <style>
+        :root {
+            --primary-color: #ff69b4; /* Hot Pink */
+            --secondary-color: #6a0dad; /* Dark Violet */
+            --background-color: #f0f2f5;
+            --card-background: #ffffff;
+            --text-color: #333;
+            --button-like: #4CAF50; /* Green */
+            --button-dislike: #f44336; /* Red */
+            --border-radius: 12px;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--background-color);
+            margin: 0;
+            color: var(--text-color);
+            padding: 20px;
+            box-sizing: border-box;
+            flex-direction: column;
+        }
+
+        #app {
+            display: flex;
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        #profile-card {
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            transform-origin: center bottom;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+            border: 2px solid var(--primary-color);
+        }
+
+        #profile-card.swiping-left {
+            transform: translateX(-150%) rotate(-30deg);
+            opacity: 0;
+        }
+
+        #profile-card.swiping-right {
+            transform: translateX(150%) rotate(30deg);
+            opacity: 0;
+        }
+
+        #profile-image-container {
+            width: 100%;
+            height: 350px;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.5em;
+        }
+
+        #profile-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        #profile-info {
+            padding: 25px;
+        }
+
+        #profile-name-age {
+            font-size: 2.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--secondary-color);
+        }
+
+        #profile-bio {
+            font-size: 1.1em;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        #buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .action-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            font-size: 2.5em;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease-in-out, background-color 0.2s ease;
+            outline: none;
+        }
+
+        .action-button:hover {
+            transform: translateY(-5px);
+        }
+
+        .action-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-button#dislike-btn {
+            background-color: var(--button-dislike);
+        }
+
+        .action-button#like-btn {
+            background-color: var(--button-like);
+        }
+
+        #no-more-profiles {
+            font-size: 1.5em;
+            color: var(--text-color);
+            text-align: center;
+            padding: 50px;
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: none;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        #matches-section {
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            border: 2px solid var(--secondary-color);
+        }
+
+        #matches-section h2 {
+            color: var(--secondary-color);
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        #matches-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        #matches-list li {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        #matches-list li:last-child {
+            border-bottom: none;
+        }
+
+        #matches-list li:hover {
+            background-color: #f9f9f9;
+        }
+
+        .match-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+            flex-shrink: 0;
+        }
+
+        .match-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: var(--text-color);
+        }
+
+        #chat-section {
+            flex: 2;
+            min-width: 300px;
+            max-width: 600px;
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            display: none;
+            flex-direction: column;
+            border: 2px solid var(--primary-color);
+        }
+
+        #chat-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+        }
+
+        #chat-header h3 {
+            margin: 0;
+            color: var(--secondary-color);
+            font-size: 1.5em;
+        }
+
+        #chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: 300px;
+            padding-right: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            background-color: #f1f0f0;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            max-width: 70%;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .message.sent {
+            background-color: var(--primary-color);
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .message.received {
+            background-color: #e0e0e0;
+            color: var(--text-color);
+            align-self: flex-start;
+            margin-right: auto;
+        }
+
+        #chat-input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        #chat-input {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: var(--border-radius);
+            font-size: 1em;
+        }
+
+        #send-chat-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.2s ease;
+        }
+
+        #send-chat-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        @media (max-width: 768px) {
+            #app {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .main-content, #matches-section, #chat-section {
+                width: 95%;
+                max-width: 450px;
+                margin-bottom: 20px;
+            }
+
+            #chat-section {
+                order: 3;
+            }
+
+            #matches-section {
+                order: 2;
+            }
+
+            .main-content {
+                order: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="main-content">
+            <div id="profile-card">
+                <div id="profile-image-container">
+                    <img id="profile-image" alt="Profile image">
+                </div>
+                <div id="profile-info">
+                    <h2 id="profile-name-age"></h2>
+                    <p id="profile-bio"></p>
+                </div>
+            </div>
+            <div id="buttons">
+                <button id="dislike-btn" class="action-button">✖</button>
+                <button id="like-btn" class="action-button">♥</button>
+            </div>
+            <div id="no-more-profiles">
+                <h3>No more profiles to show!</h3>
+                <p>Check back later or adjust your preferences.</p>
+            </div>
+        </div>
+
+        <div id="matches-section">
+            <h2>Your Matches</h2>
+            <ul id="matches-list">
+                <!-- Matches will be dynamically inserted here -->
+            </ul>
+        </div>
+
+        <div id="chat-section">
+            <div id="chat-header">
+                <img id="chat-avatar" class="match-avatar" alt="Chat partner avatar">
+                <h3 id="chat-partner-name"></h3>
+            </div>
+            <div id="chat-messages">
+                <!-- Chat messages will be dynamically inserted here -->
+            </div>
+            <div id="chat-input-container">
+                <input type="text" id="chat-input" placeholder="Type a message...">
+                <button id="send-chat-btn">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const profiles = [
+            {
+                id: 'u1',
+                name: 'You',
+                age: 30,
+                bio: 'This is your profile! You are looking for new connections. Have fun swiping!',
+                imageUrl: 'https://via.placeholder.com/400x350/ff69b4/ffffff?text=YOU',
+                likes: [],
+                likedBy: [],
+                messages: {}
+            },
+            {
+                id: 'u2',
+                name: 'Alex',
+                age: 28,
+                bio: 'Adventure seeker, coffee enthusiast, and a proud dog parent. Always up for a good laugh and exploring new places.',
+                imageUrl: 'https://picsum.photos/id/1012/400/350',
+                likes: [],
+                likedBy: []
+            },
+            {
+                id: 'u3',
+                name: 'Bella',
+                age: 26,
+                bio: 'Artist by day, gamer by night. Loves reading sci-fi and trying out new recipes. Looking for someone creative and kind.',
+                imageUrl: 'https://picsum.photos/id/1011/400/350',
+                likes: [],
+                likedBy: ['u1']
+            },
+            {
+                id: 'u4',
+                name: 'Chris',
+                age: 32,
+                bio: 'Software engineer who enjoys hiking, playing guitar, and binging true crime documentaries. Seeking a partner in crime (the good kind!).',
+                imageUrl: 'https://picsum.photos/id/1025/400/350',
+                likes: [],
+                likedBy: []
+            },
+            {
+                id: 'u5',
+                name: 'Daisy',
+                age: 29,
+                bio: 'Passionate about environmental conservation and volunteering. Loves spending time outdoors, especially near the ocean. Optimist and dreamer.',
+                imageUrl: 'https://picsum.photos/id/1027/400/350',
+                likes: ['u1'],
+                likedBy: []
+            },
+            {
+                id: 'u6',
+                name: 'Ethan',
+                age: 31,
+                bio: 'Foodie and aspiring chef. My happy place is in the kitchen experimenting with flavors. Also enjoy cycling and board games. Let\'s cook something up!',
+                imageUrl: 'https://picsum.photos/id/1062/400/350',
+                likes: [],
+                likedBy: []
+            },
+            {
+                id: 'u7',
+                name: 'Fiona',
+                age: 27,
+                bio: 'Yoga instructor and travel addict. I believe in living life to the fullest and finding joy in the small things. Looking for someone to share adventures with.',
+                imageUrl: 'https://picsum.photos/id/1074/400/350',
+                likes: [],
+                likedBy: ['u1']
+            },
+            {
+                id: 'u8',
+                name: 'George',
+                age: 33,
+                bio: 'Musician and aspiring writer. Loves indie films, obscure bands, and long philosophical conversations. Seeking a fellow deep thinker.',
+                imageUrl: 'https://picsum.photos/id/1083/400/350',
+                likes: [],
+                likedBy: []
+            },
+            {
+                id: 'u9',
+                name: 'Hannah',
+                age: 25,
+                bio: 'Avid reader and cat lover. My perfect evening involves a good book and a warm cup of tea. Looking for someone who appreciates quiet moments.',
+                imageUrl: 'https://picsum.photos/id/1084/400/350',
+                likes: [],
+                likedBy: []
+            }
+        ];
+
+        const YOU_ID = 'u1';
+        let profilesToDisplay = profiles.filter(p => p.id !== YOU_ID);
+        let currentProfileIndex = 0;
+        let currentChatPartnerId = null;
+
+        const profileCard = document.getElementById('profile-card');
+        const profileImage = document.getElementById('profile-image');
+        const profileNameAge = document.getElementById('profile-name-age');
+        const profileBio = document.getElementById('profile-bio');
+        const dislikeBtn = document.getElementById('dislike-btn');
+        const likeBtn = document.getElementById('like-btn');
+        const noMoreProfilesMessage = document.getElementById('no-more-profiles');
+        const matchesList = document.getElementById('matches-list');
+        const chatSection = document.getElementById('chat-section');
+        const chatAvatar = document.getElementById('chat-avatar');
+        const chatPartnerName = document.getElementById('chat-partner-name');
+        const chatMessagesDiv = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const sendChatBtn = document.getElementById('send-chat-btn');
+
+        function getProfileById(id) {
+            return profiles.find(p => p.id === id);
+        }
+
+        function renderProfile() {
+            if (currentProfileIndex >= profilesToDisplay.length) {
+                profileCard.style.display = 'none';
+                dislikeBtn.style.display = 'none';
+                likeBtn.style.display = 'none';
+                noMoreProfilesMessage.style.display = 'block';
+                return;
+            }
+
+            const profile = profilesToDisplay[currentProfileIndex];
+            profileImage.src = profile.imageUrl;
+            profileImage.alt = profile.name;
+            profileNameAge.textContent = `${profile.name}, ${profile.age}`;
+            profileBio.textContent = profile.bio;
+
+            profileCard.style.display = 'block';
+            dislikeBtn.style.display = 'flex';
+            likeBtn.style.display = 'flex';
+            noMoreProfilesMessage.style.display = 'none';
+
+            profileCard.classList.remove('swiping-left', 'swiping-right');
+            profileCard.style.transform = 'none';
+            profileCard.style.opacity = '1';
+        }
+
+        function checkForMatch(likerId, likedId) {
+            const likerProfile = getProfileById(likerId);
+            const likedProfile = getProfileById(likedId);
+
+            return likerProfile.likes.includes(likedId) && likedProfile.likes.includes(likerId);
+        }
+
+        function renderMatches() {
+            matchesList.innerHTML = '';
+            
+            profiles.forEach(profile => {
+                if (profile.id === YOU_ID) return;
+
+                if (checkForMatch(YOU_ID, profile.id)) {
+                    const listItem = document.createElement('li');
+                    listItem.dataset.profileId = profile.id;
+                    listItem.innerHTML = `
+                        <img src="${profile.imageUrl}" alt="${profile.name}" class="match-avatar">
+                        <span class="match-name">${profile.name}</span>
+                    `;
+                    listItem.addEventListener('click', () => openChat(profile.id));
+                    matchesList.appendChild(listItem);
+                }
+            });
+
+            if (matchesList.children.length === 0) {
+                matchesList.innerHTML = '<li style="text-align: center; color: #888; padding: 15px;">No matches yet. Keep swiping!</li>';
+            }
+        }
+
+        function handleSwipe(isLike) {
+            if (currentProfileIndex >= profilesToDisplay.length) {
+                return;
+            }
+
+            const currentProfile = profilesToDisplay[currentProfileIndex];
+            const youProfile = getProfileById(YOU_ID);
+
+            profileCard.classList.add(isLike ? 'swiping-right' : 'swiping-left');
+
+            profileCard.addEventListener('transitionend', function handler() {
+                profileCard.removeEventListener('transitionend', handler);
+
+                if (isLike) {
+                    if (!youProfile.likes.includes(currentProfile.id)) {
+                        youProfile.likes.push(currentProfile.id);
+                    }
+                    if (!currentProfile.likedBy.includes(YOU_ID)) {
+                        currentProfile.likedBy.push(YOU_ID);
+                    }
+
+                    if (checkForMatch(YOU_ID, currentProfile.id)) {
+                        alert(`It's a Match with ${currentProfile.name}!`);
+                        renderMatches();
+                    }
+                }
+
+                currentProfileIndex++;
+                renderProfile();
+            }, { once: true });
+        }
+
+        dislikeBtn.addEventListener('click', () => handleSwipe(false));
+        likeBtn.addEventListener('click', () => handleSwipe(true));
+
+        function renderMessages(partnerId) {
+            chatMessagesDiv.innerHTML = '';
+            const youProfile = getProfileById(YOU_ID);
+            const partnerProfile = getProfileById(partnerId);
+
+            if (!youProfile.messages[partnerId]) {
+                youProfile.messages[partnerId] = [];
+            }
+            if (!partnerProfile.messages) {
+                partnerProfile.messages = {};
+            }
+            if (!partnerProfile.messages[YOU_ID]) {
+                partnerProfile.messages[YOU_ID] = [];
+            }
+
+            const messages = youProfile.messages[partnerId];
+
+            messages.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(msg.sender === YOU_ID ? 'sent' : 'received');
+                messageDiv.textContent = msg.text;
+                chatMessagesDiv.appendChild(messageDiv);
+            });
+            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+        }
+
+        function openChat(partnerId) {
+            currentChatPartnerId = partnerId;
+            const partnerProfile = getProfileById(partnerId);
+
+            chatAvatar.src = partnerProfile.imageUrl;
+            chatAvatar.alt = partnerProfile.name;
+            chatPartnerName.textContent = partnerProfile.name;
+
+            chatSection.style.display = 'flex';
+            renderMessages(partnerId);
+            chatInput.focus();
+        }
+
+        sendChatBtn.addEventListener('click', () => {
+            const messageText = chatInput.value.trim();
+            if (messageText && currentChatPartnerId) {
+                const youProfile = getProfileById(YOU_ID);
+                const partnerProfile = getProfileById(currentChatPartnerId);
+
+                if (!youProfile.messages[currentChatPartnerId]) {
+                    youProfile.messages[currentChatPartnerId] = [];
+                }
+                youProfile.messages[currentChatPartnerId].push({ text: messageText, sender: YOU_ID });
+
+                if (!partnerProfile.messages[YOU_ID]) {
+                    partnerProfile.messages[YOU_ID] = [];
+                }
+                partnerProfile.messages[YOU_ID].push({ text: messageText, sender: YOU_ID });
+
+                setTimeout(() => {
+                    const automatedReplies = [
+                        `Hey! That's cool. How are you? (Automated reply from ${partnerProfile.name})`,
+                        `Interesting! Tell me more. (Automated reply from ${partnerProfile.name})`,
+                        `Haha, I know what you mean! (Automated reply from ${partnerProfile.name})`,
+                        `That's awesome! What are your plans for the weekend? (Automated reply from ${partnerProfile.name})`
+                    ];
+                    const autoReply = automatedReplies[Math.floor(Math.random() * automatedReplies.length)];
+                    youProfile.messages[currentChatPartnerId].push({ text: autoReply, sender: currentChatPartnerId });
+                    partnerProfile.messages[YOU_ID].push({ text: autoReply, sender: currentChatPartnerId });
+                    renderMessages(currentChatPartnerId);
+                }, 1500);
+
+                chatInput.value = '';
+                renderMessages(currentChatPartnerId);
+            }
+        });
+
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendChatBtn.click();
+            }
+        });
+
+        renderProfile();
+        renderMatches();
+    </script>
+</body>
+</html>

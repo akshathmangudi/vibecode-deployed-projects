@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Page</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f7f6;
+            color: #333;
+            text-align: center;
+        }
+
+        .container {
+            padding: 40px 60px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            max-width: 80%;
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            color: #007bff;
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1.2em;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        #time-display {
+            font-size: 0.9em;
+            color: #777;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="greeting-text"></h1>
+        <p>Welcome to your simple, single-file web page!</p>
+        <div id="time-display"></div>
+    </div>
+
+    <script>
+        function updateGreetingAndDateTime() {
+            const now = new Date();
+            const hour = now.getHours();
+            let greeting = "Hello";
+
+            if (hour >= 5 && hour < 12) {
+                greeting = "Good morning";
+            } else if (hour >= 12 && hour < 18) {
+                greeting = "Good afternoon";
+            } else if (hour >= 18 || hour < 5) {
+                greeting = "Good evening";
+            }
+
+            document.getElementById('greeting-text').textContent = greeting + ", World!";
+
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const dateTimeString = now.toLocaleDateString(undefined, options);
+            document.getElementById('time-display').textContent = `Current time: ${dateTimeString}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateGreetingAndDateTime();
+            setInterval(updateGreetingAndDateTime, 1000); // Update every second
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Awesome Website</title>
+    <style>
+        :root {
+            --primary-bg: #ffffff;
+            --secondary-bg: #f0f0f0;
+            --text-color: #333;
+            --accent-color: #007bff;
+            --border-color: #ddd;
+            --header-bg: #333;
+            --header-text: #fff;
+            --nav-link-hover: #0056b3;
+            --button-bg: #007bff;
+            --button-text: #fff;
+            --button-hover-bg: #0056b3;
+            --form-border: #ccc;
+        }
+
+        body.dark-mode {
+            --primary-bg: #282c34;
+            --secondary-bg: #3c4048;
+            --text-color: #e0e0e0;
+            --accent-color: #61dafb;
+            --border-color: #555;
+            --header-bg: #20232a;
+            --header-text: #fff;
+            --nav-link-hover: #4a90e2;
+            --button-bg: #61dafb;
+            --button-text: #282c34;
+            --button-hover-bg: #4a90e2;
+            --form-border: #777;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        header {
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            padding: 1rem 0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        header p {
+            margin: 0.5rem 0 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        nav {
+            background-color: var(--secondary-bg);
+            padding: 0.8rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        nav ul li {
+            margin: 0 1rem;
+        }
+
+        nav ul li a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            display: block;
+            border-radius: 4px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        nav ul li a:hover,
+        nav ul li a.active {
+            background-color: var(--accent-color);
+            color: var(--header-text);
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        section {
+            background-color: var(--primary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            display: none; /* Hidden by default, JS will show */
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        section.active {
+            display: block;
+        }
+
+        h2 {
+            color: var(--accent-color);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 1rem;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .cta-button:hover {
+            background-color: var(--button-hover-bg);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .service-item {
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .service-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .service-item h3 {
+            color: var(--accent-color);
+            margin-top: 0;
+            font-size: 1.4rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid var(--form-border);
+            border-radius: 4px;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="email"]:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            margin-top: 2rem;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--header-text);
+            border: 1px solid var(--header-text);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>My Awesome Website</h1>
+        <p>Your one-stop solution for everything amazing!</p>
+        <button id="themeToggle" class="theme-toggle">Toggle Dark Mode</button>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#" data-target="home-section" class="active">Home</a></li>
+            <li><a href="#" data-target="about-section">About</a></li>
+            <li><a href="#" data-target="services-section">Services</a></li>
+            <li><a href="#" data-target="contact-section">Contact</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <section id="home-section" class="active">
+            <h2>Welcome to Our Site!</h2>
+            <p>We are thrilled to have you here. Explore our content and learn more about what we do. Our mission is to provide high-quality solutions and exceptional service to all our clients.</p>
+            <p>Whether you're looking for innovative ideas, reliable support, or just curious about our work, you've come to the right place. Dive in and discover the possibilities!</p>
+            <div style="text-align: center;">
+                <button class="cta-button" onclick="document.querySelector('[data-target=\'services-section\']').click()">Explore Our Services</button>
+            </div>
+        </section>
+
+        <section id="about-section">
+            <h2>About Us</h2>
+            <p>Founded in 2023, My Awesome Website has grown from a small idea into a leading provider of digital solutions. Our team comprises passionate experts dedicated to pushing boundaries and delivering excellence.</p>
+            <p>We believe in collaboration, transparency, and continuous improvement. Our success is built on the trust and satisfaction of our customers, and we always strive to exceed expectations.</p>
+            <p>Learn more about our values and the amazing people behind the scenes that make it all happen.</p>
+        </section>
+
+        <section id="services-section">
+            <h2>Our Services</h2>
+            <p style="text-align: center;">We offer a wide range of services designed to meet your needs.</p>
+            <div class="services-grid">
+                <div class="service-item">
+                    <h3>Web Development</h3>
+                    <p>Creating responsive, modern, and high-performance websites for businesses of all sizes.</p>
+                </div>
+                <div class="service-item">
+                    <h3>UI/UX Design</h3>
+                    <p>Crafting intuitive and engaging user interfaces for an exceptional user experience.</p>
+                </div>
+                <div class="service-item">
+                    <h3>Digital Marketing</h3>
+                    <p>Boosting your online presence with SEO, social media, and content marketing strategies.</p>
+                </div>
+                <div class="service-item">
+                    <h3>Cloud Solutions</h3>
+                    <p>Scalable and secure cloud infrastructure setup, migration, and management.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact-section">
+            <h2>Contact Us</h2>
+            <p style="text-align: center;">Have a question or need assistance? Fill out the form below and we'll get back to you shortly.</p>
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message:</label>
+                    <textarea id="message" name="message" required></textarea>
+                </div>
+                <div style="text-align: center;">
+                    <button type="submit" class="cta-button">Send Message</button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 My Awesome Website. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('nav ul li a');
+            const sections = document.querySelectorAll('.container section');
+            const contactForm = document.getElementById('contactForm');
+            const themeToggle = document.getElementById('themeToggle');
+            const body = document.body;
+
+            // Theme Toggle
+            const currentTheme = localStorage.getItem('theme');
+            if (currentTheme) {
+                body.classList.add(currentTheme);
+                if (currentTheme === 'dark-mode') {
+                    themeToggle.textContent = 'Toggle Light Mode';
+                }
+            }
+
+            themeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                if (body.classList.contains('dark-mode')) {
+                    localStorage.setItem('theme', 'dark-mode');
+                    themeToggle.textContent = 'Toggle Light Mode';
+                } else {
+                    localStorage.removeItem('theme');
+                    themeToggle.textContent = 'Toggle Dark Mode';
+                }
+            });
+
+            // Navigation and Section Switching
+            navLinks.forEach(link => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+
+                    // Remove active class from all links
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    // Add active class to clicked link
+                    link.classList.add('active');
+
+                    // Hide all sections
+                    sections.forEach(sec => sec.classList.remove('active'));
+
+                    // Show the target section
+                    const targetId = link.getAttribute('data-target');
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                    }
+                });
+            });
+
+            // Contact Form Submission
+            if (contactForm) {
+                contactForm.addEventListener('submit', (event) => {
+                    event.preventDefault(); // Prevent actual form submission
+
+                    const name = document.getElementById('name').value;
+                    const email = document.getElementById('email').value;
+                    const message = document.getElementById('message').value;
+
+                    if (name && email && message) {
+                        alert(`Thank you for your message, ${name}! We will get back to you at ${email} shortly.\n\nMessage:\n"${message}"`);
+                        contactForm.reset(); // Clear the form
+                    } else {
+                        alert('Please fill in all fields.');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

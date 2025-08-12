@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .converter-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        h1 {
+            color: #007bff;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1.1em;
+            box-sizing: border-box; /* Include padding in width */
+            -moz-appearance: textfield; /* Remove spinner for Firefox */
+        }
+
+        /* Remove spinner for Chrome, Safari, Edge */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="converter-container">
+        <h1>Temperature Converter</h1>
+
+        <div class="input-group">
+            <label for="celsius">Celsius</label>
+            <input type="number" id="celsius" placeholder="Enter Celsius" data-unit="celsius">
+        </div>
+
+        <div class="input-group">
+            <label for="fahrenheit">Fahrenheit</label>
+            <input type="number" id="fahrenheit" placeholder="Enter Fahrenheit" data-unit="fahrenheit">
+        </div>
+
+        <div class="input-group">
+            <label for="kelvin">Kelvin</label>
+            <input type="number" id="kelvin" placeholder="Enter Kelvin" data-unit="kelvin">
+        </div>
+    </div>
+
+    <script>
+        const celsiusInput = document.getElementById('celsius');
+        const fahrenheitInput = document.getElementById('fahrenheit');
+        const kelvinInput = document.getElementById('kelvin');
+
+        function convertTemperature(event) {
+            const sourceInput = event.target;
+            const sourceUnit = sourceInput.dataset.unit;
+            const value = parseFloat(sourceInput.value);
+
+            if (isNaN(value)) {
+                // If input is not a number, clear other fields
+                celsiusInput.value = '';
+                fahrenheitInput.value = '';
+                kelvinInput.value = '';
+                return;
+            }
+
+            let c, f, k;
+
+            switch (sourceUnit) {
+                case 'celsius':
+                    c = value;
+                    f = (c * 9/5) + 32;
+                    k = c + 273.15;
+                    break;
+                case 'fahrenheit':
+                    f = value;
+                    c = (f - 32) * 5/9;
+                    k = c + 273.15;
+                    break;
+                case 'kelvin':
+                    k = value;
+                    c = k - 273.15;
+                    f = (c * 9/5) + 32;
+                    break;
+            }
+
+            // Update other fields, ensuring not to update the source field
+            if (sourceUnit !== 'celsius') {
+                celsiusInput.value = c.toFixed(2);
+            }
+            if (sourceUnit !== 'fahrenheit') {
+                fahrenheitInput.value = f.toFixed(2);
+            }
+            if (sourceUnit !== 'kelvin') {
+                kelvinInput.value = k.toFixed(2);
+            }
+        }
+
+        celsiusInput.addEventListener('input', convertTemperature);
+        fahrenheitInput.addEventListener('input', convertTemperature);
+        kelvinInput.addEventListener('input', convertTemperature);
+    </script>
+</body>
+</html>

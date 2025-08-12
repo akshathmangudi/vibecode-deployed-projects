@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Suggestor</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #e0f2f7; /* Light blue background */
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            width: 90%;
+            max-width: 550px;
+            animation: fadeIn 0.8s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 {
+            color: #2a9d8f; /* Teal color */
+            margin-bottom: 25px;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a4a4a;
+            font-size: 1.1em;
+        }
+        .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cce7ed; /* Light border */
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+            background-color: #f8fcff;
+            color: #333;
+            appearance: none; /* Remove default arrow */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%232a9d8f%22%20d%3D%22M287%2C114.7L154.7%2C247.1c-2.4%2C2.4-5.8%2C4.1-9.7%2C4.1c-3.9%2C0-7.3-1.6-9.7-4.1L5.4%2C114.7c-2.4-2.4-4.1-5.8-4.1-9.7c0-3.9%2C1.6-7.3%2C4.1-9.7l14.7-14.7c2.4-2.4%2C5.8-4.1%2C9.7-4.1s7.3%2C1.6%2C9.7%2C4.1l110.2%2C110.2L253%2C80.6c2.4-2.4%2C5.8-4.1%2C9.7-4.1s7.3%2C1.6%2C9.7%2C4.1l14.7%2C14.7c2.4%2C2.4%2C4.1%2C5.8%2C4.1%2C9.7S289.4%2C112.3%2C287%2C114.7z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 15px top 50%;
+            background-size: 16px auto;
+            cursor: pointer;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .input-group select:focus {
+            border-color: #2a9d8f;
+            box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.2);
+            outline: none;
+        }
+        button {
+            background-color: #2a9d8f;
+            color: white;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            background-color: #217f73;
+            transform: translateY(-2px);
+        }
+        button:active {
+            background-color: #1a655c;
+            transform: translateY(0);
+        }
+        #suggestionResult {
+            margin-top: 35px;
+            padding: 25px;
+            border: 2px dashed #8ecae6; /* Light blue dashed border */
+            border-radius: 10px;
+            min-height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #023047; /* Dark blue */
+            background-color: #e8f9fd; /* Very light blue background */
+            transition: all 0.5s ease;
+            animation: pulseResult 1.5s infinite alternate;
+        }
+        #suggestionResult.no-result {
+            color: #d62828; /* Red for no result */
+            border-color: #f7b2bd;
+            background-color: #ffe6e8;
+            animation: shakeResult 0.5s ease-in-out;
+        }
+        @keyframes pulseResult {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(42, 157, 143, 0.2); }
+            100% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(42, 157, 143, 0); }
+        }
+        @keyframes shakeResult {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>What's For Dinner? 🍽️</h1>
+        <div class="input-group">
+            <label for="mealType">Meal Type:</label>
+            <select id="mealType">
+                <option value="any">Any Meal</option>
+                <option value="Breakfast">Breakfast</option>
+                <option value="Lunch">Lunch</option>
+                <option value="Dinner">Dinner</option>
+                <option value="Snack">Snack</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="mood">Mood / Preference:</label>
+            <select id="mood">
+                <option value="any">Any Mood</option>
+                <option value="Light">Light & Fresh</option>
+                <option value="Hearty">Hearty & Filling</option>
+                <option value="Quick">Quick & Easy</option>
+                <option value="Comfort">Comfort Food</option>
+                <option value="Spicy">Spicy Kick</option>
+                <option value="Sweet">Sweet Treat</option>
+                <option value="Healthy">Healthy Choice</option>
+            </select>
+        </div>
+        <button id="suggestButton">Suggest Food!</button>
+        <div id="suggestionResult">
+            Click 'Suggest Food!' to get an idea!
+        </div>
+    </div>
+
+    <script>
+        const foodSuggestions = [
+            { name: "Scrambled Eggs with Spinach & Feta", mealType: "Breakfast", mood: "Hearty" },
+            { name: "Overnight Oats with Berries & Nuts", mealType: "Breakfast", mood: "Light" },
+            { name: "Green Smoothie Bowl", mealType: "Breakfast", mood: "Healthy" },
+            { name: "Fluffy Pancakes with Maple Syrup & Bacon", mealType: "Breakfast", mood: "Sweet" },
+            { name: "Yogurt Parfait with Granola & Fruit", mealType: "Breakfast", mood: "Light" },
+            { name: "Breakfast Burrito", mealType: "Breakfast", mood: "Quick" },
+
+            { name: "Chicken Caesar Salad", mealType: "Lunch", mood: "Light" },
+            { name: "Turkey & Swiss Sandwich on Whole Wheat", mealType: "Lunch", mood: "Quick" },
+            { name: "Creamy Tomato Soup with Grilled Cheese", mealType: "Lunch", mood: "Comfort" },
+            { name: "Quinoa Salad with Roasted Vegetables", mealType: "Lunch", mood: "Healthy" },
+            { name: "Lentil Soup", mealType: "Lunch", mood: "Hearty" },
+            { name: "Tuna Salad Croissant", mealType: "Lunch", mood: "Quick" },
+
+            { name: "Spicy Chicken Tacos with all the Fixings", mealType: "Dinner", mood: "Spicy" },
+            { name: "Classic Beef Lasagna", mealType: "Dinner", mood: "Comfort" },
+            { name: "Baked Salmon with Roasted Asparagus", mealType: "Dinner", mood: "Healthy" },
+            { name: "Pad See Ew (Thai Stir-fried Noodles)", mealType: "Dinner", mood: "Spicy" },
+            { name: "Hearty Beef Stew with Root Vegetables", mealType: "Dinner", mood: "Hearty" },
+            { name: "Homemade Pizza (customize your toppings!)", mealType: "Dinner", mood: "Comfort" },
+            { name: "Vegetable Stir-fry with Tofu & Brown Rice", mealType: "Dinner", mood: "Light" },
+            { name: "Chicken and Broccoli Alfredo", mealType: "Dinner", mood: "Hearty" },
+            { name: "Mushroom Risotto", mealType: "Dinner", mood: "Comfort" },
+
+            { name: "Apple Slices with Peanut Butter", mealType: "Snack", mood: "Light" },
+            { name: "Greek Yogurt with Honey", mealType: "Snack", mood: "Healthy" },
+            { name: "Cheese & Whole-Wheat Crackers", mealType: "Snack", mood: "Quick" },
+            { name: "Air-Popped Popcorn", mealType: "Snack", mood: "Comfort" },
+            { name: "Trail Mix", mealType: "Snack", mood: "Quick" },
+            { name: "Fruit Smoothie", mealType: "Snack", mood: "Sweet" }
+        ];
+
+        document.getElementById('suggestButton').addEventListener('click', () => {
+            const selectedMealType = document.getElementById('mealType').value;
+            const selectedMood = document.getElementById('mood').value;
+            const suggestionResultDiv = document.getElementById('suggestionResult');
+
+            let filteredSuggestions = foodSuggestions.filter(food => {
+                const matchesMealType = (selectedMealType === 'any' || food.mealType === selectedMealType);
+                const matchesMood = (selectedMood === 'any' || food.mood === selectedMood);
+                return matchesMealType && matchesMood;
+            });
+
+            // Fallback: If no perfect match, broaden the search to just meal type
+            if (filteredSuggestions.length === 0 && selectedMealType !== 'any') {
+                filteredSuggestions = foodSuggestions.filter(food => food.mealType === selectedMealType);
+            }
+            // Fallback: If still no suggestions, broaden to just mood
+            if (filteredSuggestions.length === 0 && selectedMood !== 'any') {
+                 filteredSuggestions = foodSuggestions.filter(food => food.mood === selectedMood);
+            }
+            // Final Fallback: If still no suggestions, pick anything
+            if (filteredSuggestions.length === 0) {
+                filteredSuggestions = foodSuggestions;
+            }
+
+            if (filteredSuggestions.length > 0) {
+                const randomIndex = Math.floor(Math.random() * filteredSuggestions.length);
+                const suggestedFood = filteredSuggestions[randomIndex];
+                suggestionResultDiv.textContent = suggestedFood.name;
+                suggestionResultDiv.classList.remove('no-result');
+                suggestionResultDiv.style.animation = 'none'; // Reset animation
+                void suggestionResultDiv.offsetWidth; // Trigger reflow
+                suggestionResultDiv.style.animation = null; // Reapply animation
+            } else {
+                suggestionResultDiv.textContent = "Oops! Couldn't find a suggestion for those options. Try 'Any Meal' and 'Any Mood'!";
+                suggestionResultDiv.classList.add('no-result');
+                suggestionResultDiv.style.animation = 'none'; // Reset animation
+                void suggestionResultDiv.offsetWidth; // Trigger reflow
+                suggestionResultDiv.style.animation = 'shakeResult 0.5s ease-in-out'; // Specific animation for no result
+            }
+        });
+
+        // Set initial text on load, removing any potential animation class
+        document.addEventListener('DOMContentLoaded', () => {
+            const suggestionResultDiv = document.getElementById('suggestionResult');
+            suggestionResultDiv.textContent = "Click 'Suggest Food!' to get an idea!";
+            suggestionResultDiv.classList.remove('no-result');
+            suggestionResultDiv.style.animation = 'none'; // Ensure no animation on initial load
+        });
+    </script>
+</body>
+</html>

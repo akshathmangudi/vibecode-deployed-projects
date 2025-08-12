@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sai Jewel Online - Exquisite Jewellery</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💎</text></svg>">
+    <style>
+        :root {
+            --primary-color: #f7d794; /* Light gold / beige */
+            --secondary-color: #8c7333; /* Darker gold */
+            --text-color: #333;
+            --light-text-color: #666;
+            --bg-color: #fff;
+            --border-color: #eee;
+            --accent-color: #e5a900; /* A more vibrant gold */
+            --red-color: #d9534f; /* For 'Remove' buttons etc. */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            color: var(--text-color);
+            line-height: 1.6;
+            background-color: var(--bg-color);
+        }
+
+        a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--accent-color);
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        button.primary {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        button.primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        button.secondary {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: 1px solid var(--secondary-color);
+        }
+
+        button.secondary:hover {
+            background-color: var(--secondary-color);
+            color: var(--bg-color);
+        }
+
+        button.danger {
+            background-color: var(--red-color);
+            color: var(--bg-color);
+        }
+
+        button.danger:hover {
+            background-color: #c9302c;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="password"] {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        header {
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo span {
+            color: var(--accent-color);
+            margin-left: 5px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+        }
+
+        .nav-menu li a {
+            font-weight: 500;
+            color: var(--text-color);
+            position: relative;
+            padding-bottom: 5px;
+        }
+
+        .nav-menu li a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            display: block;
+            margin-top: 5px;
+            right: 0;
+            background: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-menu li a:hover::after {
+            width: 100%;
+            left: 0;
+            background: var(--accent-color);
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+
+        .header-icons .cart-icon {
+            position: relative;
+        }
+
+        .header-icons .cart-count {
+            background-color: var(--red-color);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.75rem;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        main {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        section {
+            margin-bottom: 40px;
+            background-color: var(--bg-color);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        h1, h2, h3 {
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 2rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            display: inline-block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-slider {
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .hero-slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .hero-slide.active {
+            opacity: 1;
+        }
+
+        .hero-content {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 10px;
+        }
+
+        .hero-content h3 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .hero-content p {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .hero-slide-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .hero-slide-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .hero-slide-dot.active {
+            background-color: var(--accent-color);
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .product-card-content {
+            padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--text-color);
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .product-card p {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .product-card button {
+            width: 100%;
+            font-size: 0.9rem;
+            padding: 10px;
+        }
+
+        .view-section {
+            display: none; /* Controlled by JS */
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        /* Product Detail View */
+        .product-detail {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+
+        .product-detail-images {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+        }
+
+        .product-detail-main-img {
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            object-fit: contain;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .product-detail-thumbnails {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .product-detail-thumbnails img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border: 2px solid transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .product-detail-thumbnails img.active {
+            border-color: var(--accent-color);
+        }
+
+        .product-detail-info {
+            flex: 2;
+            min-width: 300px;
+        }
+
+        .product-detail-info h1 {
+            text-align: left;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .product-detail-info .price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+
+        .product-detail-info .description {
+            margin-bottom: 20px;
+            color: var(--light-text-color);
+        }
+
+        .product-detail-info .specs {
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        .product-detail-info .specs strong {
+            color: var(--text-color);
+            display: inline-block;
+            min-width: 100px;
+        }
+
+        .product-detail-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .product-detail-actions input {
+            width: 80px;
+            max-width: 80px;
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        /* Cart View */
+        .cart-items {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .cart-items th, .cart-items td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+        }
+
+        .cart-items th {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+
+        .cart-items img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .cart-quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .cart-quantity-controls button {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            font-size: 1.2rem;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cart-quantity-controls input {
+            width: 50px;
+            text-align: center;
+            max-width: 50px;
+        }
+
+        .cart-summary {
+            margin-top: 30px;
+            border-top: 2px solid var(--primary-color);
+            padding-top: 20px;
+            text-align: right;
+        }
+
+        .cart-summary p {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .cart-summary p span {
+            color: var(--accent-color);
+        }
+
+        .cart-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .empty-cart-message {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+            color: var(--light-text-color);
+        }
+
+        /* Search/Category filter */
+        .search-container {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .search-container input {
+            flex-grow: 1;
+            max-width: 400px;
+        }
+
+        .search-container select {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+
+        footer {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 50px;
+            border-top: 5px solid var(--accent-color);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 30px;
+            max-width: 1000px;
+            margin: 0 auto 30px auto;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+            text-align: left;
+        }
+
+        .footer-section h4 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 8px;
+        }
+
+        .footer-section ul li a {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+        }
+
+        .footer-section ul li a:hover {
+            color: white;
+        }
+
+        .social-icons a {
+            color: white;
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .copyright {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 10px;
+                gap: 15px;
+            }
+
+            .nav-menu {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .header-icons {
+                margin-top: 10px;
+            }
+
+            .hero-slider {
+                height: 300px;
+            }
+
+            .hero-content h3 {
+                font-size: 2.2rem;
+            }
+
+            .hero-content p {
+                font-size: 1.2rem;
+            }
+
+            .product-detail {
+                flex-direction: column;
+            }
+
+            .product-detail-images,
+            .product-detail-info {
+                max-width: 100%;
+                min-width: unset;
+            }
+
+            .cart-items th, .cart-items td {
+                padding: 8px;
+                font-size: 0.9rem;
+            }
+            .cart-items img {
+                width: 60px;
+                height: 60px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .nav-menu {
+                gap: 5px;
+            }
+
+            .hero-slider {
+                height: 200px;
+            }
+
+            .hero-content {
+                padding: 10px;
+            }
+
+            .hero-content h3 {
+                font-size: 1.5rem;
+            }
+
+            .hero-content p {
+                font-size: 0.9rem;
+            }
+
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .product-detail-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .product-detail-actions input {
+                margin-right: 0;
+            }
+
+            .cart-actions {
+                flex-direction: column;
+                align-items: flex-end;
+            }
+
+            .search-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="#home" class="logo">Sai<span>Jewel</span></a>
+        <nav>
+            <ul class="nav-menu">
+                <li><a href="#home" data-view="home">Home</a></li>
+                <li><a href="#products" data-view="products">All Products</a></li>
+                <li><a href="#products?category=Gold" data-view="products" data-category="Gold">Gold</a></li>
+                <li><a href="#products?category=Diamond" data-view="products" data-category="Diamond">Diamond</a></li>
+                <li><a href="#products?category=Gemstone" data-view="products" data-category="Gemstone">Gemstone</a></li>
+                <li><a href="#contact" data-view="contact">Contact Us</a></li>
+            </ul>
+        </nav>
+        <div class="header-icons">
+            <a href="#" class="search-toggle">🔍</a>
+            <a href="#" class="user-profile">👤</a>
+            <a href="#cart" class="cart-icon" data-view="cart">🛒<span class="cart-count">0</span></a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Home View -->
+        <section id="home-view" class="view-section active">
+            <div class="hero-slider">
+                <div class="hero-slide active" style="background-image: url('https://via.placeholder.com/1200x400/F5DEB3/8B4513?text=Exquisite+Gold+Collection');">
+                    <div class="hero-content">
+                        <h3>Discover Our Exquisite Gold Collection</h3>
+                        <p>Timeless elegance crafted for you.</p>
+                        <button class="primary" onclick="showView('products', 'Gold')">Shop Gold Now</button>
+                    </div>
+                </div>
+                <div class="hero-slide" style="background-image: url('https://via.placeholder.com/1200x400/D0F0C0/4F6B4F?text=Sparkling+Diamond+Jewellery');">
+                    <div class="hero-content">
+                        <h3>Sparkling Diamond Jewellery</h3>
+                        <p>Brilliance that lasts forever.</p>
+                        <button class="primary" onclick="showView('products', 'Diamond')">Explore Diamonds</button>
+                    </div>
+                </div>
+                <div class="hero-slide" style="background-image: url('https://via.placeholder.com/1200x400/ADD8E6/000080?text=Colorful+Gemstone+Creations');">
+                    <div class="hero-content">
+                        <h3>Colorful Gemstone Creations</h3>
+                        <p>Add a pop of color to your style.</p>
+                        <button class="primary" onclick="showView('products', 'Gemstone')">View Gemstones</button>
+                    </div>
+                </div>
+                <div class="hero-slide-nav"></div>
+            </div>
+
+            <h2>Shop by Category</h2>
+            <div class="product-grid category-grid">
+                <div class="product-card" onclick="showView('products', 'Ring')">
+                    <img src="https://via.placeholder.com/300x200/F0E68C/8B4513?text=Rings" alt="Rings">
+                    <div class="product-card-content">
+                        <h3>Rings</h3>
+                        <button class="secondary">View Collection</button>
+                    </div>
+                </div>
+                <div class="product-card" onclick="showView('products', 'Earring')">
+                    <img src="https://via.placeholder.com/300x200/F0E68C/8B4513?text=Earrings" alt="Earrings">
+                    <div class="product-card-content">
+                        <h3>Earrings</h3>
+                        <button class="secondary">View Collection</button>
+                    </div>
+                </div>
+                <div class="product-card" onclick="showView('products', 'Pendant')">
+                    <img src="https://via.placeholder.com/300x200/F0E68C/8B4513?text=Pendants" alt="Pendants">
+                    <div class="product-card-content">
+                        <h3>Pendants</h3>
+                        <button class="secondary">View Collection</button>
+                    </div>
+                </div>
+                <div class="product-card" onclick="showView('products', 'Necklace')">
+                    <img src="https://via.placeholder.com/300x200/F0E68C/8B4513?text=Necklaces" alt="Necklaces">
+                    <div class="product-card-content">
+                        <h3>Necklaces</h3>
+                        <button class="secondary">View Collection</button>
+                    </div>
+                </div>
+            </div>
+
+            <h2>New Arrivals</h2>
+            <div id="new-arrivals-grid" class="product-grid">
+                <!-- New arrivals populated by JS -->
+            </div>
+        </section>
+
+        <!-- Products View -->
+        <section id="products-view" class="view-section">
+            <h2 id="products-view-title">All Products</h2>
+            <div class="search-container">
+                <input type="text" id="product-search" placeholder="Search products...">
+                <select id="product-category-filter">
+                    <option value="All">All Categories</option>
+                    <option value="Gold">Gold</option>
+                    <option value="Diamond">Diamond</option>
+                    <option value="Gemstone">Gemstone</option>
+                    <option value="Silver">Silver</option>
+                    <option value="Ring">Rings</option>
+                    <option value="Earring">Earrings</option>
+                    <option value="Pendant">Pendants</option>
+                    <option value="Necklace">Necklaces</option>
+                </select>
+                <button class="secondary" onclick="applyProductFilters()">Apply Filters</button>
+            </div>
+            <div id="product-list" class="product-grid">
+                <!-- Products will be dynamically loaded here by JS -->
+            </div>
+        </section>
+
+        <!-- Product Detail View -->
+        <section id="product-detail-view" class="view-section">
+            <button class="secondary" onclick="showView('products')">← Back to Products</button>
+            <div class="product-detail">
+                <div class="product-detail-images">
+                    <img src="" alt="Product Image" class="product-detail-main-img" id="pd-main-img">
+                    <div class="product-detail-thumbnails" id="pd-thumbnails">
+                        <!-- Thumbnails loaded by JS -->
+                    </div>
+                </div>
+                <div class="product-detail-info">
+                    <h1 id="pd-name"></h1>
+                    <p class="price" id="pd-price"></p>
+                    <p class="description" id="pd-description"></p>
+                    <div class="specs">
+                        <p><strong>SKU:</strong> <span id="pd-sku"></span></p>
+                        <p><strong>Weight:</strong> <span id="pd-weight"></span></p>
+                        <p><strong>Material:</strong> <span id="pd-material"></span></p>
+                        <p><strong>Availability:</strong> <span id="pd-stock"></span> In Stock</p>
+                    </div>
+                    <div class="product-detail-actions">
+                        <input type="number" id="pd-quantity" value="1" min="1">
+                        <button class="primary" id="pd-add-to-cart">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cart View -->
+        <section id="cart-view" class="view-section">
+            <h2>Your Shopping Cart</h2>
+            <div id="cart-content">
+                <table class="cart-items">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cart-items-body">
+                        <!-- Cart items populated by JS -->
+                    </tbody>
+                </table>
+                <div class="cart-summary">
+                    <p>Subtotal: ₹<span id="cart-subtotal">0.00</span></p>
+                    <p>Shipping: ₹<span id="cart-shipping">0.00</span></p>
+                    <p>Grand Total: ₹<span id="cart-grand-total">0.00</span></p>
+                </div>
+                <div class="cart-actions">
+                    <button class="secondary" onclick="showView('products')">Continue Shopping</button>
+                    <button class="primary" onclick="alert('Proceeding to checkout (simulated).')">Proceed to Checkout</button>
+                </div>
+            </div>
+            <div id="empty-cart-message" class="empty-cart-message" style="display: none;">
+                Your cart is empty. <a href="#products" onclick="showView('products')">Start shopping now!</a>
+            </div>
+        </section>
+
+        <!-- Contact Us View (Simple Placeholder) -->
+        <section id="contact-view" class="view-section">
+            <h2>Contact Us</h2>
+            <p style="text-align: center; margin-bottom: 20px;">We'd love to hear from you! Please fill out the form below or reach out to us via the details provided.</p>
+            <div style="max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid var(--border-color); border-radius: 8px;">
+                <form onsubmit="alert('Thank you for your message! We will get back to you shortly (simulated).'); return false;">
+                    <div style="margin-bottom: 15px;">
+                        <label for="contact-name" style="display: block; margin-bottom: 5px;">Your Name:</label>
+                        <input type="text" id="contact-name" required>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label for="contact-email" style="display: block; margin-bottom: 5px;">Your Email:</label>
+                        <input type="email" id="contact-email" required>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label for="contact-message" style="display: block; margin-bottom: 5px;">Message:</label>
+                        <textarea id="contact-message" rows="5" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-family: inherit;" required></textarea>
+                    </div>
+                    <button type="submit" class="primary" style="width: 100%;">Send Message</button>
+                </form>
+                <div style="text-align: center; margin-top: 30px; font-size: 0.9rem; color: var(--light-text-color);">
+                    <p><strong>Phone:</strong> +91-9876543210</p>
+                    <p><strong>Email:</strong> info@saijewelonline.com</p>
+                    <p><strong>Address:</strong> 123 Jewellery Lane, Gem City, India</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>About Sai Jewel</h4>
+                <ul>
+                    <li><a href="#">Our Story</a></li>
+                    <li><a href="#">Craftsmanship</a></li>
+                    <li><a href="#">Ethical Sourcing</a></li>
+                    <li><a href="#">Customer Reviews</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Customer Service</h4>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Shipping & Delivery</a></li>
+                    <li><a href="#">Returns & Exchanges</a></li>
+                    <li><a href="#">FAQs</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Policies</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Refund Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Connect With Us</h4>
+                <div class="social-icons">
+                    <a href="#">FB</a>
+                    <a href="#">TW</a>
+                    <a href="#">IG</a>
+                    <a href="#">PT</a>
+                </div>
+            </div>
+        </div>
+        <p class="copyright">&copy; 2023 Sai Jewel Online. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const products = [
+            {
+                id: '1',
+                name: 'Elegant Gold Ring',
+                category: 'Ring',
+                material: '22k Gold',
+                price: 45000,
+                imageUrl: 'https://via.placeholder.com/300x300/F5DEB3/8B4513?text=Gold+Ring+1',
+                images: [
+                    'https://via.placeholder.com/600x600/F5DEB3/8B4513?text=Gold+Ring+1',
+                    'https://via.placeholder.com/600x600/E8D6AC/8B4513?text=Gold+Ring+Side',
+                    'https://via.placeholder.com/600x600/F0E68C/8B4513?text=Gold+Ring+Zoom'
+                ],
+                description: 'A beautifully crafted 22k gold ring, perfect for any occasion. Features intricate detailing and a polished finish. This piece exudes timeless elegance and sophistication.',
+                sku: 'GR001',
+                weight: '5 grams',
+                stock: 10
+            },
+            {
+                id: '2',
+                name: 'Diamond Stud Earrings',
+                category: 'Earring',
+                material: '18k White Gold, Diamonds',
+                price: 75000,
+                imageUrl: 'https://via.placeholder.com/300x300/D0F0C0/4F6B4F?text=Diamond+Earrings+1',
+                images: [
+                    'https://via.placeholder.com/600x600/D0F0C0/4F6B4F?text=Diamond+Earrings+1',
+                    'https://via.placeholder.com/600x600/C8E6C0/4F6B4F?text=Diamond+Earrings+Side',
+                    'https://via.placeholder.com/600x600/B0D9B0/4F6B4F?text=Diamond+Earrings+Close'
+                ],
+                description: 'Classic diamond stud earrings in 18k white gold. Each earring features a brilliant-cut diamond, ideal for everyday wear or special events. Total diamond weight: 0.5 carat.',
+                sku: 'DE002',
+                weight: '2.5 grams',
+                stock: 8
+            },
+            {
+                id: '3',
+                name: 'Emerald Pendant Necklace',
+                category: 'Pendant',
+                material: '18k Gold, Emerald',
+                price: 60000,
+                imageUrl: 'https://via.placeholder.com/300x300/ADD8E6/000080?text=Emerald+Pendant+1',
+                images: [
+                    'https://via.placeholder.com/600x600/ADD8E6/000080?text=Emerald+Pendant+1',
+                    'https://via.placeholder.com/600x600/9ACFEA/000080?text=Emerald+Pendant+Side',
+                    'https://via.placeholder.com/600x600/87C0D8/000080?text=Emerald+Pendant+Detail'
+                ],
+                description: 'A captivating emerald pendant set in 18k gold, suspended from a delicate chain. The vibrant green emerald is ethically sourced and beautifully showcases its natural brilliance.',
+                sku: 'EPN003',
+                weight: '4 grams',
+                stock: 5
+            },
+            {
+                id: '4',
+                name: 'Traditional Temple Necklace',
+                category: 'Necklace',
+                material: '22k Gold',
+                price: 180000,
+                imageUrl: 'https://via.placeholder.com/300x300/F0E68C/8B4513?text=Temple+Necklace+1',
+                images: [
+                    'https://via.placeholder.com/600x600/F0E68C/8B4513?text=Temple+Necklace+1',
+                    'https://via.placeholder.com/600x600/E5D890/8B4513?text=Temple+Necklace+Detail',
+                    'https://via.placeholder.com/600x600/DCCB80/8B4513?text=Temple+Necklace+Wear'
+                ],
+                description: 'Magnificent 22k gold traditional temple necklace, featuring intricate craftsmanship and cultural motifs. A statement piece for weddings and grand festivities.',
+                sku: 'TTN004',
+                weight: '25 grams',
+                stock: 3
+            },
+            {
+                id: '5',
+                name: 'Silver Anklet Pair',
+                category: 'Anklet',
+                material: '92.5 Sterling Silver',
+                price: 3500,
+                imageUrl: 'https://via.placeholder.com/300x300/C0C0C0/555555?text=Silver+Anklet+1',
+                images: [
+                    'https://via.placeholder.com/600x600/C0C0C0/555555?text=Silver+Anklet+1',
+                    'https://via.placeholder.com/600x600/B0B0B0/555555?text=Silver+Anklet+Pair',
+                    'https://via.placeholder.com/600x600/A0A0A0/555555?text=Silver+Anklet+Detail'
+                ],
+                description: 'A charming pair of sterling silver anklets with delicate bells, creating a soft melodic sound with every step. Perfect for adding a touch of traditional elegance.',
+                sku: 'SA005',
+                weight: '30 grams (pair)',
+                stock: 15
+            },
+            {
+                id: '6',
+                name: 'Ruby Gold Ring',
+                category: 'Ring',
+                material: '22k Gold, Ruby',
+                price: 55000,
+                imageUrl: 'https://via.placeholder.com/300x300/F5DEB3/8B4513?text=Ruby+Gold+Ring+1',
+                images: [
+                    'https://via.placeholder.com/600x600/F5DEB3/8B4513?text=Ruby+Gold+Ring+1',
+                    'https://via.placeholder.com/600x600/E8D6AC/8B4513?text=Ruby+Ring+Side',
+                    'https://via.placeholder.com/600x600/F0E68C/8B4513?text=Ruby+Ring+Zoom'
+                ],
+                description: 'Exquisite 22k gold ring adorned with a vibrant natural ruby. A symbol of passion and prosperity, designed for enduring beauty.',
+                sku: 'RGR006',
+                weight: '6 grams',
+                stock: 7
+            },
+            {
+                id: '7',
+                name: 'Pearl Drop Earrings',
+                category: 'Earring',
+                material: '14k Gold, Freshwater Pearls',
+                price: 28000,
+                imageUrl: 'https://via.placeholder.com/300x300/FDF5E6/8B4513?text=Pearl+Earrings+1',
+                images: [
+                    'https://via.placeholder.com/600x600/FDF5E6/8B4513?text=Pearl+Earrings+1',
+                    'https://via.placeholder.com/600x600/FAEBD7/8B4513?text=Pearl+Earrings+Side',
+                    'https://via.placeholder.com/600x600/FFEBCD/8B4513?text=Pearl+Earrings+Detail'
+                ],
+                description: 'Elegant pearl drop earrings featuring lustrous freshwater pearls suspended from delicate 14k gold settings. Perfect for sophisticated charm.',
+                sku: 'PDE007',
+                weight: '3.5 grams',
+                stock: 12
+            },
+            {
+                id: '8',
+                name: 'Sapphire Diamond Pendant',
+                category: 'Pendant',
+                material: '18k White Gold, Sapphire, Diamonds',
+                price: 90000,
+                imageUrl: 'https://via.placeholder.com/300x300/D0F0C0/4F6B4F?text=Sapphire+Pendant+1',
+                images: [
+                    'https://via.placeholder.com/600x600/D0F0C0/4F6B4F?text=Sapphire+Pendant+1',
+                    'https://via.placeholder.com/600x600/C8E6C0/4F6B4F?text=Sapphire+Pendant+Side',
+                    'https://via.placeholder.com/600x600/B0D9B0/4F6B4F?text=Sapphire+Pendant+Close'
+                ],
+                description: 'A stunning pendant showcasing a deep blue sapphire surrounded by a halo of sparkling diamonds, set in luxurious 18k white gold. A truly majestic piece.',
+                sku: 'SDP008',
+                weight: '4.8 grams',
+                stock: 4
+            },
+            {
+                id: '9',
+                name: 'Geometric Gold Bracelet',
+                category: 'Bracelet',
+                material: '22k Gold',
+                price: 85000,
+                imageUrl: 'https://via.placeholder.com/300x300/F0E68C/8B4513?text=Gold+Bracelet+1',
+                images: [
+                    'https://via.placeholder.com/600x600/F0E68C/8B4513?text=Gold+Bracelet+1',
+                    'https://via.placeholder.com/600x600/E5D890/8B4513?text=Gold+Bracelet+Detail',
+                    'https://via.placeholder.com/600x600/DCCB80/8B4513?text=Gold+Bracelet+Wear'
+                ],
+                description: 'Modern and chic 22k gold bracelet featuring interconnected geometric shapes. A versatile accessory that adds contemporary flair to any outfit.',
+                sku: 'GGB009',
+                weight: '12 grams',
+                stock: 9
+            },
+            {
+                id: '10',
+                name: 'Kids Gold Bracelet',
+                category: 'Bracelet',
+                material: '18k Gold',
+                price: 15000,
+                imageUrl: 'https://via.placeholder.com/300x300/FFDDC1/FF6F61?text=Kids+Bracelet+1',
+                images: [
+                    'https://via.placeholder.com/600x600/FFDDC1/FF6F61?text=Kids+Bracelet+1',
+                    'https://via.placeholder.com/600x600/FFCBA4/FF6F61?text=Kids+Bracelet+Detail',
+                    'https://via.placeholder.com/600x600/FFB788/FF6F61?text=Kids+Bracelet+Wear'
+                ],
+                description: 'A charming 18k gold bracelet designed for kids, featuring a playful motif. Durable and adorable, perfect for a little one.',
+                sku: 'KGB010',
+                weight: '2 grams',
+                stock: 20
+            }
+        ];
+
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let currentProduct = null; // For product detail view
+
+        const views = document.querySelectorAll('.view-section');
+        const cartCountElement = document.querySelector('.cart-count');
+        const productListElement = document.getElementById('product-list');
+        const newArrivalsGrid = document.getElementById('new-arrivals-grid');
+        const productSearchInput = document.getElementById('product-search');
+        const productCategoryFilter = document.getElementById('product-category-filter');
+        const productsViewTitle = document.getElementById('products-view-title');
+
+        // Hero Slider Logic
+        const heroSlides = document.querySelectorAll('.hero-slide');
+        const heroSlideNav = document.querySelector('.hero-slide-nav');
+        let currentSlide = 0;
+
+        function updateHeroSlider() {
+            heroSlides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+            const dots = heroSlideNav.querySelectorAll('.hero-slide-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.remove('active');
+                if (index === currentSlide) {
+                    dot.classList.add('active');
+                }
+            });
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % heroSlides.length;
+            updateHeroSlider();
+        }
+
+        function createHeroDots() {
+            heroSlides.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.classList.add('hero-slide-dot');
+                dot.addEventListener('click', () => {
+                    currentSlide = index;
+                    updateHeroSlider();
+                });
+                heroSlideNav.appendChild(dot);
+            });
+            updateHeroSlider(); // Initial update
+        }
+
+        // Initialize Slider
+        if (heroSlides.length > 0) {
+            createHeroDots();
+            setInterval(nextSlide, 5000); // Change slide every 5 seconds
+        }
+
+        // View Management
+        function showView(viewId, param = null) {
+            views.forEach(view => view.classList.remove('active'));
+            const targetView = document.getElementById(`${viewId}-view`);
+            if (targetView) {
+                targetView.classList.add('active');
+            }
+
+            if (viewId === 'products') {
+                let category = param;
+                let search = productSearchInput.value;
+
+                // Handle direct URL hash navigation
+                if (window.location.hash.startsWith('#products')) {
+                    const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
+                    if (urlParams.has('category')) {
+                        category = urlParams.get('category');
+                    }
+                    if (urlParams.has('search')) {
+                        search = urlParams.get('search');
+                    }
+                }
+
+                productCategoryFilter.value = category || 'All';
+                productSearchInput.value = search || '';
+                productsViewTitle.textContent = category && category !== 'All' ? `${category} Jewellery` : 'All Products';
+                renderProducts(category, search);
+            } else if (viewId === 'product-detail') {
+                renderProductDetail(param);
+            } else if (viewId === 'cart') {
+                renderCart();
+            } else if (viewId === 'home') {
+                renderNewArrivals(); // Re-render new arrivals on home view
+            }
+
+            // Update URL hash without page reload
+            let newHash = `#${viewId}`;
+            if (viewId === 'products' && (param || productSearchInput.value)) {
+                const params = new URLSearchParams();
+                if (param && param !== 'All') params.set('category', param);
+                if (productSearchInput.value) params.set('search', productSearchInput.value);
+                if (params.toString()) newHash += `?${params.toString()}`;
+            } else if (viewId === 'product-detail' && param) {
+                newHash += `?id=${param}`;
+            }
+            history.pushState(null, '', newHash);
+
+            updateActiveNavLink(newHash);
+        }
+
+        function updateActiveNavLink(currentHash) {
+            document.querySelectorAll('.nav-menu li a').forEach(link => {
+                link.classList.remove('active'); // Remove any existing active classes
+
+                let linkHref = link.getAttribute('href');
+                let linkView = link.dataset.view;
+                let linkCategory = link.dataset.category;
+
+                // Simple match for home and contact
+                if (currentHash === linkHref) {
+                    link.classList.add('active');
+                }
+                // Match for products and products with category
+                else if (currentHash.startsWith('#products')) {
+                    if (linkView === 'products') {
+                        if (!linkCategory && currentHash === '#products') {
+                            link.classList.add('active'); // "All Products" link
+                        } else if (linkCategory && currentHash.includes(`category=${linkCategory}`)) {
+                            link.classList.add('active'); // Category specific link
+                        }
+                    }
+                }
+            });
+        }
+
+
+        // Product Listing
+        function createProductCard(product) {
+            const card = document.createElement('div');
+            card.classList.add('product-card');
+            card.innerHTML = `
+                <img src="${product.imageUrl}" alt="${product.name}" data-id="${product.id}">
+                <div class="product-card-content">
+                    <h3 data-id="${product.id}">${product.name}</h3>
+                    <p>₹${product.price.toLocaleString('en-IN')}</p>
+                    <button class="primary add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+                </div>
+            `;
+            card.querySelector('img').addEventListener('click', () => showView('product-detail', product.id));
+            card.querySelector('h3').addEventListener('click', () => showView('product-detail', product.id));
+            card.querySelector('.add-to-cart-btn').addEventListener('click', (e) => {
+                addToCart(product.id);
+                e.stopPropagation(); // Prevent card click event
+            });
+            return card;
+        }
+
+        function renderProducts(category = 'All', search = '') {
+            productListElement.innerHTML = '';
+            const filteredProducts = products.filter(product => {
+                const matchesCategory = category === 'All' || product.category === category || product.material.includes(category);
+                const matchesSearch = search === '' || product.name.toLowerCase().includes(search.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+
+            if (filteredProducts.length === 0) {
+                productListElement.innerHTML = '<p style="text-align: center; grid-column: 1 / -1; color: var(--light-text-color);">No products found matching your criteria.</p>';
+            } else {
+                filteredProducts.forEach(product => {
+                    productListElement.appendChild(createProductCard(product));
+                });
+            }
+        }
+
+        function renderNewArrivals() {
+            newArrivalsGrid.innerHTML = '';
+            // Get 4 most recent products as "new arrivals"
+            const newArrivals = products.slice(0, 4);
+            newArrivals.forEach(product => {
+                newArrivalsGrid.appendChild(createProductCard(product));
+            });
+        }
+
+        function applyProductFilters() {
+            const category = productCategoryFilter.value;
+            const search = productSearchInput.value;
+            showView('products', category); // This will re-render with search and category
+        }
+
+        // Product Detail View
+        function renderProductDetail(productId) {
+            currentProduct = products.find(p => p.id === productId);
+            if (!currentProduct) {
+                alert('Product not found!');
+                showView('products');
+                return;
+            }
+
+            document.getElementById('pd-name').textContent = currentProduct.name;
+            document.getElementById('pd-price').textContent = `₹${currentProduct.price.toLocaleString('en-IN')}`;
+            document.getElementById('pd-description').textContent = currentProduct.description;
+            document.getElementById('pd-sku').textContent = currentProduct.sku;
+            document.getElementById('pd-weight').textContent = currentProduct.weight;
+            document.getElementById('pd-material').textContent = currentProduct.material;
+            document.getElementById('pd-stock').textContent = currentProduct.stock;
+            document.getElementById('pd-quantity').value = 1;
+
+            const mainImg = document.getElementById('pd-main-img');
+            const thumbnailsContainer = document.getElementById('pd-thumbnails');
+            thumbnailsContainer.innerHTML = '';
+
+            mainImg.src = currentProduct.images[0];
+            currentProduct.images.forEach((imgSrc, index) => {
+                const img = document.createElement('img');
+                img.src = imgSrc;
+                img.alt = `${currentProduct.name} thumbnail ${index + 1}`;
+                img.addEventListener('click', () => {
+                    mainImg.src = imgSrc;
+                    thumbnailsContainer.querySelectorAll('img').forEach(thumb => thumb.classList.remove('active'));
+                    img.classList.add('active');
+                });
+                if (index === 0) {
+                    img.classList.add('active');
+                }
+                thumbnailsContainer.appendChild(img);
+            });
+
+            document.getElementById('pd-add-to-cart').onclick = () => {
+                const quantity = parseInt(document.getElementById('pd-quantity').value);
+                if (isNaN(quantity) || quantity < 1) {
+                    alert('Please enter a valid quantity.');
+                    return;
+                }
+                addToCart(currentProduct.id, quantity);
+            };
+        }
+
+        // Cart Management
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCountElement.textContent = totalItems;
+        }
+
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+        }
+
+        function addToCart(productId, quantity = 1) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const existingItem = cart.find(item => item.id === productId);
+
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    imageUrl: product.imageUrl,
+                    quantity: quantity
+                });
+            }
+            saveCart();
+            alert(`${quantity} x ${product.name} added to cart!`);
+        }
+
+        function updateCartItemQuantity(productId, newQuantity) {
+            const item = cart.find(i => i.id === productId);
+            if (item) {
+                item.quantity = newQuantity;
+                if (item.quantity <= 0) {
+                    cart = cart.filter(i => i.id !== productId);
+                }
+                saveCart();
+                renderCart();
+            }
+        }
+
+        function removeCartItem(productId) {
+            if (confirm('Are you sure you want to remove this item from your cart?')) {
+                cart = cart.filter(item => item.id !== productId);
+                saveCart();
+                renderCart();
+            }
+        }
+
+        function renderCart() {
+            const cartItemsBody = document.getElementById('cart-items-body');
+            const cartSubtotalElement = document.getElementById('cart-subtotal');
+            const cartShippingElement = document.getElementById('cart-shipping');
+            const cartGrandTotalElement = document.getElementById('cart-grand-total');
+            const cartContentDiv = document.getElementById('cart-content');
+            const emptyCartMessageDiv = document.getElementById('empty-cart-message');
+
+            cartItemsBody.innerHTML = '';
+            let subtotal = 0;
+            const shipping = cart.length > 0 ? 500 : 0; // Simulated shipping cost
+
+            if (cart.length === 0) {
+                cartContentDiv.style.display = 'none';
+                emptyCartMessageDiv.style.display = 'block';
+            } else {
+                cartContentDiv.style.display = 'block';
+                emptyCartMessageDiv.style.display = 'none';
+
+                cart.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    subtotal += itemTotal;
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <img src="${item.imageUrl}" alt="${item.name}">
+                                <a href="#product-detail?id=${item.id}" onclick="showView('product-detail', '${item.id}')">${item.name}</a>
+                            </div>
+                        </td>
+                        <td>₹${item.price.toLocaleString('en-IN')}</td>
+                        <td>
+                            <div class="cart-quantity-controls">
+                                <button class="secondary" onclick="updateCartItemQuantity('${item.id}', ${item.quantity - 1})">-</button>
+                                <input type="number" value="${item.quantity}" min="1" onchange="updateCartItemQuantity('${item.id}', parseInt(this.value))">
+                                <button class="secondary" onclick="updateCartItemQuantity('${item.id}', ${item.quantity + 1})">+</button>
+                            </div>
+                        </td>
+                        <td>₹${itemTotal.toLocaleString('en-IN')}</td>
+                        <td><button class="danger" onclick="removeCartItem('${item.id}')">Remove</button></td>
+                    `;
+                    cartItemsBody.appendChild(row);
+                });
+            }
+
+            cartSubtotalElement.textContent = subtotal.toLocaleString('en-IN');
+            cartShippingElement.textContent = shipping.toLocaleString('en-IN');
+            cartGrandTotalElement.textContent = (subtotal + shipping).toLocaleString('en-IN');
+        }
+
+        // Event Listeners for navigation and search
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const view = e.target.dataset.view;
+                const category = e.target.dataset.category;
+                showView(view, category);
+            });
+        });
+
+        document.querySelector('.cart-icon').addEventListener('click', (e) => {
+            e.preventDefault();
+            showView('cart');
+        });
+
+        // Simple search toggle (simulated)
+        document.querySelector('.search-toggle').addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('Search functionality is integrated into the "All Products" page.');
+            showView('products');
+            productSearchInput.focus();
+        });
+
+        document.querySelector('.user-profile').addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('User profile/login is simulated. No actual authentication implemented.');
+        });
+
+        // Initial load based on URL hash
+        window.addEventListener('hashchange', () => {
+            const hash = window.location.hash;
+            if (hash.startsWith('#products?id=')) { // This is an old PDP hash, convert to new
+                const productId = hash.split('id=')[1];
+                showView('product-detail', productId);
+            } else if (hash.startsWith('#products')) {
+                const urlParams = new URLSearchParams(hash.split('?')[1]);
+                const category = urlParams.get('category') || 'All';
+                const search = urlParams.get('search') || '';
+                showView('products', category, search);
+            } else if (hash.startsWith('#product-detail?id=')) {
+                const productId = hash.split('id=')[1];
+                showView('product-detail', productId);
+            } else if (hash === '#cart') {
+                showView('cart');
+            } else if (hash === '#contact') {
+                showView('contact');
+            }
+            else {
+                showView('home');
+            }
+        });
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCartCount();
+            const initialHash = window.location.hash;
+            if (initialHash) {
+                // Trigger hashchange event listeners
+                window.dispatchEvent(new Event('hashchange'));
+            } else {
+                showView('home');
+            }
+        });
+    </script>
+</body>
+</html>
+```

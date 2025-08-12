@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Quiz App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        #quiz-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 2.2em;
+        }
+
+        #question-display {
+            font-size: 1.6em;
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #e9f5ff;
+            border-radius: 8px;
+            border: 1px solid #cceeff;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.4;
+        }
+
+        #answer-buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .answer-button {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            background-color: #3498db;
+            color: white;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+            outline: none;
+        }
+
+        .answer-button:hover:not([disabled]) {
+            background-color: #2980b9;
+            border-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .answer-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+            background-color: #cccccc;
+            border-color: #999999;
+            color: #666666;
+        }
+
+        .answer-button.correct {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .answer-button.incorrect {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+
+        #next-button {
+            padding: 12px 25px;
+            margin-top: 30px;
+            border: none;
+            border-radius: 8px;
+            background-color: #007bff;
+            color: white;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            outline: none;
+            display: none; /* Hidden by default */
+        }
+
+        #next-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        #score-display {
+            margin-top: 25px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container">
+        <h1>Simple Quiz</h1>
+        <div id="question-display"></div>
+        <div id="answer-buttons"></div>
+        <button id="next-button">Next</button>
+        <div id="score-display">Score: 0</div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "What is the capital of France?",
+                options: ["Berlin", "Madrid", "Paris", "Rome"],
+                correctAnswer: 2
+            },
+            {
+                question: "Which planet is known as the Red Planet?",
+                options: ["Earth", "Mars", "Jupiter", "Venus"],
+                correctAnswer: 1
+            },
+            {
+                question: "What is the largest ocean on Earth?",
+                options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+                correctAnswer: 3
+            },
+            {
+                question: "What is 2 + 2?",
+                options: ["3", "4", "5", "6"],
+                correctAnswer: 1
+            },
+            {
+                question: "Who wrote 'Romeo and Juliet'?",
+                options: ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"],
+                correctAnswer: 1
+            }
+        ];
+
+        const questionDisplay = document.getElementById('question-display');
+        const answerButtonsContainer = document.getElementById('answer-buttons');
+        const nextButton = document.getElementById('next-button');
+        const scoreDisplay = document.getElementById('score-display');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answerSelected = false;
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            answerSelected = false;
+            scoreDisplay.textContent = `Score: ${score}`;
+            nextButton.textContent = 'Next';
+            nextButton.style.display = 'none';
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            answerSelected = false;
+            if (currentQuestionIndex < questions.length) {
+                const currentQuestion = questions[currentQuestionIndex];
+                questionDisplay.textContent = currentQuestion.question;
+                answerButtonsContainer.innerHTML = '';
+                nextButton.style.display = 'none';
+
+                currentQuestion.options.forEach((option, index) => {
+                    const button = document.createElement('button');
+                    button.textContent = option;
+                    button.classList.add('answer-button');
+                    button.addEventListener('click', () => selectAnswer(index));
+                    answerButtonsContainer.appendChild(button);
+                });
+            } else {
+                showScore();
+            }
+        }
+
+        function selectAnswer(selectedIndex) {
+            if (answerSelected) return; // Prevent multiple selections for the same question
+            answerSelected = true;
+
+            const currentQuestion = questions[currentQuestionIndex];
+            const isCorrect = selectedIndex === currentQuestion.correctAnswer;
+
+            if (isCorrect) {
+                score++;
+                scoreDisplay.textContent = `Score: ${score}`;
+            }
+
+            Array.from(answerButtonsContainer.children).forEach((button, index) => {
+                button.disabled = true; // Disable all buttons after selection
+                if (index === currentQuestion.correctAnswer) {
+                    button.classList.add('correct'); // Highlight correct answer
+                } else if (index === selectedIndex && !isCorrect) {
+                    button.classList.add('incorrect'); // Highlight selected incorrect answer
+                }
+            });
+
+            nextButton.style.display = 'block';
+            if (currentQuestionIndex === questions.length - 1) {
+                nextButton.textContent = 'Finish Quiz';
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showScore();
+            }
+        }
+
+        function showScore() {
+            questionDisplay.textContent = `Quiz Completed! Your final score is ${score} out of ${questions.length}.`;
+            answerButtonsContainer.innerHTML = '';
+            nextButton.style.display = 'block';
+            nextButton.textContent = 'Play Again';
+        }
+
+        nextButton.addEventListener('click', () => {
+            if (currentQuestionIndex < questions.length) { // If there are more questions or currently on the last question
+                nextQuestion();
+            } else { // Quiz completed, user wants to play again
+                startQuiz();
+            }
+        });
+
+        // Start the quiz when the page loads
+        startQuiz();
+    </script>
+</body>
+</html>

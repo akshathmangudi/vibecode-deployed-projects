@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>trip to go</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-align: center;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px 40px;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 15px;
+        }
+
+        .current-time #datetime-display {
+            font-size: 2.8em;
+            font-weight: bold;
+            color: #2980b9;
+            margin-bottom: 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .current-time #date-display {
+            font-size: 1.5em;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .quote-of-the-day #quote-display {
+            font-size: 1.4em;
+            font-style: italic;
+            color: #444;
+            margin-top: 15px;
+            line-height: 1.6;
+        }
+
+        .chat-of-day #chat-display {
+            font-size: 1.4em;
+            font-style: normal;
+            color: #444;
+            margin-top: 15px;
+            line-height: 1.6;
+        }
+
+        .food-suggestion #food-display {
+            font-size: 1.4em;
+            font-style: normal;
+            color: #444;
+            margin-top: 15px;
+            line-height: 1.6;
+        }
+
+        .date-difference-calculator .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .date-difference-calculator label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+            text-align: left;
+        }
+
+        .date-difference-calculator input[type="date"] {
+            width: calc(100% - 20px);
+            padding: 12px 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1.1em;
+            box-sizing: border-box;
+            background-color: #fcfcfc;
+            transition: border-color 0.3s ease;
+        }
+
+        .date-difference-calculator input[type="date"]:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+
+        .date-difference-calculator button,
+        .food-suggestion button {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 8px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: auto;
+            min-width: 180px;
+            margin-top: 10px;
+        }
+
+        .date-difference-calculator button:hover,
+        .food-suggestion button:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        .date-difference-calculator button:active,
+        .food-suggestion button:active {
+            transform: translateY(0);
+        }
+
+        .date-difference-calculator #difference-result {
+            margin-top: 30px;
+            font-size: 1.3em;
+            color: #2c3e50;
+            font-weight: bold;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+                margin-bottom: 20px;
+            }
+
+            .container {
+                padding: 25px 30px;
+            }
+
+            h2 {
+                font-size: 1.5em;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+            }
+
+            .current-time #datetime-display {
+                font-size: 2em;
+            }
+
+            .current-time #date-display {
+                font-size: 1.2em;
+            }
+
+            .quote-of-the-day #quote-display,
+            .chat-of-day #chat-display,
+            .food-suggestion #food-display {
+                font-size: 1.2em;
+            }
+
+            .date-difference-calculator input[type="date"] {
+                font-size: 1em;
+            }
+
+            .date-difference-calculator button,
+            .food-suggestion button {
+                font-size: 1.1em;
+                padding: 12px 20px;
+            }
+
+            .date-difference-calculator #difference-result {
+                font-size: 1.1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .container {
+                padding: 20px 20px;
+                margin-bottom: 20px;
+            }
+
+            h2 {
+                font-size: 1.3em;
+            }
+
+            .current-time #datetime-display {
+                font-size: 1.8em;
+            }
+
+            .current-time #date-display {
+                font-size: 1em;
+            }
+
+            .quote-of-the-day #quote-display,
+            .chat-of-day #chat-display,
+            .food-suggestion #food-display {
+                font-size: 1em;
+            }
+
+            .date-difference-calculator button,
+            .food-suggestion button {
+                width: 100%;
+                min-width: unset;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>trip to go</h1>
+
+    <div class="container current-time">
+        <h2>Current Date & Time</h2>
+        <div id="datetime-display"></div>
+        <div id="date-display"></div>
+    </div>
+
+    <div class="container quote-of-the-day">
+        <h2>Daily Inspiration</h2>
+        <div id="quote-display"></div>
+    </div>
+
+    <div class="container chat-of-day">
+        <h2>Daily Thought</h2>
+        <div id="chat-display"></div>
+    </div>
+
+    <div class="container food-suggestion">
+        <h2>Food Menu Suggestion</h2>
+        <div id="food-display"></div>
+        <button id="new-food-suggestion">Get New Suggestion</button>
+    </div>
+
+    <div class="container date-difference-calculator">
+        <h2>Calculate Event Duration</h2>
+        <div class="input-group">
+            <label for="start-date">Event Start Date:</label>
+            <input type="date" id="start-date">
+        </div>
+        <div class="input-group">
+            <label for="end-date">Event End Date:</label>
+            <input type="date" id="end-date">
+        </div>
+        <button id="calculate-difference">Calculate Duration</button>
+        <div id="difference-result"></div>
+    </div>
+
+    <script>
+        // --- Current Date & Time Display ---
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('datetime-display').textContent = now.toLocaleTimeString();
+            document.getElementById('date-display').textContent = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // Update every second
+        setInterval(updateDateTime, 1000);
+        updateDateTime(); // Initial call to display immediately
+
+        // --- Quote of the Day Display ---
+        const quotes = [
+            "The only way to do great work is to love what you do. – Steve Jobs",
+            "Believe you can and you're halfway there. – Theodore Roosevelt",
+            "The future belongs to those who believe in the beauty of their dreams. – Eleanor Roosevelt",
+            "It is during our darkest moments that we must focus to see the light. – Aristotle Onassis",
+            "Don't watch the clock; do what it does. Keep going. – Sam Levenson",
+            "The best way to predict the future is to create it. – Peter Drucker",
+            "Success is not final, failure is not fatal: It is the courage to continue that counts. – Winston Churchill",
+            "The mind is everything. What you think you become. – Buddha",
+            "Strive not to be a success, but rather to be of value. – Albert Einstein",
+            "Life is 10% what happens to us and 90% how we react to it. – Charles R. Swindoll",
+            "The successful warrior is the average man, with laser-like focus. – Bruce Lee",
+            "Opportunities don't happen, you create them. – Chris Grosser",
+            "The only limit to our realization of tomorrow will be our doubts of today. – Franklin D. Roosevelt"
+        ];
+
+        function displayRandomQuote() {
+            const quoteDisplay = document.getElementById('quote-display');
+            if (quoteDisplay) {
+                const randomIndex = Math.floor(Math.random() * quotes.length);
+                quoteDisplay.textContent = quotes[randomIndex];
+            }
+        }
+
+        // Initial call to display a quote
+        displayRandomQuote();
+
+        // --- Auto Chat of Day Display ---
+        const chats = [
+            "Hello! Hope you're having a fantastic day.",
+            "Remember to stay hydrated and take short breaks!",
+            "You've got this! Keep pushing forward.",
+            "What's one thing you're grateful for today?",
+            "Don't forget to smile!",
+            "Wishing you a productive and joyful day.",
+            "Every small step counts!",
+            "Take a moment to appreciate your progress.",
+            "Sending positive vibes your way!",
+            "It's a great day to achieve your goals."
+        ];
+
+        function displayRandomChat() {
+            const chatDisplay = document.getElementById('chat-display');
+            if (chatDisplay) {
+                const randomIndex = Math.floor(Math.random() * chats.length);
+                chatDisplay.textContent = chats[randomIndex];
+            }
+        }
+
+        // Initial call to display a chat
+        displayRandomChat();
+        // Update every minute (60 seconds)
+        setInterval(displayRandomChat, 60000);
+
+        // --- Food Menu Suggestion ---
+        const foodSuggestions = [
+            "Pizza",
+            "Pasta Carbonara",
+            "Chicken Curry",
+            "Sushi",
+            "Beef Tacos",
+            "Vegetable Stir-fry",
+            "Grilled Salmon with Asparagus",
+            "Burger and Fries",
+            "Lentil Soup",
+            "Margherita Pizza",
+            "Spaghetti Bolognese",
+            "Fish and Chips",
+            "Caesar Salad",
+            "Ramen",
+            "Falafel Wrap"
+        ];
+
+        function displayRandomFoodSuggestion() {
+            const foodDisplay = document.getElementById('food-display');
+            if (foodDisplay) {
+                const randomIndex = Math.floor(Math.random() * foodSuggestions.length);
+                foodDisplay.textContent = foodSuggestions[randomIndex];
+            }
+        }
+
+        // Initial call to display a food suggestion
+        displayRandomFoodSuggestion();
+
+        // Event listener for the "Get New Suggestion" button
+        document.getElementById('new-food-suggestion').addEventListener('click', displayRandomFoodSuggestion);
+
+        // --- Date Difference Calculator ---
+        document.getElementById('calculate-difference').addEventListener('click', () => {
+            const startDateInput = document.getElementById('start-date').value;
+            const endDateInput = document.getElementById('end-date').value;
+            const resultDisplay = document.getElementById('difference-result');
+
+            if (!startDateInput || !endDateInput) {
+                resultDisplay.textContent = 'Please select both event start and end dates.';
+                resultDisplay.style.color = '#e74c3c';
+                return;
+            }
+
+            const startDate = new Date(startDateInput);
+            const endDate = new Date(endDateInput);
+
+            // Set times to midnight to ensure calculation is purely based on dates
+            startDate.setHours(0, 0, 0, 0);
+            endDate.setHours(0, 0, 0, 0);
+
+            let diffMs = endDate.getTime() - startDate.getTime(); // Difference in milliseconds
+
+            const sign = diffMs < 0 ? 'before' : 'after';
+            diffMs = Math.abs(diffMs);
+
+            const seconds = Math.floor(diffMs / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+
+            const displaySeconds = seconds % 60;
+            const displayMinutes = minutes % 60;
+            const displayHours = hours % 24;
+
+            let resultString = '';
+            if (diffMs === 0) {
+                resultString = 'The event dates are the same.';
+            } else {
+                let parts = [];
+                if (days > 0) parts.push(`${days} day${days === 1 ? '' : 's'}`);
+                if (displayHours > 0) parts.push(`${displayHours} hour${displayHours === 1 ? '' : 's'}`);
+                if (displayMinutes > 0) parts.push(`${displayMinutes} minute${displayMinutes === 1 ? '' : 's'}`);
+                if (displaySeconds > 0) parts.push(`${displaySeconds} second${displaySeconds === 1 ? '' : 's'}`);
+
+                if (parts.length === 0) {
+                    resultString = 'Less than a second difference in event duration.';
+                } else {
+                    resultString = `The event ends ${parts.join(', ')} ${sign} the event starts.`;
+                }
+            }
+
+            resultDisplay.textContent = resultString;
+            resultDisplay.style.color = '#2c3e50';
+        });
+    </script>
+</body>
+</html>

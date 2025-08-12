@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe Code</title>
+    <style>
+        :root {
+            --bg-color: #0A001A;
+            --text-color-primary: #00FFFF; /* Cyan */
+            --text-color-secondary: #FF69B4; /* Pink */
+            --text-color-tertiary: #BF00FF; /* Purple */
+            --border-color: #BF00FF;
+            --glow-color-primary: #00FFFF;
+            --glow-color-secondary: #FF69B4;
+            --glow-color-tertiary: #BF00FF;
+            --font-mono: 'Fira Code', 'Cascadia Code', 'Consolas', 'Monaco', 'Andale Mono', 'Ubuntu Mono', monospace;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: var(--font-mono);
+            background-color: var(--bg-color);
+            color: var(--text-color-primary);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            box-sizing: border-box;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: #0d0022;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 0 15px var(--glow-color-tertiary), 0 0 30px var(--glow-color-tertiary) inset;
+            padding: 30px;
+            border-radius: 10px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            animation: pulse-border 2s infinite alternate;
+        }
+
+        @keyframes pulse-border {
+            from {
+                box-shadow: 0 0 15px var(--glow-color-tertiary), 0 0 30px var(--glow-color-tertiary) inset;
+            }
+            to {
+                box-shadow: 0 0 25px var(--glow-color-secondary), 0 0 50px var(--glow-color-secondary) inset;
+            }
+        }
+
+        h1 {
+            font-size: 2.8em;
+            text-align: center;
+            color: var(--text-color-secondary);
+            text-shadow: 0 0 10px var(--glow-color-secondary), 0 0 20px var(--glow-color-secondary), 0 0 30px var(--glow-color-secondary);
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            animation: text-glow 1.5s infinite alternate;
+        }
+
+        @keyframes text-glow {
+            from {
+                text-shadow: 0 0 10px var(--glow-color-secondary), 0 0 20px var(--glow-color-secondary);
+            }
+            to {
+                text-shadow: 0 0 15px var(--glow-color-secondary), 0 0 25px var(--glow-color-secondary), 0 0 40px var(--glow-color-secondary);
+            }
+        }
+
+        .editor-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            min-height: 400px;
+        }
+
+        textarea, .code-output {
+            flex: 1;
+            min-width: 300px;
+            background-color: #050010;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            font-size: 1.1em;
+            color: var(--text-color-primary);
+            box-sizing: border-box;
+            outline: none;
+            resize: vertical;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            box-shadow: 0 0 8px var(--glow-color-primary) inset, 0 0 15px var(--glow-color-primary);
+            transition: all 0.3s ease;
+            border-radius: 5px;
+            line-height: inherit; /* Ensure line height consistency */
+        }
+
+        textarea:focus {
+            border-color: var(--glow-color-secondary);
+            box-shadow: 0 0 12px var(--glow-color-secondary) inset, 0 0 20px var(--glow-color-secondary);
+        }
+
+        textarea::placeholder {
+            color: rgba(0, 255, 255, 0.4);
+        }
+
+        .code-output {
+            position: relative;
+            cursor: default;
+            min-height: 300px;
+        }
+
+        .code-output .keyword {
+            color: var(--text-color-secondary);
+            text-shadow: 0 0 3px var(--glow-color-secondary);
+        }
+        .code-output .string {
+            color: var(--text-color-tertiary);
+            text-shadow: 0 0 3px var(--glow-color-tertiary);
+        }
+        .code-output .comment {
+            color: rgba(0, 255, 255, 0.6);
+        }
+        .code-output .number {
+            color: var(--text-color-primary);
+        }
+
+        .code-output::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent 1px,
+                rgba(0, 255, 255, 0.05) 1px,
+                rgba(0, 255, 255, 0.05) 2px
+            );
+            pointer-events: none;
+            opacity: 0.2;
+        }
+
+        @media (max-width: 768px) {
+            .editor-container {
+                flex-direction: column;
+            }
+            textarea, .code-output {
+                width: 100%;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            body {
+                padding: 15px;
+            }
+            #app-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <h1>Vibe Code // terminal 3000 //</h1>
+        <div class="editor-container">
+            <textarea id="code-input" spellcheck="false" placeholder="Type your code or text here...
+Example:
+
+function greet(name) {
+  // This is a comment
+  const message = 'Hello, ' + name + '! Welcome to Vibe Code.';
+  console.log(message); // Log to console
+  return 123;
+}
+
+greet('Viber');
+"></textarea>
+            <div id="code-output" class="code-output"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const codeInput = document.getElementById('code-input');
+            const codeOutput = document.getElementById('code-output');
+
+            const highlightCode = () => {
+                let text = codeInput.value;
+
+                text = text.replace(/&/g, '&amp;')
+                           .replace(/</g, '&lt;')
+                           .replace(/>/g, '&gt;')
+                           .replace(/"/g, '&quot;')
+                           .replace(/'/g, '&apos;');
+
+                const replacements = [];
+
+                // Store comments first to prevent them from being highlighted as keywords/strings
+                text = text.replace(/(\/\*[\s\S]*?\*\/)/g, (match, p1) => {
+                    const placeholder = `__COMMENT_${replacements.length}__`;
+                    replacements.push({ type: 'comment', value: p1 });
+                    return placeholder;
+                });
+                text = text.replace(/(\/\/[^\n]*)/g, (match, p1) => {
+                    const placeholder = `__COMMENT_${replacements.length}__`;
+                    replacements.push({ type: 'comment', value: p1 });
+                    return placeholder;
+                });
+
+                // Store string literals
+                text = text.replace(/(".*?"|'.*?'|`.*?`)/g, (match, p1) => {
+                    const placeholder = `__STRING_${replacements.length}__`;
+                    replacements.push({ type: 'string', value: p1 });
+                    return placeholder;
+                });
+
+                // Store numbers
+                text = text.replace(/\b(\d+(\.\d+)?([eE][+-]?\d+)?)\b/g, (match, p1) => {
+                    const placeholder = `__NUMBER_${replacements.length}__`;
+                    replacements.push({ type: 'number', value: p1 });
+                    return placeholder;
+                });
+
+                // Apply keyword highlighting
+                const keywords = ['function', 'const', 'let', 'var', 'return', 'if', 'else', 'for', 'while', 'class', 'this', 'new', 'import', 'export', 'await', 'async', 'try', 'catch', 'finally', 'break', 'continue', 'switch', 'case', 'default', 'true', 'false', 'null', 'undefined', 'typeof', 'instanceof', 'delete', 'void'];
+                keywords.forEach(keyword => {
+                    text = text.replace(new RegExp(`\\b${keyword}\\b`, 'g'), `<span class="keyword">${keyword}</span>`);
+                });
+
+                // Restore stored elements
+                replacements.forEach((item, index) => {
+                    const placeholder = `__${item.type.toUpperCase()}_${index}__`;
+                    text = text.replace(placeholder, `<span class="${item.type}">${item.value}</span>`);
+                });
+                
+                codeOutput.innerHTML = text;
+            };
+
+            highlightCode();
+            codeInput.addEventListener('input', highlightCode);
+        });
+    </script>
+</body>
+</html>

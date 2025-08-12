@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tea Lover's Timer</title>
+    <style>
+        :root {
+            --bg-color: #f0f4f8; /* Light blue-grey, soothing */
+            --card-bg: #ffffff; /* White */
+            --text-color: #334e68; /* Dark blue-grey */
+            --primary-color: #6a994e; /* Tea leaf green */
+            --accent-color: #c4793f; /* Brewed tea brown */
+            --border-color: #e0e6ed; /* Light grey border */
+            --button-hover-bg: #f5f5f5;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        #app {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+
+        #tea-selection {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        #tea-selection button,
+        #controls button {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+            outline: none;
+        }
+
+        #tea-selection button:hover:not(:disabled),
+        #controls button:hover:not(:disabled) {
+            background-color: var(--button-hover-bg);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        #tea-selection button.selected {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        #tea-selection button:disabled,
+        #controls button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #timer-display {
+            font-size: 4em;
+            font-weight: bold;
+            margin: 30px 0;
+            color: var(--accent-color);
+            letter-spacing: 2px;
+            min-height: 1.5em; /* Prevent layout shift */
+        }
+
+        #controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        #start-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        #start-btn:hover:not(:disabled) {
+            background-color: #5b8245; /* Darker primary */
+            border-color: #5b8245;
+        }
+
+        @media (max-width: 600px) {
+            #app {
+                margin: 20px;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            #timer-display {
+                font-size: 3.5em;
+            }
+
+            #tea-selection button,
+            #controls button {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>🍵 Tea Lover's Timer</h1>
+
+        <div id="tea-selection">
+            <button data-tea-type="Green">Green (2min)</button>
+            <button data-tea-type="Black">Black (3min)</button>
+            <button data-tea-type="Herbal">Herbal (5min)</button>
+            <button data-tea-type="Oolong">Oolong (4min)</button>
+            <button data-tea-type="White">White (1.5min)</button>
+            <button data-tea-type="Rooibos">Rooibos (6min)</button>
+        </div>
+
+        <div id="timer-display">00:00</div>
+
+        <div id="controls">
+            <button id="start-btn" disabled>Start Brewing</button>
+            <button id="reset-btn" disabled>Reset</button>
+        </div>
+    </div>
+
+    <script>
+        const brewTimes = {
+            "Green": 120,    // 2 minutes
+            "Black": 180,    // 3 minutes
+            "Herbal": 300,   // 5 minutes
+            "Oolong": 240,   // 4 minutes
+            "White": 90,     // 1.5 minutes
+            "Rooibos": 360   // 6 minutes
+        };
+
+        let currentTeaType = null;
+        let timeLeft = 0;
+        let timerInterval = null;
+        let isTimerRunning = false;
+
+        const timerDisplay = document.getElementById('timer-display');
+        const startBtn = document.getElementById('start-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const teaSelectionContainer = document.getElementById('tea-selection');
+        const teaSelectionButtons = teaSelectionContainer.querySelectorAll('button');
+
+        // --- Utility Functions ---
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+        }
+
+        function updateDisplay() {
+            timerDisplay.textContent = formatTime(timeLeft);
+        }
+
+        function playAlarm() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (!audioCtx) {
+                    throw new Error("AudioContext not supported.");
+                }
+
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note for a sharper sound
+                gainNode.gain.setValueAtTime(0.7, audioCtx.currentTime); // A bit louder
+
+                oscillator.start();
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5); // Fade out over 1.5 sec
+                oscillator.stop(audioCtx.currentTime + 1.5);
+
+                // For visual feedback
+                document.body.style.backgroundColor = var_accent_color; // Assuming you have this CSS variable
+                setTimeout(() => {
+                    document.body.style.backgroundColor = ''; // Reset after a short while
+                }, 1000);
+                alert("Your tea is ready! Enjoy!"); // Fallback/additional notification
+            } catch (e) {
+                console.error("Error playing alarm:", e);
+                alert("Brewing complete! Your tea is ready!");
+            }
+        }
+
+        // --- Core Logic Functions ---
+        function selectTea(type) {
+            if (isTimerRunning) return; // Prevent changing tea while brewing
+
+            currentTeaType = type;
+            timeLeft = brewTimes[type];
+
+            // Update active button styling
+            teaSelectionButtons.forEach(button => {
+                if (button.dataset.teaType === type) {
+                    button.classList.add('selected');
+                } else {
+                    button.classList.remove('selected');
+                }
+            });
+
+            updateDisplay();
+            startBtn.disabled = false;
+            resetBtn.disabled = false;
+        }
+
+        function startTimer() {
+            if (isTimerRunning || timeLeft <= 0) {
+                return;
+            }
+
+            isTimerRunning = true;
+            startBtn.disabled = true;
+            teaSelectionButtons.forEach(button => button.disabled = true); // Disable selection during timer
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateDisplay();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    isTimerRunning = false;
+                    playAlarm();
+                    resetTimerState(); // Reset buttons and allow new selection
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            timerInterval = null;
+            resetTimerState();
+
+            // Re-set time if a tea was selected
+            if (currentTeaType) {
+                timeLeft = brewTimes[currentTeaType];
+            } else {
+                timeLeft = 0;
+            }
+            updateDisplay();
+
+            startBtn.disabled = !currentTeaType; // Disable start if no tea selected
+        }
+
+        function resetTimerState() {
+            startBtn.disabled = false;
+            teaSelectionButtons.forEach(button => button.disabled = false);
+        }
+
+        // --- Event Listeners ---
+        teaSelectionButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                selectTea(button.dataset.teaType);
+            });
+        });
+
+        startBtn.addEventListener('click', startTimer);
+        resetBtn.addEventListener('click', resetTimer);
+
+        // Initial display update
+        updateDisplay();
+    </script>
+</body>
+</html>

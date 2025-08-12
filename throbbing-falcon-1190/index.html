@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Counter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .counter-container {
+            background-color: #ffffff;
+            padding: 40px 60px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        #counter {
+            font-size: 6em;
+            margin-bottom: 30px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .buttons-container button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            margin: 0 10px;
+            border-radius: 8px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+        }
+
+        .buttons-container button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .buttons-container button:active {
+            background-color: #216ba2;
+            transform: translateY(0);
+        }
+
+        #decrementBtn {
+            background-color: #e74c3c;
+        }
+
+        #decrementBtn:hover {
+            background-color: #c0392b;
+        }
+
+        #decrementBtn:active {
+            background-color: #962d22;
+        }
+    </style>
+</head>
+<body>
+    <div class="counter-container">
+        <div id="counter">0</div>
+        <div class="buttons-container">
+            <button id="decrementBtn">Decrement</button>
+            <button id="incrementBtn">Increment</button>
+        </div>
+    </div>
+
+    <script>
+        let count = 0;
+        const counterDisplay = document.getElementById('counter');
+        const incrementBtn = document.getElementById('incrementBtn');
+        const decrementBtn = document.getElementById('decrementBtn');
+
+        function updateCounterDisplay() {
+            counterDisplay.textContent = count;
+        }
+
+        function increment() {
+            count++;
+            updateCounterDisplay();
+        }
+
+        function decrement() {
+            count--;
+            updateCounterDisplay();
+        }
+
+        incrementBtn.addEventListener('click', increment);
+        decrementBtn.addEventListener('click', decrement);
+
+        // Initial display update
+        updateCounterDisplay();
+    </script>
+</body>
+</html>

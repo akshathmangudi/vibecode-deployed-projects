@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Page</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            outline: none;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            background-color: #004080;
+            transform: translateY(0);
+        }
+
+        #messageDisplay {
+            margin-top: 30px;
+            font-size: 1.4em;
+            color: #28a745;
+            font-weight: bold;
+            min-height: 1.4em; /* To prevent layout shift */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hello, Web Developer!</h1>
+        <p>This is a simple single-file web application, fully contained within one HTML file. Click the button to see a message!</p>
+        <button id="greetButton">Greet Me!</button>
+        <div id="messageDisplay"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const greetButton = document.getElementById('greetButton');
+            const messageDisplay = document.getElementById('messageDisplay');
+            let hasGreeted = false;
+
+            greetButton.addEventListener('click', () => {
+                if (!hasGreeted) {
+                    messageDisplay.textContent = 'Hello there! Nice to meet you virtually.';
+                    greetButton.textContent = 'You\'ve been greeted!';
+                    greetButton.style.backgroundColor = '#6c757d'; /* Change color after click */
+                    greetButton.style.cursor = 'default';
+                    greetButton.disabled = true; /* Disable button after first click */
+                    hasGreeted = true;
+                } else {
+                    // This part won't be reached if button is disabled, but good for potential future logic
+                    messageDisplay.textContent = 'You already said hello!';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

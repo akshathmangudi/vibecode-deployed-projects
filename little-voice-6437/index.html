@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Blog Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            color: #0056b3;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        form {
+            background-color: #f9f9f9;
+            padding: 25px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            margin-bottom: 30px;
+        }
+
+        form div {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"],
+        textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box; /* Include padding in width */
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #posts-container {
+            margin-top: 30px;
+        }
+
+        .blog-post {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .blog-post h3 {
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .blog-post p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .blog-post .post-meta {
+            font-size: 0.9em;
+            color: #999;
+            text-align: right;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simple Blog Tool</h1>
+
+        <h2>Create New Post</h2>
+        <form id="blog-post-form">
+            <div>
+                <label for="post-title">Title:</label>
+                <input type="text" id="post-title" required>
+            </div>
+            <div>
+                <label for="post-content">Content:</label>
+                <textarea id="post-content" required></textarea>
+            </div>
+            <button type="submit">Publish Post</button>
+        </form>
+
+        <h2>Published Posts</h2>
+        <div id="posts-container">
+            <!-- Blog posts will be loaded here by JavaScript -->
+            <p style="text-align: center; color: #777;">No posts yet. Start writing!</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const postForm = document.getElementById('blog-post-form');
+            const postTitleInput = document.getElementById('post-title');
+            const postContentTextarea = document.getElementById('post-content');
+            const postsContainer = document.getElementById('posts-container');
+
+            let blogPosts = loadPosts();
+
+            function loadPosts() {
+                try {
+                    const storedPosts = localStorage.getItem('blogPosts');
+                    return storedPosts ? JSON.parse(storedPosts) : [];
+                } catch (e) {
+                    console.error("Error loading posts from localStorage:", e);
+                    return [];
+                }
+            }
+
+            function savePosts() {
+                try {
+                    localStorage.setItem('blogPosts', JSON.stringify(blogPosts));
+                } catch (e) {
+                    console.error("Error saving posts to localStorage:", e);
+                }
+            }
+
+            function displayPosts() {
+                postsContainer.innerHTML = ''; // Clear existing posts
+
+                if (blogPosts.length === 0) {
+                    postsContainer.innerHTML = '<p style="text-align: center; color: #777;">No posts yet. Start writing!</p>';
+                    return;
+                }
+
+                blogPosts.sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by newest first
+
+                blogPosts.forEach(post => {
+                    const postDiv = document.createElement('div');
+                    postDiv.classList.add('blog-post');
+
+                    const titleEl = document.createElement('h3');
+                    titleEl.textContent = post.title;
+
+                    const contentEl = document.createElement('p');
+                    contentEl.textContent = post.content;
+
+                    const metaEl = document.createElement('div');
+                    metaEl.classList.add('post-meta');
+                    const postDate = new Date(post.date);
+                    metaEl.textContent = `Published on ${postDate.toLocaleDateString()} at ${postDate.toLocaleTimeString()}`;
+
+                    postDiv.appendChild(titleEl);
+                    postDiv.appendChild(contentEl);
+                    postDiv.appendChild(metaEl);
+
+                    postsContainer.appendChild(postDiv);
+                });
+            }
+
+            postForm.addEventListener('submit', (event) => {
+                event.preventDefault(); // Prevent default form submission
+
+                const title = postTitleInput.value.trim();
+                const content = postContentTextarea.value.trim();
+
+                if (title && content) {
+                    const newPost = {
+                        title: title,
+                        content: content,
+                        date: new Date().toISOString()
+                    };
+
+                    blogPosts.push(newPost);
+                    savePosts();
+                    displayPosts();
+
+                    // Clear form fields
+                    postTitleInput.value = '';
+                    postContentTextarea.value = '';
+                } else {
+                    alert('Please enter both title and content for your post.');
+                }
+            });
+
+            // Initial display of posts when the page loads
+            displayPosts();
+        });
+    </script>
+</body>
+</html>

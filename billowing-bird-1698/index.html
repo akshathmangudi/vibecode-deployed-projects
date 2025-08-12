@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SteganoApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-gray-900 text-gray-100;
+            }
+        }
+    </style>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback } = React;
+
+        const Stegano = {
+            textToBinary: (text) => {
+                let binary = '';
+                for (let i = 0; i < text.length; i++) {
+                    binary += text.charCodeAt(i).toString(2).padStart(8, '0');
+                }
+                return binary;
+            },
+
+            binaryToText: (binary) => {
+                let text = '';
+                for (let i = 0; i < binary.length; i += 8) {
+                    text += String.fromCharCode(parseInt(binary.substring(i, i + 8), 2));
+                }
+                return text;
+            },
+
+            hideMessage: (imgSrc, message) => {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.crossOrigin = "Anonymous";
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+
+                        const imageData = ctx.getImageData(0, 0, img.width, img.height);
+                        const data = imageData.data;
+
+                        const messageWithLength = String.fromCharCode(message.length >> 8) + String.fromCharCode(message.length & 0xFF) + message + '\0';
+                        const binaryMessage = Stegano.textToBinary(messageWithLength);
+
+                        if (binaryMessage.length > (data.length / 4) * 3) {
+                            reject('Message too long for this image. Maximum characters: ' + Math.floor(((data.length / 4) * 3) / 8) + '. Current message: ' + message.length);
+                            return;
+                        }
+
+                        let messageIndex = 0;
+                        for (let i = 0; i < data.length; i += 4) {
+                            for (let channel = 0; channel < 3; channel++) {
+                                if (messageIndex < binaryMessage.length) {
+                                    data[i + channel] = (data[i + channel] & 0xFE) | parseInt(binaryMessage[messageIndex], 2);
+                                    messageIndex++;
+                                }
+                            }
+                        }
+
+                        ctx.putImageData(imageData, 0, 0);
+                        resolve(canvas.toDataURL('image/png'));
+                    };
+                    img.onerror = () => reject('Failed to load image. Ensure it is a valid image type and not corrupted.');
+                    img.src = imgSrc;
+                });
+            },
+
+            retrieveMessage: (imgSrc) => {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.crossOrigin = "Anonymous";
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+
+                        const imageData = ctx.getImageData(0, 0, img.width, img.height);
+                        const data = imageData.data;
+
+                        let binaryLength = '';
+                        for (let i = 0; i < 2; i++) {
+                            for (let bit = 0; bit < 8; bit++) {
+                                const channelIndex = (i * 8 + bit) % 3;
+                                const pixelIndex = Math.floor((i * 8 + bit) / 3) * 4;
+                                if (pixelIndex + channelIndex >= data.length) {
+                                    reject('Image too small to contain a message length.');
+                                    return;
+                                }
+                                binaryLength += (data[pixelIndex + channelIndex] & 1).toString();
+                            }
+                        }
+
+                        const messageLength = parseInt(binaryLength.substring(0, 8), 2) * 256 + parseInt(binaryLength.substring(8, 16), 2);
+
+                        let binaryMessage = '';
+                        let charCodeBuffer = '';
+                        let messageBytesRead = 0;
+
+                        for (let i = 2 * 4; i < data.length; i += 4) {
+                            for (let channel = 0; channel < 3; channel++) {
+                                const bit = data[i + channel] & 1;
+                                charCodeBuffer += bit.toString();
+
+                                if (charCodeBuffer.length === 8) {
+                                    const charCode = parseInt(charCodeBuffer, 2);
+                                    if (charCode === 0x00 && messageBytesRead >= messageLength) {
+                                        resolve(Stegano.binaryToText(binaryMessage));
+                                        return;
+                                    }
+                                    binaryMessage += charCodeBuffer;
+                                    messageBytesRead++;
+                                    charCodeBuffer = '';
+
+                                    if (messageBytesRead > messageLength + 10 && messageLength > 0) { // Safety break
+                                        resolve(Stegano.binaryToText(binaryMessage));
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        resolve(Stegano.binaryToText(binaryMessage));
+                    };
+                    img.onerror = () => reject('Failed to load image. Ensure it is a valid image type and not corrupted.');
+                    img.src = imgSrc;
+                });
+            }
+        };
+
+        const NavBar = ({ setPage }) => (
+            <nav className="p-4 bg-gray-800 shadow-md">
+                <div className="container mx-auto flex justify-between items-center">
+                    <span className="text-xl font-bold text-blue-400 cursor-pointer" onClick={() => setPage('home')}>SteganoApp</span>
+                    <div>
+                        <button className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium" onClick={() => setPage('home')}>Home</button>
+                        <button className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium" onClick={() => setPage('contact')}>Contact Us</button>
+                    </div>
+                </div>
+            </nav>
+        );
+
+        const HomePage = ({ setPage }) => (
+            <div className="flex flex-col items-center justify-center min-h-screen p-4">
+                <div className="max-w-3xl text-center">
+                    <h1 className="text-5xl font-extrabold text-white mb-6 animate-pulse">Welcome to SteganoApp</h1>
+                    <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+                        Your go-to application for hiding secret messages within images using advanced steganography techniques.
+                        Keep your communications private and secure, or recover hidden gems from images.
+                    </p>
+                    <p className="text-lg text-gray-400 mb-10">
+                        Click 'Get Started' to begin your journey into the world of digital secrecy.
+                    </p>
+                    <button
+                        onClick={() => setPage('main')}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50"
+                    >
+                        Get Started
+                    </button>
+                </div>
+            </div>
+        );
+
+        const MainMenuPage = ({ setPage }) => (
+            <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
+                <h2 className="text-4xl font-bold text-white mb-12">What would you like to do?</h2>
+                <div className="flex flex-col sm:flex-row gap-8">
+                    <button
+                        onClick={() => setPage('hide')}
+                        className="flex-1 min-w-[250px] bg-green-600 hover:bg-green-700 text-white font-bold py-12 px-8 rounded-lg shadow-xl transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50"
+                    >
+                        <span className="text-3xl block mb-2">Hide</span>
+                        <span className="text-lg">a message in an image</span>
+                    </button>
+                    <button
+                        onClick={() => setPage('seek')}
+                        className="flex-1 min-w-[250px] bg-red-600 hover:bg-red-700 text-white font-bold py-12 px-8 rounded-lg shadow-xl transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-500 focus:ring-opacity-50"
+                    >
+                        <span className="text-3xl block mb-2">Seek</span>
+                        <span className="text-lg">a message from an image</span>
+                    </button>
+                </div>
+            </div>
+        );
+
+        const HidePage = ({ setPage }) => {
+            const [message, setMessage] = useState('');
+            const [imageFile, setImageFile] = useState(null);
+            const [outputImageUrl, setOutputImageUrl] = useState(null);
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState(null);
+            const [success, setSuccess] = useState(false);
+
+            const handleImageChange = (e) => {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    setImageFile(file);
+                    setOutputImageUrl(null);
+                    setError(null);
+                    setSuccess(false);
+                } else {
+                    setImageFile(null);
+                    setError('Please upload a valid image file.');
+                }
+            };
+
+            const handleHideMessage = async () => {
+                setError(null);
+                setSuccess(false);
+                if (!message || !imageFile) {
+                    setError('Please enter a message and select an image.');
+                    return;
+                }
+
+                setLoading(true);
+                const reader = new FileReader();
+                reader.onloadend = async () => {
+                    try {
+                        const dataUrl = await Stegano.hideMessage(reader.result, message);
+                        setOutputImageUrl(dataUrl);
+                        setSuccess(true);
+                    } catch (err) {
+                        setError(err.message || 'An error occurred during steganography.');
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+                reader.readAsDataURL(imageFile);
+            };
+
+            return (
+                <div className="flex flex-col items-center justify-center min-h-screen p-4">
+                    <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-2xl">
+                        <h2 className="text-3xl font-bold text-white mb-6 text-center">Hide a Message</h2>
+                        <div className="mb-6">
+                            <label htmlFor="messageInput" className="block text-gray-300 text-sm font-bold mb-2">
+                                Your Secret Message:
+                            </label>
+                            <textarea
+                                id="messageInput"
+                                className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-900 leading-tight focus:outline-none focus:shadow-outline bg-gray-200"
+                                placeholder="Enter your secret message here..."
+                                rows="5"
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                            ></textarea>
+                            <p className="text-gray-400 text-xs mt-2">Max length is limited by image size. Keep it concise!</p>
+                        </div>
+                        <div className="mb-6">
+                            <label htmlFor="imageUpload" className="block text-gray-300 text-sm font-bold mb-2">
+                                Upload Image:
+                            </label>
+                            <input
+                                type="file"
+                                id="imageUpload"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            />
+                            {imageFile && <p className="text-gray-400 text-xs mt-2">Selected: {imageFile.name}</p>}
+                        </div>
+                        <button
+                            onClick={handleHideMessage}
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={loading}
+                        >
+                            {loading ? 'Hiding...' : 'Hide Message'}
+                        </button>
+                        {error && <p className="text-red-400 text-center mt-4">{error}</p>}
+                        {success && <p className="text-green-400 text-center mt-4">Message hidden successfully!</p>}
+                        {outputImageUrl && (
+                            <div className="mt-8 text-center">
+                                <h3 className="text-xl text-white mb-4">Hidden Image:</h3>
+                                <img src={outputImageUrl} alt="Hidden Message" className="max-w-full h-auto mx-auto border-2 border-gray-700 rounded-md" />
+                                <a
+                                    href={outputImageUrl}
+                                    download="hidden_message_image.png"
+                                    className="inline-block mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                >
+                                    Download Image
+                                </a>
+                            </div>
+                        )}
+                        <div className="mt-8 text-center">
+                            <button
+                                onClick={() => setPage('main')}
+                                className="text-blue-400 hover:text-blue-300 text-sm font-medium"
+                            >
+                                Back to Main Menu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const SeekPage = ({ setPage }) => {
+            const [imageFile, setImageFile] = useState(null);
+            const [extractedMessage, setExtractedMessage] = useState('');
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState(null);
+
+            const handleImageChange = (e) => {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    setImageFile(file);
+                    setExtractedMessage('');
+                    setError(null);
+                } else {
+                    setImageFile(null);
+                    setError('Please upload a valid image file.');
+                }
+            };
+
+            const handleSeekMessage = async () => {
+                setError(null);
+                setExtractedMessage('');
+                if (!imageFile) {
+                    setError('Please select an image to seek from.');
+                    return;
+                }
+
+                setLoading(true);
+                const reader = new FileReader();
+                reader.onloadend = async () => {
+                    try {
+                        const message = await Stegano.retrieveMessage(reader.result);
+                        setExtractedMessage(message || 'No message found or message is empty.');
+                    } catch (err) {
+                        setError(err.message || 'An error occurred during message retrieval. This might happen if the image is corrupted or no message is hidden.');
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+                reader.readAsDataURL(imageFile);
+            };
+
+            return (
+                <div className="flex flex-col items-center justify-center min-h-screen p-4">
+                    <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-2xl">
+                        <h2 className="text-3xl font-bold text-white mb-6 text-center">Seek a Message</h2>
+                        <div className="mb-6">
+                            <label htmlFor="imageUploadSeek" className="block text-gray-300 text-sm font-bold mb-2">
+                                Upload Image:
+                            </label>
+                            <input
+                                type="file"
+                                id="imageUploadSeek"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            />
+                            {imageFile && <p className="text-gray-400 text-xs mt-2">Selected: {imageFile.name}</p>}
+                        </div>
+                        <button
+                            onClick={handleSeekMessage}
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={loading}
+                        >
+                            {loading ? 'Seeking...' : 'Seek Message'}
+                        </button>
+                        {error && <p className="text-red-400 text-center mt-4">{error}</p>}
+                        {extractedMessage && (
+                            <div className="mt-8">
+                                <h3 className="text-xl text-white mb-4 text-center">Extracted Message:</h3>
+                                <div className="bg-gray-700 p-4 rounded-md overflow-auto max-h-48">
+                                    <p className="text-gray-200 whitespace-pre-wrap">{extractedMessage}</p>
+                                </div>
+                            </div>
+                        )}
+                        <div className="mt-8 text-center">
+                            <button
+                                onClick={() => setPage('main')}
+                                className="text-blue-400 hover:text-blue-300 text-sm font-medium"
+                            >
+                                Back to Main Menu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ContactPage = ({ setPage }) => (
+            <div className="flex flex-col items-center justify-center min-h-screen p-4">
+                <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-xl text-center">
+                    <h2 className="text-3xl font-bold text-white mb-6">Contact Us</h2>
+                    <p className="text-gray-300 mb-4">
+                        Have questions, feedback, or need assistance? Feel free to reach out to us!
+                    </p>
+                    <p className="text-gray-300 mb-2">
+                        <strong>Email:</strong> support@steganoapp.com
+                    </p>
+                    <p className="text-gray-300 mb-6">
+                        <strong>Phone:</strong> +1 (123) 456-7890 (Mon-Fri, 9 AM - 5 PM EST)
+                    </p>
+                    <p className="text-gray-400 text-sm">
+                        We strive to respond to all inquiries within 24-48 hours.
+                    </p>
+                    <div className="mt-8 text-center">
+                        <button
+                            onClick={() => setPage('home')}
+                            className="text-blue-400 hover:text-blue-300 text-sm font-medium"
+                        >
+                            Back to Home
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const App = () => {
+            const [page, setPage] = useState('home');
+
+            useEffect(() => {
+                const handleHashChange = () => {
+                    const hash = window.location.hash.slice(1);
+                    if (['home', 'main', 'hide', 'seek', 'contact'].includes(hash)) {
+                        setPage(hash);
+                    } else if (!hash && page !== 'home') {
+                        setPage('home');
+                    }
+                };
+
+                window.addEventListener('hashchange', handleHashChange);
+                handleHashChange();
+
+                return () => {
+                    window.removeEventListener('hashchange', handleHashChange);
+                };
+            }, [page]);
+
+            const navigateTo = useCallback((newPage) => {
+                setPage(newPage);
+                window.location.hash = newPage === 'home' ? '' : newPage;
+            }, []);
+
+            let PageComponent;
+            switch (page) {
+                case 'main':
+                    PageComponent = <MainMenuPage setPage={navigateTo} />;
+                    break;
+                case 'hide':
+                    PageComponent = <HidePage setPage={navigateTo} />;
+                    break;
+                case 'seek':
+                    PageComponent = <SeekPage setPage={navigateTo} />;
+                    break;
+                case 'contact':
+                    PageComponent = <ContactPage setPage={navigateTo} />;
+                    break;
+                case 'home':
+                default:
+                    PageComponent = <HomePage setPage={navigateTo} />;
+                    break;
+            }
+
+            return (
+                <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col">
+                    <NavBar setPage={navigateTo} />
+                    <main className="flex-grow">
+                        {PageComponent}
+                    </main>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

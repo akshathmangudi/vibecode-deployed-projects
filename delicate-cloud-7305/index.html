@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Page Preview</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #555;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 123, 255, 0.3);
+        }
+
+        #currentTimestamp {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hello Page Preview!</h1>
+        <p id="greetingMessage">This is a simple preview of a web page.</p>
+        <button id="updateButton">Update Greeting</button>
+        <p id="currentTimestamp"></p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const greetingMessage = document.getElementById('greetingMessage');
+            const updateButton = document.getElementById('updateButton');
+            const currentTimestamp = document.getElementById('currentTimestamp');
+
+            let greetingIndex = 0;
+            const greetings = [
+                "This is a simple preview of a web page.",
+                "Welcome to your one-file web app!",
+                "Hello from the single HTML file!",
+                "Interactive content right here!",
+                "Hope you're having a great day!"
+            ];
+
+            function updateContent() {
+                greetingMessage.textContent = greetings[greetingIndex];
+                greetingIndex = (greetingIndex + 1) % greetings.length;
+
+                const now = new Date();
+                currentTimestamp.textContent = `Last updated: ${now.toLocaleString()}`;
+            }
+
+            updateContent();
+
+            updateButton.addEventListener('click', updateContent);
+        });
+    </script>
+</body>
+</html>

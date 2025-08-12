@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Harvest Mart</title>
+    <style>
+        /* Global Styles & Green Palette */
+        :root {
+            --primary-green: #2E8B57; /* Sea Green */
+            --dark-green: #1B5E20; /* Darker Green for accents/text */
+            --light-green: #4CAF50; /* Brighter Green for highlights/buttons */
+            --background-light: #F0F8FF; /* Alice Blue */
+            --text-dark: #333;
+            --text-light: #FFF;
+            --border-color: #DDD;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--dark-green);
+            color: var(--text-light);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px var(--shadow-color);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .cart-summary {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        main {
+            display: flex;
+            flex-wrap: wrap; /* Allows sections to wrap on smaller screens */
+            gap: 20px;
+            padding: 20px;
+            flex-grow: 1;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        #product-list, #shopping-cart {
+            background-color: var(--text-light);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px var(--shadow-color);
+            padding: 20px;
+        }
+
+        #product-list {
+            flex: 3; /* Takes more space */
+            min-width: 300px;
+        }
+
+        #shopping-cart {
+            flex: 1; /* Takes less space */
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        h2 {
+            color: var(--primary-green);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            font-size: 1.7rem;
+        }
+
+        /* Product Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: var(--text-light);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .product-info {
+            padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-info h3 {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            color: var(--dark-green);
+        }
+
+        .product-info p {
+            font-size: 1.1rem;
+            color: var(--primary-green);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: center;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .primary-btn {
+            background-color: var(--primary-green);
+            color: var(--text-light);
+        }
+
+        .primary-btn:hover {
+            background-color: var(--dark-green);
+        }
+
+        .secondary-btn {
+            background-color: #E0E0E0;
+            color: var(--text-dark);
+        }
+
+        .secondary-btn:hover {
+            background-color: #CCC;
+        }
+
+        .btn:disabled {
+            background-color: #B0B0B0;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .btn:disabled:hover {
+            transform: none;
+        }
+
+
+        /* Shopping Cart */
+        #cart-items {
+            flex-grow: 1;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 10px;
+            min-height: 100px;
+            max-height: 400px; /* Limit height for scrolling */
+            overflow-y: auto; /* Enable scrolling if too many items */
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item-info {
+            flex-grow: 1;
+        }
+
+        .cart-item-info span {
+            font-weight: bold;
+        }
+
+        .cart-item-actions button {
+            background-color: #F44336; /* Red for remove */
+            color: var(--text-light);
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .cart-item-actions button:hover {
+            background-color: #D32F2F;
+        }
+
+        .cart-total {
+            text-align: right;
+            font-size: 1.3rem;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid var(--border-color);
+            color: var(--dark-green);
+        }
+
+        .empty-cart-message {
+            text-align: center;
+            color: #777;
+            padding: 20px;
+        }
+
+        #checkout-button, #clear-cart-button {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        footer {
+            background-color: var(--dark-green);
+            color: var(--text-light);
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: auto; /* Pushes footer to the bottom */
+            box-shadow: 0 -2px 4px var(--shadow-color);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            main {
+                flex-direction: column;
+                padding: 15px;
+            }
+
+            #product-list, #shopping-cart {
+                width: 100%;
+                margin-bottom: 15px;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 10px;
+                padding: 1rem;
+            }
+
+            header h1 {
+                font-size: 1.7rem;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Green Harvest Mart</h1>
+        <div class="cart-summary">
+            Shopping Cart (<span id="cart-item-count">0</span> items)
+        </div>
+    </header>
+
+    <main>
+        <section id="product-list">
+            <h2>Our Fresh Picks</h2>
+            <div class="products-grid" id="products-container">
+                <!-- Products will be rendered here by JavaScript -->
+            </div>
+        </section>
+
+        <aside id="shopping-cart">
+            <h2>Your Basket</h2>
+            <div id="cart-items">
+                <p class="empty-cart-message">Your basket is empty.</p>
+            </div>
+            <div class="cart-total">
+                <strong>Total:</strong> <span id="cart-total-amount">$0.00</span>
+            </div>
+            <button id="checkout-button" class="btn primary-btn" disabled>Proceed to Checkout</button>
+            <button id="clear-cart-button" class="btn secondary-btn" disabled>Clear Basket</button>
+        </aside>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Green Harvest Mart. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const products = [
+            { id: 1, name: 'Organic Apples', price: 2.99, image: 'https://images.unsplash.com/photo-1579613832107-573516584284?auto=format&fit=crop&q=80&w=2940&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+            { id: 2, name: 'Fresh Broccoli', price: 3.49, image: 'https://images.unsplash.com/photo-1596328325992-0b89327581d4?auto=format&fit=crop&q=80&w=2940&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+            { id: 3, name: 'Ripe Bananas', price: 1.29, image: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&q=80&w=2940&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+            { id: 4, name: 'Heritage Tomatoes', price: 4.79, image: 'https://images.unsplash.com/photo-1532050854497-6c245c345ac2?auto=format&fit=crop&q=80&w=2940&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+            { id: 5, name: 'Organic Carrots', price: 2.19, image: 'https://images.unsplash.com/photo-1523145465293-f0967a550965?auto=format&fit=crop&q=80&w=2940&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+            { id: 6, name: 'Avocado (Each)', price: 1.99, image: 'https://images.unsplash.com/photo-1557002012-d81b855239a5?auto=format&fit=crop&q=80&w=2940&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+        ];
+
+        let cart = [];
+
+        const productsContainer = document.getElementById('products-container');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartTotalAmountSpan = document.getElementById('cart-total-amount');
+        const cartItemCountSpan = document.getElementById('cart-item-count');
+        const checkoutButton = document.getElementById('checkout-button');
+        const clearCartButton = document.getElementById('clear-cart-button');
+        const emptyCartMessage = cartItemsContainer.querySelector('.empty-cart-message');
+
+        // --- Utility Functions ---
+        function getProductById(id) {
+            return products.find(p => p.id === id);
+        }
+
+        function saveCart() {
+            localStorage.setItem('greenHarvestCart', JSON.stringify(cart));
+        }
+
+        function loadCart() {
+            const savedCart = localStorage.getItem('greenHarvestCart');
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+            }
+        }
+
+        // --- Render Functions ---
+        function renderProducts() {
+            productsContainer.innerHTML = '';
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}">
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <p>$${product.price.toFixed(2)}</p>
+                        <button class="btn primary-btn add-to-cart-btn" data-product-id="${product.id}">Add to Basket</button>
+                    </div>
+                `;
+                productsContainer.appendChild(productCard);
+            });
+        }
+
+        function renderCart() {
+            cartItemsContainer.innerHTML = ''; // Clear current cart display
+            let total = 0;
+            let itemCount = 0;
+
+            if (cart.length === 0) {
+                emptyCartMessage.style.display = 'block';
+            } else {
+                emptyCartMessage.style.display = 'none';
+                cart.forEach(item => {
+                    const product = getProductById(item.productId);
+                    if (product) {
+                        const itemTotal = product.price * item.quantity;
+                        total += itemTotal;
+                        itemCount += item.quantity;
+
+                        const cartItemDiv = document.createElement('div');
+                        cartItemDiv.className = 'cart-item';
+                        cartItemDiv.innerHTML = `
+                            <div class="cart-item-info">
+                                <span>${product.name}</span> x ${item.quantity} - $${itemTotal.toFixed(2)}
+                            </div>
+                            <div class="cart-item-actions">
+                                <button class="btn remove-from-cart-btn" data-product-id="${product.id}">Remove</button>
+                            </div>
+                        `;
+                        cartItemsContainer.appendChild(cartItemDiv);
+                    }
+                });
+            }
+
+            cartTotalAmountSpan.textContent = `$${total.toFixed(2)}`;
+            cartItemCountSpan.textContent = itemCount;
+
+            // Enable/disable buttons based on cart content
+            checkoutButton.disabled = cart.length === 0;
+            clearCartButton.disabled = cart.length === 0;
+        }
+
+        // --- Cart Actions ---
+        function addToCart(productId) {
+            const existingItemIndex = cart.findIndex(item => item.productId === productId);
+            if (existingItemIndex > -1) {
+                cart[existingItemIndex].quantity++;
+            } else {
+                cart.push({ productId: productId, quantity: 1 });
+            }
+            saveCart();
+            renderCart();
+        }
+
+        function removeFromCart(productId) {
+            const existingItemIndex = cart.findIndex(item => item.productId === productId);
+            if (existingItemIndex > -1) {
+                if (cart[existingItemIndex].quantity > 1) {
+                    cart[existingItemIndex].quantity--;
+                } else {
+                    cart.splice(existingItemIndex, 1); // Remove item if quantity is 1
+                }
+            }
+            saveCart();
+            renderCart();
+        }
+
+        function clearCart() {
+            if (confirm('Are you sure you want to clear your entire basket?')) {
+                cart = [];
+                saveCart();
+                renderCart();
+                alert('Basket has been cleared!');
+            }
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                alert('Your basket is empty. Please add items before checking out.');
+                return;
+            }
+            const total = parseFloat(cartTotalAmountSpan.textContent.replace('$', ''));
+            alert(`Thank you for your purchase! Your total is ${total.toFixed(2)}. This is a demo checkout.`);
+            cart = []; // Clear cart after "checkout"
+            saveCart();
+            renderCart();
+        }
+
+        // --- Event Listeners ---
+        productsContainer.addEventListener('click', (event) => {
+            if (event.target.classList.contains('add-to-cart-btn')) {
+                const productId = parseInt(event.target.dataset.productId);
+                addToCart(productId);
+            }
+        });
+
+        cartItemsContainer.addEventListener('click', (event) => {
+            if (event.target.classList.contains('remove-from-cart-btn')) {
+                const productId = parseInt(event.target.dataset.productId);
+                removeFromCart(productId);
+            }
+        });
+
+        checkoutButton.addEventListener('click', checkout);
+        clearCartButton.addEventListener('click', clearCart);
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCart();
+            renderProducts();
+            renderCart();
+        });
+    </script>
+</body>
+</html>

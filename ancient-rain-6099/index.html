@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMI Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+
+        #app {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        input[type="number"] {
+            width: calc(100% - 22px);
+            padding: 12px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 1em;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        input[type="number"]:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result-display {
+            margin-top: 25px;
+            font-size: 1.15em;
+            font-weight: 600;
+            color: #28a745; /* Green for normal, can change based on category if needed */
+        }
+
+        #result {
+            margin-top: 25px;
+            color: #007bff;
+        }
+
+        #category {
+            font-size: 1.25em;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #343a40;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>BMI Calculator</h1>
+        <div class="input-group">
+            <label for="height">Height (cm):</label>
+            <input type="number" id="height" min="1" step="0.1" placeholder="e.g., 170">
+        </div>
+        <div class="input-group">
+            <label for="weight">Weight (kg):</label>
+            <input type="number" id="weight" min="1" step="0.1" placeholder="e.g., 65">
+        </div>
+        <button id="calculateBtn">Calculate BMI</button>
+        <div id="result" class="result-display"></div>
+        <div id="category" class="result-display"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const heightInput = document.getElementById('height');
+            const weightInput = document.getElementById('weight');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resultDiv = document.getElementById('result');
+            const categoryDiv = document.getElementById('category');
+
+            calculateBtn.addEventListener('click', calculateBMI);
+
+            function calculateBMI() {
+                const heightCm = parseFloat(heightInput.value);
+                const weightKg = parseFloat(weightInput.value);
+
+                if (isNaN(heightCm) || isNaN(weightKg) || heightCm <= 0 || weightKg <= 0) {
+                    resultDiv.textContent = "Please enter valid positive numbers for height and weight.";
+                    categoryDiv.textContent = "";
+                    resultDiv.style.color = '#dc3545'; /* Red for error */
+                    return;
+                }
+
+                const heightM = heightCm / 100;
+                const bmi = weightKg / (heightM * heightM);
+                const bmiRounded = bmi.toFixed(2);
+
+                let category = "";
+                let categoryColor = '#343a40'; /* Default dark color */
+
+                if (bmi < 18.5) {
+                    category = "Underweight";
+                    categoryColor = '#ffc107'; /* Yellow for caution */
+                } else if (bmi < 25) {
+                    category = "Normal weight";
+                    categoryColor = '#28a745'; /* Green for normal */
+                } else if (bmi < 30) {
+                    category = "Overweight";
+                    categoryColor = '#fd7e14'; /* Orange for warning */
+                } else {
+                    category = "Obese";
+                    categoryColor = '#dc3545'; /* Red for critical */
+                }
+
+                resultDiv.textContent = `Your BMI is: ${bmiRounded} kg/m²`;
+                resultDiv.style.color = '#007bff'; /* Blue for BMI result */
+                categoryDiv.textContent = `Category: ${category}`;
+                categoryDiv.style.color = categoryColor;
+            }
+        });
+    </script>
+</body>
+</html>

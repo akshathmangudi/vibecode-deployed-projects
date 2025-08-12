@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibecode portfolio</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+            color: #333;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            word-wrap: break-word;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            color: #555;
+        }
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 12px;
+            margin-bottom: 25px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.1em;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="greeting">hello india welcome</h1>
+        <label for="nameInput">Enter your name:</label>
+        <input type="text" id="nameInput" placeholder="Your Name Here">
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const greetingElement = document.getElementById('greeting');
+            const nameInputElement = document.getElementById('nameInput');
+            const storedName = localStorage.getItem('userName');
+            const defaultName = 'Guest';
+
+            function updateGreeting(name) {
+                greetingElement.textContent = `hello india welcome, ${name || defaultName}!`;
+            }
+
+            // Initialize on load
+            if (storedName) {
+                nameInputElement.value = storedName;
+                updateGreeting(storedName);
+            } else {
+                updateGreeting(defaultName);
+            }
+
+            // Add event listener for input changes
+            nameInputElement.addEventListener('input', (event) => {
+                const currentName = event.target.value.trim();
+                if (currentName) {
+                    updateGreeting(currentName);
+                    localStorage.setItem('userName', currentName);
+                } else {
+                    updateGreeting(defaultName);
+                    localStorage.removeItem('userName'); // Clear if input is empty
+                }
+            });
+        });
+    </script>
+</body>
+</html>

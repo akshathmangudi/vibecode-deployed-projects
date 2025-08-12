@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idea Refiner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        #app {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            width: 100%;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #555;
+            line-height: 1.6;
+        }
+        .input-section, .refinement-area {
+            margin-bottom: 30px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #4a4a4a;
+        }
+        textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            resize: vertical;
+            min-height: 100px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s ease;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        h2 {
+            color: #2c3e50;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .refinement-prompts .prompt-group {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .refinement-prompts .prompt-group h4 {
+            color: #3498db;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .refinement-prompts .prompt-group label {
+            margin-bottom: 5px;
+            font-weight: normal;
+            color: #666;
+            font-style: italic;
+        }
+        .refinement-prompts .prompt-group textarea {
+            margin-bottom: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            min-height: 60px;
+        }
+        .refined-summary textarea {
+            min-height: 150px;
+            background-color: #fcfcfc;
+            border: 1px solid #ccc;
+        }
+        #clearButton {
+            background-color: #e74c3c;
+            margin-top: 10px;
+        }
+        #clearButton:hover {
+            background-color: #c0392b;
+        }
+        @media (max-width: 768px) {
+            #app {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            textarea {
+                min-height: 80px;
+            }
+            .refinement-prompts .prompt-group {
+                padding: 15px;
+            }
+        }
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            #app {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            button {
+                width: 100%;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Idea Refiner</h1>
+            <p>Enter your rough idea below and we'll help you refine it with structured prompts, now with AI assistance!</p>
+        </header>
+
+        <section class="input-section">
+            <label for="roughIdea">Your Rough Idea:</label>
+            <textarea id="roughIdea" placeholder="e.g., 'A website for sharing recipes' or 'An app to track my reading'"></textarea>
+            <button id="refineButton">Refine Idea with AI</button>
+        </section>
+
+        <section id="refinementArea" class="refinement-area" style="display: none;">
+            <h2>Refine Your Idea</h2>
+
+            <div class="refinement-prompts">
+                <!-- Prompts will be dynamically generated here -->
+            </div>
+
+            <div class="refined-summary">
+                <h3>Refined Idea Summary:</h3>
+                <textarea id="refinedIdeaSummary" placeholder="Type your refined idea here based on the prompts above..."></textarea>
+                <button id="clearButton">Clear All</button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const roughIdeaInput = document.getElementById('roughIdea');
+            const refineButton = document.getElementById('refineButton');
+            const refinementArea = document.getElementById('refinementArea');
+            const refinementPromptsContainer = document.querySelector('.refinement-prompts');
+            const refinedIdeaSummary = document.getElementById('refinedIdeaSummary');
+            const clearButton = document.getElementById('clearButton');
+
+            const prompts = [
+                {
+                    title: '1. Core Idea & Problem Solved',
+                    questions: [
+                        { id: 'promptQ1', label: 'In one sentence, what is the core idea?', placeholder: 'e.g., A mobile app for finding local dog walkers.' },
+                        { id: 'promptQ2', label: 'What specific problem does this idea solve?', placeholder: 'e.g., Dog owners struggle to find reliable sitters quickly.' }
+                    ]
+                },
+                {
+                    title: '2. Target Audience',
+                    questions: [
+                        { id: 'promptQ3', label: 'Who is the primary user/audience for this idea?', placeholder: 'e.g., Busy urban dog owners, aged 25-45.' },
+                        { id: 'promptQ4', label: 'What are their needs or pain points that your idea addresses?', placeholder: 'e.g., Convenience, trust, affordability, last-minute booking options.' }
+                    ]
+                },
+                {
+                    title: '3. Value Proposition & Benefits',
+                    questions: [
+                        { id: 'promptQ5', label: 'What unique value does your idea offer?', placeholder: 'e.g., Instant booking, vetted walkers, GPS tracking.' },
+                        { id: 'promptQ6', label: 'What are the main benefits for the user?', placeholder: 'e.g., Peace of mind, time saving, reliable pet care.' }
+                    ]
+                },
+                {
+                    title: '4. Key Features / Components (if applicable)',
+                    questions: [
+                        { id: 'promptQ7', label: 'What are the essential features or components of your idea?', placeholder: 'e.g., User profiles, messaging, payment gateway, rating system.' }
+                    ]
+                },
+                {
+                    title: '5. Next Steps / Actionable Insights',
+                    questions: [
+                        { id: 'promptQ8', label: 'What is the very first step you would take to implement/explore this idea?', placeholder: 'e.g., Research competitor apps, survey potential users.' },
+                        { id: 'promptQ9', label: 'What potential challenges do you foresee?', placeholder: 'e.g., User acquisition, building trust, scaling the platform.' }
+                    ]
+                }
+            ];
+
+            refineButton.addEventListener('click', () => {
+                const roughIdeaText = roughIdeaInput.value.trim();
+                if (roughIdeaText === '') {
+                    alert('Please enter your rough idea first!');
+                    return;
+                }
+
+                refinementArea.style.display = 'block';
+                refinementPromptsContainer.innerHTML = '';
+
+                let simulatedAnswers = {};
+
+                prompts.forEach(group => {
+                    const groupDiv = document.createElement('div');
+                    groupDiv.classList.add('prompt-group');
+                    const groupTitle = document.createElement('h4');
+                    groupTitle.textContent = group.title;
+                    groupDiv.appendChild(groupTitle);
+
+                    group.questions.forEach(q => {
+                        const label = document.createElement('label');
+                        label.setAttribute('for', q.id);
+                        label.textContent = q.label;
+                        groupDiv.appendChild(label);
+
+                        const textarea = document.createElement('textarea');
+                        textarea.id = q.id;
+                        textarea.placeholder = q.placeholder;
+
+                        let simulatedValue = '';
+                        switch (q.id) {
+                            case 'promptQ1':
+                                simulatedValue = `This idea focuses on creating a solution to streamline aspects of "${roughIdeaText}".`;
+                                break;
+                            case 'promptQ2':
+                                simulatedValue = `It addresses the inefficiency or lack of a dedicated platform often encountered when dealing with "${roughIdeaText}".`;
+                                break;
+                            case 'promptQ3':
+                                simulatedValue = `The primary users are individuals or groups actively engaged with or in need of support related to "${roughIdeaText}".`;
+                                break;
+                            case 'promptQ4':
+                                simulatedValue = `They face challenges such as finding relevant information, organizing tasks, or connecting with others within the "${roughIdeaText}" context.`;
+                                break;
+                            case 'promptQ5':
+                                simulatedValue = `This idea offers unique value by providing a centralized, intelligent, and user-friendly system for "${roughIdeaText}".`;
+                                break;
+                            case 'promptQ6':
+                                simulatedValue = `Users will experience increased productivity, better organization, and enhanced insights concerning "${roughIdeaText}".`;
+                                break;
+                            case 'promptQ7':
+                                simulatedValue = `Key features might include a data input system, analytical dashboards, communication tools, and a knowledge base tailored to "${roughIdeaText}".`;
+                                break;
+                            case 'promptQ8':
+                                simulatedValue = `The very first step would be to conduct a market analysis and prototype a core feature related to "${roughIdeaText}".`;
+                                break;
+                            case 'promptQ9':
+                                simulatedValue = `Foreseeable challenges include user adoption, data privacy concerns, and scaling the solution effectively for "${roughIdeaText}".`;
+                                break;
+                            default:
+                                simulatedValue = `A refined detail for "${roughIdeaText}" based on this prompt.`;
+                        }
+                        textarea.value = simulatedValue;
+                        simulatedAnswers[q.id] = simulatedValue;
+
+                        groupDiv.appendChild(textarea);
+                    });
+                    refinementPromptsContainer.appendChild(groupDiv);
+                });
+
+                let refinedSummaryContent = `Rough Idea: ${roughIdeaText}\n\n`;
+                refinedSummaryContent += `--- AI-Generated Refinement Summary ---\n\n`;
+                refinedSummaryContent += `Core Concept: ${simulatedAnswers['promptQ1']}\n`;
+                refinedSummaryContent += `Problem Solved: ${simulatedAnswers['promptQ2']}\n`;
+                refinedSummaryContent += `Target Audience: ${simulatedAnswers['promptQ3']}\n`;
+                refinedSummaryContent += `Value Proposition: ${simulatedAnswers['promptQ5']}\n`;
+                refinedSummaryContent += `Key Features: ${simulatedAnswers['promptQ7']}\n`;
+                refinedSummaryContent += `Next Steps: ${simulatedAnswers['promptQ8']}\n\n`;
+                refinedSummaryContent += `Overall Insight: This idea centers around enhancing and streamlining processes related to "${roughIdeaText}" by addressing key user pain points and offering a robust, feature-rich solution. The AI suggests focusing on user validation and key feature development as immediate next steps.\n`;
+
+                refinedIdeaSummary.value = refinedSummaryContent;
+            });
+
+            clearButton.addEventListener('click', () => {
+                roughIdeaInput.value = '';
+                refinedIdeaSummary.value = '';
+                refinementPromptsContainer.innerHTML = '';
+                refinementArea.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>

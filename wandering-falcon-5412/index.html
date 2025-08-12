@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Black Diamond</title>
+    <style>
+        :root {
+            --diamond-size: 150px;
+            --main-bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --diamond-color: #000000;
+            --sparkle-color: #f0f0f0;
+            --hover-glow-color: #333;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--main-bg-color);
+            color: var(--text-color);
+            overflow: hidden; /* Prevent scrollbars from sparkle overflow */
+        }
+
+        h1 {
+            color: var(--text-color);
+            margin-bottom: 40px;
+            text-align: center;
+            font-size: 2.5em;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        #diamond-container {
+            position: relative; /* For positioning sparkles */
+            width: var(--diamond-size);
+            height: var(--diamond-size);
+            display: flex; /* To center the diamond if its a child */
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+            box-shadow: 0 0 0px rgba(0, 0, 0, 0.5); /* Initial subtle shadow */
+            border-radius: 5px; /* For a soft edge to the container visually */
+        }
+
+        #diamond-container:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--hover-glow-color); /* Subtle glow on hover */
+        }
+
+        #diamond {
+            width: 100%;
+            height: 100%;
+            background-color: var(--diamond-color);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            border: 2px solid #222; /* Add a slight border for depth */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+
+        .sparkle {
+            position: absolute;
+            background-color: var(--sparkle-color);
+            border-radius: 50%;
+            pointer-events: none; /* Do not interfere with clicks */
+            opacity: 0; /* Starts hidden, animates in */
+            transform: translate(-50%, -50%); /* Centers the sparkle origin */
+            animation: sparkle-fade-out 1s forwards cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        @keyframes sparkle-fade-out {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx, -50%), var(--ty, -50%)) scale(0.2);
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>The Black Diamond</h1>
+    <div id="diamond-container">
+        <div id="diamond"></div>
+    </div>
+
+    <script>
+        const diamondContainer = document.getElementById('diamond-container');
+
+        diamondContainer.addEventListener('click', (event) => {
+            const numSparkles = 15;
+            const maxDistance = 100;
+            const sparkleMaxSize = 8;
+
+            for (let i = 0; i < numSparkles; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.classList.add('sparkle');
+
+                const currentSparkleSize = Math.max(2, Math.random() * sparkleMaxSize);
+                sparkle.style.width = `${currentSparkleSize}px`;
+                sparkle.style.height = `${currentSparkleSize}px`;
+
+                const angle = Math.random() * 2 * Math.PI;
+                const distance = Math.random() * maxDistance;
+                const translateX = distance * Math.cos(angle);
+                const translateY = distance * Math.sin(angle);
+
+                sparkle.style.setProperty('--tx', `${translateX}px`);
+                sparkle.style.setProperty('--ty', `${translateY}px`);
+
+                const animationDuration = 0.8 + Math.random() * 0.4;
+                const animationDelay = Math.random() * 0.2;
+                sparkle.style.animationDuration = `${animationDuration}s`;
+                sparkle.style.animationDelay = `${animationDelay}s`;
+
+                diamondContainer.appendChild(sparkle);
+
+                sparkle.addEventListener('animationend', () => {
+                    sparkle.remove();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

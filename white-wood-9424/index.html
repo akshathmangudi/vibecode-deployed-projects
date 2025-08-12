@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMI Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .input-group input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+
+        .unit-selection {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .unit-selection label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: #555;
+            font-weight: normal;
+        }
+
+        .unit-selection input[type="radio"] {
+            margin-right: 8px;
+            transform: scale(1.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #e9f7ef;
+            border-radius: 6px;
+            border: 1px solid #d4edda;
+            min-height: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        #result p {
+            margin: 5px 0;
+            font-weight: bold;
+        }
+
+        .bmi-category {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .underweight { background-color: #ffe0b2; color: #ff9800; } /* Orange */
+        .normal { background-color: #c8e6c9; color: #4CAF50; } /* Green */
+        .overweight { background-color: #ffccbc; color: #f44336; } /* Red */
+        .obese { background-color: #ffcdd2; color: #d32f2f; } /* Darker Red */
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.6em;
+            }
+            button {
+                font-size: 1em;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BMI Calculator</h1>
+
+        <div class="unit-selection">
+            <label>
+                <input type="radio" name="units" value="metric" checked> Metric (kg/cm)
+            </label>
+            <label>
+                <input type="radio" name="units" value="imperial"> Imperial (lbs/in)
+            </label>
+        </div>
+
+        <div class="input-group">
+            <label for="weightInput" id="weightLabel">Weight (kg):</label>
+            <input type="number" id="weightInput" placeholder="Enter weight" min="1" step="0.1">
+        </div>
+
+        <div class="input-group">
+            <label for="heightInput" id="heightLabel">Height (cm):</label>
+            <input type="number" id="heightInput" placeholder="Enter height" min="1" step="0.1">
+        </div>
+
+        <button id="calculateBtn">Calculate BMI</button>
+
+        <div id="result">
+            <p>Your BMI will appear here.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const weightInput = document.getElementById('weightInput');
+            const heightInput = document.getElementById('heightInput');
+            const weightLabel = document.getElementById('weightLabel');
+            const heightLabel = document.getElementById('heightLabel');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resultDiv = document.getElementById('result');
+            const unitRadios = document.querySelectorAll('input[name="units"]');
+
+            function updateUnitLabels() {
+                const selectedUnit = document.querySelector('input[name="units"]:checked').value;
+                if (selectedUnit === 'metric') {
+                    weightLabel.textContent = 'Weight (kg):';
+                    weightInput.placeholder = 'Enter weight in kilograms';
+                    heightLabel.textContent = 'Height (cm):';
+                    heightInput.placeholder = 'Enter height in centimeters';
+                } else {
+                    weightLabel.textContent = 'Weight (lbs):';
+                    weightInput.placeholder = 'Enter weight in pounds';
+                    heightLabel.textContent = 'Height (in):';
+                    heightInput.placeholder = 'Enter height in inches';
+                }
+                // Clear inputs and result when units change
+                weightInput.value = '';
+                heightInput.value = '';
+                resultDiv.innerHTML = '<p>Your BMI will appear here.</p>';
+            }
+
+            function calculateBMI() {
+                const weight = parseFloat(weightInput.value);
+                const height = parseFloat(heightInput.value);
+                const selectedUnit = document.querySelector('input[name="units"]:checked').value;
+
+                if (isNaN(weight) || isNaN(height) || weight <= 0 || height <= 0) {
+                    resultDiv.innerHTML = '<p style="color: red;">Please enter valid positive numbers for weight and height.</p>';
+                    return;
+                }
+
+                let bmi;
+                let heightInMeters;
+
+                if (selectedUnit === 'metric') {
+                    heightInMeters = height / 100; // cm to meters
+                    bmi = weight / (heightInMeters * heightInMeters);
+                } else { // imperial
+                    bmi = (weight / (height * height)) * 703;
+                }
+
+                displayResult(bmi);
+            }
+
+            function displayResult(bmi) {
+                const roundedBmi = bmi.toFixed(2);
+                let category = '';
+                let categoryClass = '';
+
+                if (bmi < 18.5) {
+                    category = 'Underweight';
+                    categoryClass = 'underweight';
+                } else if (bmi >= 18.5 && bmi <= 24.9) {
+                    category = 'Normal weight';
+                    categoryClass = 'normal';
+                } else if (bmi >= 25 && bmi <= 29.9) {
+                    category = 'Overweight';
+                    categoryClass = 'overweight';
+                } else {
+                    category = 'Obese';
+                    categoryClass = 'obese';
+                }
+
+                resultDiv.innerHTML = `
+                    <p>Your BMI is: <strong>${roundedBmi}</strong></p>
+                    <div class="bmi-category ${categoryClass}">${category}</div>
+                `;
+            }
+
+            // Event Listeners
+            unitRadios.forEach(radio => {
+                radio.addEventListener('change', updateUnitLabels);
+            });
+
+            calculateBtn.addEventListener('click', calculateBMI);
+
+            // Initialize labels on load
+            updateUnitLabels();
+        });
+    </script>
+</body>
+</html>

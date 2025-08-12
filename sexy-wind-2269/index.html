@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jump Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #282c34;
+            font-family: 'Arial', sans-serif;
+            color: #eee;
+            overflow: hidden; /* Prevent scrollbars */
+            user-select: none; /* Prevent text selection */
+        }
+        #gameContainer {
+            position: relative;
+            width: 800px;
+            height: 400px;
+            border: 5px solid #61dafb;
+            background-color: #87CEEB; /* Sky blue */
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+        canvas {
+            display: block;
+            background-color: transparent; /* Canvas background is handled by container */
+        }
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 5px 10px;
+            border-radius: 5px;
+            z-index: 5;
+        }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            z-index: 10;
+        }
+        .overlay h2 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #61dafb;
+        }
+        .overlay p {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        .overlay button {
+            background-color: #61dafb;
+            color: #282c34;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+        .overlay button:hover {
+            background-color: #4fa3d1;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        <div id="score">Score: 0</div>
+
+        <div id="startScreen" class="overlay">
+            <h2>Jump Game</h2>
+            <p>Press SPACE to Start</p>
+            <p>Jump over obstacles by pressing SPACE.</p>
+        </div>
+
+        <div id="gameOverScreen" class="overlay" style="display: none;">
+            <h2>Game Over!</h2>
+            <p>Your Score: <span id="finalScore">0</span></p>
+            <button id="restartButton">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('score');
+        const startScreen = document.getElementById('startScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const finalScoreDisplay = document.getElementById('finalScore');
+        const restartButton = document.getElementById('restartButton');
+
+        let player = {
+            x: 50,
+            y: canvas.height - 70, // Start just above ground
+            width: 30,
+            height: 60,
+            dy: 0, // Vertical velocity in px/s
+            gravity: 1000, // px/s^2
+            jumpStrength: -350, // px/s
+            onGround: true
+        };
+
+        let obstacles = [];
+        let score = 0;
+        let gameOver = false;
+        let gameRunning = false;
+        let lastObstacleTime = 0;
+        const obstacleIntervalMin = 1200; // milliseconds
+        const obstacleIntervalMax = 2000;
+        const obstacleMinSpeed = 200; // px/s
+        const obstacleMaxSpeed = 400; // px/s
+        const obstacleWidth = 30;
+        const obstacleMinHeight = 40;
+        const obstacleMaxHeight = 80;
+
+        let animationFrameId;
+        let lastFrameTime = 0; // For delta time calculations
+
+        function initGame() {
+            // Draw initial player and ground for start screen display
+            clearCanvas();
+            drawGround();
+            drawPlayer();
+            scoreDisplay.textContent = 'Score: 0';
+        }
+
+        function startGame() {
+            player = {
+                x: 50,
+                y: canvas.height - 70,
+                width: 30,
+                height: 60,
+                dy: 0,
+                gravity: 1000,
+                jumpStrength: -350,
+                onGround: true
+            };
+            obstacles = [];
+            score = 0;
+            gameOver = false;
+            gameRunning = true;
+            lastObstacleTime = performance.now(); // Initialize for obstacle spawning
+            scoreDisplay.textContent = 'Score: 0';
+
+            startScreen.style.display = 'none';
+            gameOverScreen.style.display = 'none';
+
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            lastFrameTime = performance.now(); // Reset lastFrameTime for smooth start
+            gameLoop(lastFrameTime); // Start the loop
+        }
+
+        function drawPlayer() {
+            ctx.fillStyle = '#4CAF50'; // Green
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
+
+        function drawObstacles() {
+            ctx.fillStyle = '#f44336'; // Red
+            obstacles.forEach(obstacle => {
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            });
+        }
+
+        function drawGround() {
+            ctx.fillStyle = '#6D4C41'; // Brown
+            ctx.fillRect(0, canvas.height - 10, canvas.width, 10);
+        }
+
+        function updateGame(deltaTime) {
+            if (gameOver || !gameRunning) return;
+
+            const dtSeconds = deltaTime / 1000; // Convert delta time from ms to seconds
+
+            // Update player physics
+            player.dy += player.gravity * dtSeconds; // Apply gravity (acceleration)
+            player.y += player.dy * dtSeconds;       // Apply velocity to position
+
+            // Prevent player from falling through ground
+            const groundLevel = canvas.height - player.height - 10; // 10px buffer from bottom
+            if (player.y >= groundLevel) {
+                player.y = groundLevel;
+                player.dy = 0;
+                player.onGround = true;
+            }
+
+            // Update obstacles
+            obstacles.forEach(obstacle => {
+                obstacle.x -= obstacle.speed * dtSeconds; // Move obstacles horizontally
+            });
+
+            // Remove off-screen obstacles to keep array small
+            obstacles = obstacles.filter(obstacle => obstacle.x + obstacle.width > 0);
+
+            // Spawn new obstacles
+            if (performance.now() - lastObstacleTime > Math.random() * (obstacleIntervalMax - obstacleIntervalMin) + obstacleIntervalMin) {
+                spawnObstacle();
+                lastObstacleTime = performance.now();
+            }
+
+            // Collision detection (AABB)
+            obstacles.forEach(obstacle => {
+                if (
+                    player.x < obstacle.x + obstacle.width &&
+                    player.x + player.width > obstacle.x &&
+                    player.y < obstacle.y + obstacle.height &&
+                    player.y + player.height > obstacle.y
+                ) {
+                    endGame();
+                }
+            });
+
+            // Update score
+            score += dtSeconds * 100; // Score increases based on time
+            scoreDisplay.textContent = 'Score: ' + Math.floor(score);
+        }
+
+        function spawnObstacle() {
+            const obstacleHeight = Math.random() * (obstacleMaxHeight - obstacleMinHeight) + obstacleMinHeight;
+            const obstacleSpeed = Math.random() * (obstacleMaxSpeed - obstacleMinSpeed) + obstacleMinSpeed;
+            obstacles.push({
+                x: canvas.width,
+                y: canvas.height - obstacleHeight - 10, // 10px buffer from bottom
+                width: obstacleWidth,
+                height: obstacleHeight,
+                speed: obstacleSpeed
+            });
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function gameLoop(currentTime) {
+            const deltaTime = currentTime - lastFrameTime;
+            lastFrameTime = currentTime;
+
+            clearCanvas();
+            drawGround(); // Redraw ground every frame
+            updateGame(deltaTime);
+            drawPlayer();
+            drawObstacles();
+
+            if (!gameOver) {
+                animationFrameId = requestAnimationFrame(gameLoop);
+            }
+        }
+
+        function jump() {
+            if (player.onGround) {
+                player.dy = player.jumpStrength; // Set initial upward velocity
+                player.onGround = false;
+            }
+        }
+
+        function endGame() {
+            gameOver = true;
+            gameRunning = false;
+            cancelAnimationFrame(animationFrameId); // Stop the game loop
+            finalScoreDisplay.textContent = Math.floor(score);
+            gameOverScreen.style.display = 'flex'; // Show game over screen
+        }
+
+        // Event Listeners
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault(); // Prevent default spacebar action (scrolling)
+                if (!gameRunning && !gameOver) { // If game not running and not over (i.e., at start screen)
+                    startGame();
+                } else if (gameRunning) { // If game is running, space means jump
+                    jump();
+                }
+            }
+        });
+
+        restartButton.addEventListener('click', startGame);
+
+        // Initialize game display when the page loads
+        initGame();
+    </script>
+</body>
+</html>

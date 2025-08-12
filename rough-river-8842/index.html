@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Simple To-Do App</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #f44336;
+            --background-color: #f5f7fa;
+            --card-background: #ffffff;
+            --text-color: #333;
+            --light-text-color: #666;
+            --border-color: #ddd;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-color);
+        }
+
+        .container {
+            background-color: var(--card-background);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .input-group {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .input-group input[type="text"] {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px 0 0 5px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input[type="text"]:focus {
+            border-color: var(--primary-color);
+        }
+
+        .input-group button {
+            padding: 12px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .input-group button:hover {
+            background-color: #45a049;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul li {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        ul li:last-child {
+            margin-bottom: 0;
+        }
+
+        ul li.completed {
+            background-color: #e0ffe0;
+            border-color: #c8e6c9;
+            color: var(--light-text-color);
+            text-decoration: line-through;
+        }
+
+        ul li .task-text {
+            flex-grow: 1;
+            margin-right: 15px;
+            word-break: break-word;
+        }
+
+        ul li .delete-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            transition: background-color 0.3s ease;
+        }
+
+        ul li .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>My To-Do List</h1>
+        <div class="input-group">
+            <input type="text" id="taskInput" placeholder="Add a new task...">
+            <button id="addTaskBtn">Add Task</button>
+        </div>
+        <ul id="taskList">
+            <!-- Tasks will be added here dynamically -->
+        </ul>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const taskInput = document.getElementById('taskInput');
+            const addTaskBtn = document.getElementById('addTaskBtn');
+            const taskList = document.getElementById('taskList');
+
+            function loadTasks() {
+                const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+                tasks.forEach(taskData => appendTaskToDOM(taskData.text, taskData.completed, false));
+            }
+
+            function saveTasks() {
+                const tasks = [];
+                taskList.querySelectorAll('li').forEach(li => {
+                    const taskTextSpan = li.querySelector('.task-text');
+                    if (taskTextSpan) {
+                        tasks.push({
+                            text: taskTextSpan.textContent,
+                            completed: li.classList.contains('completed')
+                        });
+                    }
+                });
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+            }
+
+            function appendTaskToDOM(taskText, completed = false, save = true) {
+                if (!taskText.trim()) {
+                    if (save) alert('Please enter a task!');
+                    return;
+                }
+
+                const listItem = document.createElement('li');
+                if (completed) {
+                    listItem.classList.add('completed');
+                }
+
+                const taskSpan = document.createElement('span');
+                taskSpan.classList.add('task-text');
+                taskSpan.textContent = taskText;
+                listItem.appendChild(taskSpan);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'x';
+                deleteButton.classList.add('delete-btn');
+                listItem.appendChild(deleteButton);
+
+                taskList.appendChild(listItem);
+
+                if (save) {
+                    saveTasks();
+                    taskInput.value = '';
+                }
+            }
+
+            taskList.addEventListener('click', (event) => {
+                const target = event.target;
+
+                if (target.classList.contains('delete-btn')) {
+                    const listItem = target.closest('li');
+                    if (listItem) {
+                        taskList.removeChild(listItem);
+                        saveTasks();
+                    }
+                } else if (target.classList.contains('task-text') || target.tagName === 'LI') {
+                    const listItem = target.tagName === 'LI' ? target : target.closest('li');
+                    if (listItem) {
+                        listItem.classList.toggle('completed');
+                        saveTasks();
+                    }
+                }
+            });
+
+            addTaskBtn.addEventListener('click', () => {
+                appendTaskToDOM(taskInput.value, false, true);
+            });
+
+            taskInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    appendTaskToDOM(taskInput.value, false, true);
+                }
+            });
+
+            loadTasks();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nike. Just Do It. Nike.com</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👟</text></svg>">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@400;700&family=Roboto:wght@400;700&display=swap');
+
+        :root {
+            --nike-black: #111;
+            --nike-white: #fff;
+            --nike-grey: #f5f5f5;
+            --nike-dark-grey: #707070;
+            --nike-red: #fe0002;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', 'Roboto', sans-serif;
+            color: var(--nike-black);
+            line-height: 1.6;
+            background-color: var(--nike-white);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            outline: none;
+            background: var(--nike-black);
+            color: var(--nike-white);
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 30px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--nike-dark-grey);
+        }
+
+        .top-bar {
+            background-color: var(--nike-black);
+            color: var(--nike-white);
+            font-size: 0.8rem;
+            padding: 8px 0;
+            text-align: right;
+        }
+
+        .top-bar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+        }
+
+        .top-bar-content a {
+            color: var(--nike-white);
+            transition: color 0.3s ease;
+        }
+
+        .top-bar-content a:hover {
+            color: var(--nike-dark-grey);
+        }
+
+        .main-header {
+            background-color: var(--nike-white);
+            padding: 15px 0;
+            border-bottom: 1px solid var(--nike-grey);
+        }
+
+        .main-header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--nike-black);
+        }
+
+        .main-nav ul {
+            display: flex;
+            gap: 30px;
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .main-nav a:hover {
+            opacity: 0.7;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 20px;
+            font-size: 1.2rem;
+        }
+
+        .icon-btn {
+            background: none;
+            color: var(--nike-black);
+            font-size: 1.2rem;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+        }
+
+        .icon-btn:hover {
+            background-color: var(--nike-grey);
+        }
+
+        .hero-section {
+            background-image: url('https://via.placeholder.com/1920x800/eeeeee/333333?text=Nike+Just+Do+It');
+            background-size: cover;
+            background-position: center;
+            height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--nike-white);
+            position: relative;
+        }
+
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5));
+        }
+
+        .hero-content {
+            z-index: 1;
+            max-width: 800px;
+            padding: 20px;
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .hero-content p {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+        }
+
+        .hero-content button {
+            background-color: var(--nike-white);
+            color: var(--nike-black);
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 30px;
+        }
+
+        .hero-content button:hover {
+            background-color: var(--nike-grey);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 60px 0 40px;
+        }
+
+        .product-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 80px;
+        }
+
+        .product-card {
+            background-color: var(--nike-grey);
+            border-radius: 8px;
+            overflow: hidden;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            background-color: var(--nike-dark-grey);
+        }
+
+        .product-card .info {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
+
+        .product-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .product-card p {
+            font-size: 1.1rem;
+            color: var(--nike-dark-grey);
+            margin-bottom: 15px;
+        }
+
+        .product-card .price {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .product-card button {
+            background-color: var(--nike-black);
+            color: var(--nike-white);
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            border-radius: 20px;
+            width: 100%;
+        }
+
+        .cta-banner {
+            background-image: url('https://via.placeholder.com/1920x600/1a1a1a/cccccc?text=Unleash+Your+Potential');
+            background-size: cover;
+            background-position: center;
+            height: 450px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--nike-white);
+            position: relative;
+            margin-bottom: 80px;
+        }
+
+        .cta-banner::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+        }
+
+        .cta-banner-content {
+            z-index: 1;
+            max-width: 700px;
+            padding: 20px;
+        }
+
+        .cta-banner-content h2 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .cta-banner-content p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        .cta-banner-content button {
+            background-color: var(--nike-white);
+            color: var(--nike-black);
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 30px;
+        }
+
+        .main-footer {
+            background-color: var(--nike-black);
+            color: var(--nike-white);
+            padding: 60px 0;
+            font-size: 0.9rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .footer-column {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .footer-column h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--nike-white);
+        }
+
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-column a {
+            color: var(--nike-dark-grey);
+            transition: color 0.3s ease;
+        }
+
+        .footer-column a:hover {
+            color: var(--nike-white);
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-icons a {
+            font-size: 1.5rem;
+            color: var(--nike-white);
+        }
+
+        .copyright {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--nike-dark-grey);
+        }
+
+        .icon-search::before { content: '🔍'; }
+        .icon-cart::before { content: '🛒'; }
+        .icon-facebook::before { content: '📘'; }
+        .icon-twitter::before { content: '🐦'; }
+        .icon-instagram::before { content: '📸'; }
+        .icon-youtube::before { content: '▶️'; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="top-bar-content">
+            <a href="#">Find a Store</a>
+            <a href="#">Help</a>
+            <a href="#">Join Us</a>
+            <a href="#">Sign In</a>
+        </div>
+    </div>
+
+    <header class="main-header">
+        <div class="main-header-content">
+            <a href="#" class="logo">NIKE</a>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#">New Arrivals</a></li>
+                    <li><a href="#">Men</a></li>
+                    <li><a href="#">Women</a></li>
+                    <li><a href="#">Kids</a></li>
+                    <li><a href="#">Sale</a></li>
+                    <li><a href="#">SNKRS</a></li>
+                </ul>
+            </nav>
+            <div class="header-icons">
+                <button class="icon-btn icon-search" aria-label="Search"></button>
+                <button class="icon-btn icon-cart" aria-label="Cart"></button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>MOVE WITH US.</h1>
+                <p>From the track to the street, find the gear that moves you.</p>
+                <button>Shop Now</button>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Trending Now</h2>
+            <div class="product-grid">
+                <div class="product-card">
+                    <img src="https://via.placeholder.com/300x280/a0a0a0/ffffff?text=Running+Shoe" alt="Product 1">
+                    <div class="info">
+                        <h3>Nike Air Max 270</h3>
+                        <p>Men's Shoe</p>
+                        <div class="price">$150</div>
+                        <button>Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="https://via.placeholder.com/300x280/808080/ffffff?text=Sportswear" alt="Product 2">
+                    <div class="info">
+                        <h3>Nike Tech Fleece Hoodie</h3>
+                        <p>Women's Apparel</p>
+                        <div class="price">$120</div>
+                        <button>Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="https://via.placeholder.com/300x280/707070/ffffff?text=Basketball+Shoe" alt="Product 3">
+                    <div class="info">
+                        <h3>Jordan Zion 2</h3>
+                        <p>Basketball Shoe</p>
+                        <div class="price">$130</div>
+                        <button>Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="https://via.placeholder.com/300x280/606060/ffffff?text=Kids+Shoe" alt="Product 4">
+                    <div class="info">
+                        <h3>Nike Blazer Mid '77</h3>
+                        <p>Kids' Shoe</p>
+                        <div class="price">$75</div>
+                        <button>Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-banner">
+            <div class="cta-banner-content">
+                <h2>FIND YOUR PACE.</h2>
+                <p>Discover our latest collection designed for every stride, every run, every goal.</p>
+                <button>Explore Running</button>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Shop By Sport</h2>
+            <div class="product-grid">
+                <div class="product-card">
+                    <img src="https://via.placeholder.com/300x280/303030/ffffff?text=Running" alt="Running">
+                    <div class="info">
+                        <h3>Running</h3>
+                        <p>Hit the ground running.</p>
+                        <button>Shop Running</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="https://via.placeholder.com/300x280/404040/ffffff?text=Basketball" alt="Basketball">
+                    <div class="info">
+                        <h3>Basketball</h3>
+                        <p>Dominate the court.</p>
+                        <button>Shop Basketball</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="https://via.placeholder.com/300x280/505050/ffffff?text=Football" alt="Football">
+                    <div class="info">
+                        <h3>Football</h3>
+                        <p>Own the field.</p>
+                        <button>Shop Football</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="https://via.placeholder.com/300x280/202020/ffffff?text=Training" alt="Training">
+                    <div class="info">
+                        <h3>Training</h3>
+                        <p>Push your limits.</p>
+                        <button>Shop Training</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-column">
+                <h4>GET HELP</h4>
+                <ul>
+                    <li><a href="#">Order Status</a></li>
+                    <li><a href="#">Shipping & Delivery</a></li>
+                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">Payment Options</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>COMPANY</h4>
+                <ul>
+                    <li><a href="#">About Nike</a></li>
+                    <li><a href="#">News</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Investors</a></li>
+                    <li><a href="#">Sustainability</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>PROMOTIONS</h4>
+                <ul>
+                    <li><a href="#">Gift Cards</a></li>
+                    <li><a href="#">Student Discount</a></li>
+                    <li><a href="#">Military Discount</a></li>
+                    <li><a href="#">Find a Store</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>SOCIAL MEDIA</h4>
+                <div class="social-icons">
+                    <a href="#" class="icon-twitter" aria-label="Twitter"></a>
+                    <a href="#" class="icon-facebook" aria-label="Facebook"></a>
+                    <a href="#" class="icon-youtube" aria-label="Youtube"></a>
+                    <a href="#" class="icon-instagram" aria-label="Instagram"></a>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            © 2023 Nike, Inc. All Rights Reserved
+        </div>
+    </footer>
+</body>
+</html>

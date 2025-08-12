@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature Converter</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        h1 {
+            color: #007bff;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+
+        .input-group,
+        .result-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .input-group input[type="number"],
+        .input-group select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 1em;
+            box-sizing: border-box;
+            -webkit-appearance: none; /* Remove default styling for select */
+            -moz-appearance: none;
+            appearance: none;
+            background-color: #fff;
+            color: #333;
+        }
+        
+        .input-group select {
+            width: 100%; /* Make select full width */
+            padding-right: 30px; /* Space for custom arrow */
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="%23495057" d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592c.86 0 1.32 1.013.753 1.658L8.753 11.14a1 1 0 0 1-1.506 0z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .result-group p {
+            margin: 0;
+            font-size: 1.1em;
+            color: #555;
+            text-align: center;
+        }
+
+        #resultDisplay {
+            font-weight: 600;
+            color: #007bff; /* Initial color for results */
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Temperature Converter</h1>
+
+        <div class="input-group">
+            <label for="temperatureInput">Temperature:</label>
+            <input type="number" id="temperatureInput" placeholder="Enter value">
+        </div>
+
+        <div class="input-group">
+            <label for="fromUnit">From Unit:</label>
+            <select id="fromUnit">
+                <option value="celsius">Celsius (°C)</option>
+                <option value="fahrenheit">Fahrenheit (°F)</option>
+                <option value="kelvin">Kelvin (K)</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="toUnit">To Unit:</label>
+            <select id="toUnit">
+                <option value="fahrenheit">Fahrenheit (°F)</option>
+                <option value="celsius">Celsius (°C)</option>
+                <option value="kelvin">Kelvin (K)</option>
+            </select>
+        </div>
+
+        <button id="convertBtn">Convert</button>
+
+        <div class="result-group">
+            <p>Result: <span id="resultDisplay"></span></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const temperatureInput = document.getElementById('temperatureInput');
+            const fromUnitSelect = document.getElementById('fromUnit');
+            const toUnitSelect = document.getElementById('toUnit');
+            const convertBtn = document.getElementById('convertBtn');
+            const resultDisplay = document.getElementById('resultDisplay');
+
+            // Set initial conversion from Celsius to Fahrenheit
+            fromUnitSelect.value = 'celsius';
+            toUnitSelect.value = 'fahrenheit';
+
+            convertBtn.addEventListener('click', convertTemperature);
+
+            function convertTemperature() {
+                const inputValue = parseFloat(temperatureInput.value);
+                const fromUnit = fromUnitSelect.value;
+                const toUnit = toUnitSelect.value;
+
+                if (isNaN(inputValue)) {
+                    resultDisplay.textContent = 'Please enter a valid number.';
+                    resultDisplay.style.color = 'red';
+                    return;
+                }
+
+                if (fromUnit === toUnit) {
+                    let unitSymbol = getUnitSymbol(toUnit);
+                    resultDisplay.textContent = `${inputValue.toFixed(2)} ${unitSymbol}`;
+                    resultDisplay.style.color = '#007bff';
+                    return;
+                }
+
+                let celsiusValue;
+                // Convert from source unit to Celsius
+                switch (fromUnit) {
+                    case 'celsius':
+                        celsiusValue = inputValue;
+                        break;
+                    case 'fahrenheit':
+                        celsiusValue = (inputValue - 32) * 5 / 9;
+                        break;
+                    case 'kelvin':
+                        celsiusValue = inputValue - 273.15;
+                        break;
+                }
+
+                let result;
+                let unitSymbol;
+                // Convert from Celsius to target unit
+                switch (toUnit) {
+                    case 'celsius':
+                        result = celsiusValue;
+                        unitSymbol = '°C';
+                        break;
+                    case 'fahrenheit':
+                        result = (celsiusValue * 9 / 5) + 32;
+                        unitSymbol = '°F';
+                        break;
+                    case 'kelvin':
+                        result = celsiusValue + 273.15;
+                        unitSymbol = 'K';
+                        break;
+                }
+                
+                resultDisplay.textContent = `${result.toFixed(2)} ${unitSymbol}`;
+                resultDisplay.style.color = '#007bff';
+            }
+
+            function getUnitSymbol(unit) {
+                switch (unit) {
+                    case 'celsius':
+                        return '°C';
+                    case 'fahrenheit':
+                        return '°F';
+                    case 'kelvin':
+                        return 'K';
+                    default:
+                        return '';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

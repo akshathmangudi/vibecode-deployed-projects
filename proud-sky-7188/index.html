@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Page</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 40px 60px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            box-sizing: border-box;
+        }
+        h1 {
+            color: #673AB7; /* Deep purple */
+            margin-bottom: 20px;
+            font-size: 2.8em;
+        }
+        p#greetingMessage {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 30px;
+        }
+        input[type="text"] {
+            width: calc(100% - 24px); /* Adjust for padding */
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1.1em;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        input[type="text"]:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+        button {
+            background-color: #007bff; /* Blue */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hello!</h1>
+        <p id="greetingMessage">Welcome to the Hello Page!</p>
+        <input type="text" id="nameInput" placeholder="What's your name?">
+        <button id="greetButton">Greet Me!</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const greetButton = document.getElementById('greetButton');
+            const greetingMessage = document.getElementById('greetingMessage');
+            const nameInput = document.getElementById('nameInput');
+
+            greetButton.addEventListener('click', () => {
+                const now = new Date();
+                const hours = now.getHours();
+                let timeOfDay;
+
+                if (hours < 12) {
+                    timeOfDay = 'Good Morning';
+                } else if (hours < 18) {
+                    timeOfDay = 'Good Afternoon';
+                } else {
+                    timeOfDay = 'Good Evening';
+                }
+
+                const userName = nameInput.value.trim();
+                const personalizedPart = userName ? `, ${userName}!` : '!';
+
+                greetingMessage.textContent = `${timeOfDay}${personalizedPart}`;
+            });
+        });
+    </script>
+</body>
+</html>

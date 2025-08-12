@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie of the Day</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #app {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            text-align: center;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        header h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2.2em;
+        }
+
+        #movie-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #movie-title {
+            color: #34495e;
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-size: 1.8em;
+        }
+
+        #movie-poster {
+            max-width: 250px;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .movie-details {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px 30px;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+            color: #555;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .movie-details p {
+            margin: 0;
+        }
+
+        .detail-label {
+            color: #4CAF50;
+        }
+
+        #movie-description {
+            line-height: 1.6;
+            color: #666;
+            text-align: justify;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        footer {
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 0.85em;
+        }
+
+        @media (max-width: 600px) {
+            #app {
+                padding: 20px;
+                margin: 10px;
+            }
+            header h1 {
+                font-size: 1.8em;
+            }
+            #movie-title {
+                font-size: 1.5em;
+            }
+            .movie-details {
+                flex-direction: column;
+                gap: 5px;
+            }
+            #movie-poster {
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Today's Movie Pick</h1>
+        </header>
+        <main id="movie-container">
+            <h2 id="movie-title"></h2>
+            <img id="movie-poster" src="" alt="Movie Poster">
+            <div class="movie-details">
+                <p><strong class="detail-label">Year:</strong> <span id="movie-year"></span></p>
+                <p><strong class="detail-label">Genre:</strong> <span id="movie-genre"></span></p>
+                <p><strong class="detail-label">Rating:</strong> <span id="movie-rating"></span></p>
+            </div>
+            <p id="movie-description"></p>
+        </main>
+        <footer>
+            <p>&copy; <span id="current-year"></span> Movie of the Day App</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const movies = [
+                {
+                    title: "The Shawshank Redemption",
+                    poster: "https://image.tmdb.org/t/p/w500/q6y0sGFXy6gMvV6P7V5dJ2T6y.jpg",
+                    description: "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency. Based on the novella Rita Hayworth and the Shawshank Redemption by Stephen King.",
+                    year: 1994,
+                    genre: "Drama",
+                    rating: "R"
+                },
+                {
+                    title: "The Godfather",
+                    poster: "https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enXSUSo5oKGAz8c.jpg",
+                    description: "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.",
+                    year: 1972,
+                    genre: "Crime, Drama",
+                    rating: "R"
+                },
+                {
+                    title: "The Dark Knight",
+                    poster: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911NYJPT8IKKEhQ.jpg",
+                    description: "When the menace known as The Joker emerges from his mysterious past, he wreaks havoc and chaos on the people of Gotham. The Dark Knight must accept one of the greatest psychological and physical tests of his ability to fight injustice.",
+                    year: 2008,
+                    genre: "Action, Crime, Drama",
+                    rating: "PG-13"
+                },
+                {
+                    title: "Pulp Fiction",
+                    poster: "https://image.tmdb.org/t/p/w500/d5iVQg25R9P5mQ0z5G3t8F58iG.jpg",
+                    description: "The lives of two mob hitmen, a boxer, a gangster's wife, and a pair of diner bandits intertwine in four tales of violence and redemption.",
+                    year: 1994,
+                    genre: "Crime, Drama",
+                    rating: "R"
+                },
+                {
+                    title: "Forrest Gump",
+                    poster: "https://image.tmdb.org/t/p/w500/arw2WFCpXCRt0g0gNq4jGjNfF.jpg",
+                    description: "The presidencies of Kennedy and Johnson, the events of Vietnam, Watergate, and other historical events unfold through the perspective of an Alabama man with an IQ of 75, whose only desire is to be reunited with his childhood sweetheart.",
+                    year: 1994,
+                    genre: "Drama, Romance",
+                    rating: "PG-13"
+                },
+                {
+                    title: "Inception",
+                    poster: "https://image.tmdb.org/t/p/w500/oYuEqTPsTH4Yg5Vvsa5fCgI0P.jpg",
+                    description: "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+                    year: 2010,
+                    genre: "Action, Sci-Fi, Thriller",
+                    rating: "PG-13"
+                }
+            ];
+
+            function getMovieOfTheDayIndex() {
+                const today = new Date();
+                const startOfDayUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+                const daysSinceEpoch = Math.floor(startOfDayUTC / (1000 * 60 * 60 * 24));
+                return daysSinceEpoch % movies.length;
+            }
+
+            function displayMovieOfTheDay() {
+                const movieIndex = getMovieOfTheDayIndex();
+                const movie = movies[movieIndex];
+
+                document.getElementById('movie-title').textContent = movie.title;
+                document.getElementById('movie-poster').src = movie.poster;
+                document.getElementById('movie-poster').alt = `${movie.title} Poster`;
+                document.getElementById('movie-year').textContent = movie.year;
+                document.getElementById('movie-genre').textContent = movie.genre;
+                document.getElementById('movie-rating').textContent = movie.rating;
+                document.getElementById('movie-description').textContent = movie.description;
+            }
+
+            displayMovieOfTheDay();
+
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISL Translator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #app {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            box-sizing: border-box;
+            margin-top: 20px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2em;
+        }
+
+        .mode-toggle {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #4CAF50; /* Green */
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #4CAF50;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+        }
+
+        .section-item {
+            flex: 1;
+            min-width: 300px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-sizing: border-box;
+        }
+
+        .section-item h2 {
+            color: #444;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+            text-align: center;
+        }
+
+        .box {
+            width: 100%;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            background-color: #ffffff;
+            padding: 15px;
+            box-sizing: border-box;
+            min-height: 200px; /* Increased min-height for better visual balance */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #666;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+            display: none; /* Hidden by default, shown by JS when stream is active */
+        }
+
+        textarea {
+            width: 100%;
+            height: 170px; /* Adjusted height for textarea */
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 15px;
+            font-size: 1em;
+            resize: vertical;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        #webcam-section {
+            display: flex; /* Default: visible */
+        }
+
+        #text-section {
+            display: none; /* Default: hidden */
+        }
+
+        @media (max-width: 768px) {
+            .section {
+                flex-direction: column;
+            }
+            .section-item {
+                min-width: unset;
+            }
+            #app {
+                padding: 20px;
+                margin-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Indian Sign Language Translator</h1>
+
+        <div class="mode-toggle">
+            <span>Webcam to ISL</span>
+            <label class="switch">
+                <input type="checkbox" id="modeToggle">
+                <span class="slider"></span>
+            </label>
+            <span>Text to ISL</span>
+        </div>
+
+        <!-- Webcam to ISL Section -->
+        <div id="webcam-section" class="section">
+            <div class="section-item">
+                <h2>Webcam Input</h2>
+                <div class="box" id="webcam-input-box">
+                    <video id="webcamVideo" autoplay playsinline></video>
+                    <p id="webcam-status">Please grant camera access to start webcam...</p>
+                </div>
+            </div>
+            <div class="section-item">
+                <h2>ISL Translation (Text Output)</h2>
+                <div class="box" id="webcam-output-text">
+                    <p>Live ISL translation will appear here.<br><br><i>(Note: Real-time sign language recognition requires advanced AI/ML models not feasible in a client-side, single-file application.)</i></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Text to ISL Section -->
+        <div id="text-section" class="section">
+            <div class="section-item">
+                <h2>Text Input</h2>
+                <div class="box">
+                    <textarea id="textInput" placeholder="Enter text here to see its ISL animation..."></textarea>
+                </div>
+            </div>
+            <div class="section-item">
+                <h2>ISL Animation Output</h2>
+                <div class="box" id="animation-output-box">
+                    <p>ISL animation for your text input would appear here.<br><br><i>(Note: Generating dynamic ISL animations from arbitrary text requires a comprehensive sign language animation library or generation engine, which is beyond the scope of this single-file application.)</i></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modeToggle = document.getElementById('modeToggle');
+        const webcamSection = document.getElementById('webcam-section');
+        const textSection = document.getElementById('text-section');
+        const webcamVideo = document.getElementById('webcamVideo');
+        const webcamStatus = document.getElementById('webcam-status');
+        
+        let currentStream = null; // To store the webcam MediaStream object
+
+        // Function to start the webcam
+        async function startWebcam() {
+            if (currentStream) { // If a stream is already active, stop it first
+                stopWebcam();
+            }
+            webcamStatus.textContent = "Attempting to access webcam...";
+            webcamStatus.style.display = 'block';
+            webcamVideo.style.display = 'none';
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                currentStream = stream;
+                webcamVideo.srcObject = stream;
+                webcamVideo.style.display = 'block'; // Show video element
+                webcamStatus.style.display = 'none'; // Hide status message
+            } catch (err) {
+                console.error("Error accessing webcam: ", err);
+                webcamStatus.textContent = `Error: ${err.name}. Please ensure camera access is allowed and no other applications are using it.`;
+                webcamStatus.style.display = 'block'; // Show error message
+                webcamVideo.style.display = 'none'; // Hide video element
+            }
+        }
+
+        // Function to stop the webcam
+        function stopWebcam() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
+                webcamVideo.srcObject = null;
+                webcamVideo.style.display = 'none'; // Hide video element
+                webcamStatus.textContent = 'Webcam stopped.';
+                webcamStatus.style.display = 'block'; // Show status message
+            }
+        }
+
+        // Handle mode toggle change
+        modeToggle.addEventListener('change', () => {
+            if (modeToggle.checked) { // Text to ISL mode is active (checkbox is checked)
+                webcamSection.style.display = 'none';
+                textSection.style.display = 'flex';
+                stopWebcam(); // Stop webcam when switching away from webcam mode
+            } else { // Webcam to ISL mode is active (checkbox is unchecked)
+                webcamSection.style.display = 'flex';
+                textSection.style.display = 'none';
+                startWebcam(); // Start webcam when switching to webcam mode
+            }
+        });
+
+        // Initialize on page load (start with Webcam to ISL mode by default)
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ensure the initial state of the toggle matches the displayed section
+            modeToggle.checked = false; // Ensure it's unchecked for "Webcam to ISL"
+            webcamSection.style.display = 'flex';
+            textSection.style.display = 'none';
+            startWebcam(); // Start webcam immediately
+        });
+
+        // Ensure webcam is stopped when the user navigates away or closes the tab
+        window.addEventListener('beforeunload', () => {
+            stopWebcam();
+        });
+    </script>
+</body>
+</html>

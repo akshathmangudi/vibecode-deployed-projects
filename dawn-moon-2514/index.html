@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Page</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2.5em 3.5em;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 3.5em;
+            margin-bottom: 0.3em;
+            letter-spacing: -0.02em;
+            transition: color 0.3s ease-in-out;
+        }
+
+        p {
+            font-size: 1.3em;
+            color: #555;
+            margin-top: 0;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hello, World!</h1>
+        <p>This is a simple, single-file web application.</p>
+        <p>Everything you see is contained within this one HTML document.</p>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Hello page loaded successfully!');
+            const heading = document.querySelector('h1');
+
+            heading.addEventListener('mouseover', () => {
+                heading.style.color = '#3498db'; /* A pleasant blue on hover */
+            });
+
+            heading.addEventListener('mouseout', () => {
+                heading.style.color = '#2c3e50'; /* Revert to original color */
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agency Project Manager</title>
+    <style>
+        :root {
+            --primary-color: #6366F1; /* Indigo 500 */
+            --secondary-color: #818CF8; /* Indigo 400 */
+            --accent-color: #EC4899; /* Pink 500 */
+            --bg-color: #F3F4F6; /* Gray 100 */
+            --card-bg-color: #FFFFFF;
+            --text-color: #374151; /* Gray 700 */
+            --light-text-color: #6B7280; /* Gray 500 */
+            --border-color: #D1D5DB; /* Gray 300 */
+            --success-color: #22C55E; /* Green 500 */
+            --warning-color: #F59E0B; /* Yellow 500 */
+            --error-color: #EF4444; /* Red 500 */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            letter-spacing: -0.025em;
+        }
+
+        .app-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: var(--card-bg-color);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-group input[type="text"] {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1em;
+            color: var(--text-color);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .input-group input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button.delete-btn {
+            background-color: var(--error-color);
+        }
+
+        button.delete-btn:hover {
+            background-color: #DC2626; /* Red 600 */
+        }
+
+        button.toggle-status-btn {
+            background-color: var(--warning-color);
+        }
+
+        button.toggle-status-btn:hover {
+            background-color: #D97706; /* Amber 600 */
+        }
+
+        .project-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .project-card {
+            background-color: var(--bg-color);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .project-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .project-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .project-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+            color: var(--primary-color);
+            flex-grow: 1;
+        }
+
+        .project-status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 15px;
+            white-space: nowrap;
+        }
+
+        .project-status.active {
+            background-color: rgba(34, 197, 94, 0.1); /* Green 500 with opacity */
+            color: var(--success-color);
+        }
+
+        .project-status.completed {
+            background-color: rgba(99, 102, 241, 0.1); /* Primary color with opacity */
+            color: var(--primary-color);
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: 15px;
+        }
+
+        .project-details {
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        .project-details.hidden {
+            display: none;
+        }
+
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-item input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+            accent-color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .task-item span {
+            flex-grow: 1;
+            font-size: 1em;
+            color: var(--text-color);
+        }
+
+        .task-item.completed span {
+            text-decoration: line-through;
+            color: var(--light-text-color);
+        }
+
+        .task-item .task-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .task-item .task-actions button {
+            padding: 6px 10px;
+            font-size: 0.8em;
+            border-radius: 6px;
+        }
+
+        .task-input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .task-input-group input {
+            flex-grow: 1;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95em;
+        }
+
+        .task-input-group button {
+            padding: 10px 15px;
+            font-size: 0.9em;
+        }
+
+        .no-projects-message {
+            text-align: center;
+            color: var(--light-text-color);
+            font-style: italic;
+            padding: 30px;
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Agency Project Manager</h1>
+
+    <div class="app-container">
+        <div class="input-group">
+            <input type="text" id="project-name-input" placeholder="New project name...">
+            <button id="add-project-btn">Add Project</button>
+        </div>
+
+        <div class="project-list" id="project-list">
+            <p class="no-projects-message" id="no-projects-message" style="display: none;">No projects yet. Add one above!</p>
+        </div>
+    </div>
+
+    <script>
+        const projectListDiv = document.getElementById('project-list');
+        const projectNameInput = document.getElementById('project-name-input');
+        const addProjectBtn = document.getElementById('add-project-btn');
+        const noProjectsMessage = document.getElementById('no-projects-message');
+
+        const LOCAL_STORAGE_KEY = 'agencyProjects';
+        let projects = [];
+
+        function generateUniqueId() {
+            return 'id-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function saveProjects() {
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(projects));
+        }
+
+        function loadProjects() {
+            const storedProjects = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (storedProjects) {
+                try {
+                    projects = JSON.parse(storedProjects);
+                } catch (e) {
+                    console.error("Error parsing stored projects:", e);
+                    projects = [];
+                }
+            } else {
+                projects = [];
+            }
+            renderProjects();
+        }
+
+        function addProject() {
+            const name = projectNameInput.value.trim();
+            if (name) {
+                const newProject = {
+                    id: generateUniqueId(),
+                    name: name,
+                    status: 'Active',
+                    tasks: []
+                };
+                projects.unshift(newProject);
+                saveProjects();
+                projectNameInput.value = '';
+                renderProjects();
+            }
+        }
+
+        function deleteProject(projectId) {
+            projects = projects.filter(p => p.id !== projectId);
+            saveProjects();
+            renderProjects();
+        }
+
+        function toggleProjectStatus(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (project) {
+                project.status = project.status === 'Active' ? 'Completed' : 'Active';
+                saveProjects();
+                renderProjects();
+            }
+        }
+
+        function addTask(projectId, description) {
+            const project = projects.find(p => p.id === projectId);
+            if (project && description.trim()) {
+                const newTask = {
+                    id: generateUniqueId(),
+                    description: description.trim(),
+                    completed: false
+                };
+                project.tasks.push(newTask);
+                saveProjects();
+                renderProjects();
+            }
+        }
+
+        function toggleTaskCompletion(projectId, taskId) {
+            const project = projects.find(p => p.id === projectId);
+            if (project) {
+                const task = project.tasks.find(t => t.id === taskId);
+                if (task) {
+                    task.completed = !task.completed;
+                    saveProjects();
+                    renderProjects();
+                }
+            }
+        }
+
+        function deleteTask(projectId, taskId) {
+            const project = projects.find(p => p.id === projectId);
+            if (project) {
+                project.tasks = project.tasks.filter(t => t.id !== taskId);
+                saveProjects();
+                renderProjects();
+            }
+        }
+
+        function renderProjects() {
+            projectListDiv.innerHTML = '';
+
+            if (projects.length === 0) {
+                noProjectsMessage.style.display = 'block';
+                return;
+            } else {
+                noProjectsMessage.style.display = 'none';
+            }
+
+            projects.forEach(project => {
+                const projectCard = document.createElement('div');
+                projectCard.className = 'project-card';
+                projectCard.dataset.projectId = project.id;
+
+                const header = document.createElement('div');
+                header.className = 'project-header';
+                header.innerHTML = `
+                    <h2>${project.name}</h2>
+                    <span class="project-status ${project.status.toLowerCase()}">${project.status}</span>
+                    <div class="project-actions">
+                        <button class="toggle-status-btn" data-action="toggle-status">
+                            ${project.status === 'Active' ? 'Complete' : 'Activate'}
+                        </button>
+                        <button class="delete-btn" data-action="delete-project">Delete</button>
+                    </div>
+                `;
+                
+                const details = document.createElement('div');
+                details.className = 'project-details hidden';
+
+                const taskList = document.createElement('ul');
+                taskList.className = 'task-list';
+
+                if (project.tasks.length === 0) {
+                    const noTasksMessage = document.createElement('p');
+                    noTasksMessage.textContent = "No tasks yet. Add one below!";
+                    noTasksMessage.style.color = 'var(--light-text-color)';
+                    noTasksMessage.style.textAlign = 'center';
+                    noTasksMessage.style.marginTop = '10px';
+                    taskList.appendChild(noTasksMessage);
+                } else {
+                    project.tasks.forEach(task => {
+                        const taskItem = document.createElement('li');
+                        taskItem.className = `task-item ${task.completed ? 'completed' : ''}`;
+                        taskItem.dataset.taskId = task.id;
+
+                        taskItem.innerHTML = `
+                            <input type="checkbox" ${task.completed ? 'checked' : ''} data-action="toggle-task-completion">
+                            <span>${task.description}</span>
+                            <div class="task-actions">
+                                <button class="delete-btn" data-action="delete-task">Delete</button>
+                            </div>
+                        `;
+                        taskList.appendChild(taskItem);
+                    });
+                }
+
+                const taskInputGroup = document.createElement('div');
+                taskInputGroup.className = 'task-input-group';
+                taskInputGroup.innerHTML = `
+                    <input type="text" class="task-description-input" placeholder="New task description...">
+                    <button class="add-task-btn" data-action="add-task">Add Task</button>
+                `;
+
+                details.appendChild(taskList);
+                details.appendChild(taskInputGroup);
+
+                projectCard.appendChild(header);
+                projectCard.appendChild(details);
+                projectListDiv.appendChild(projectCard);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProjects);
+
+        addProjectBtn.addEventListener('click', addProject);
+        projectNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addProject();
+            }
+        });
+
+        projectListDiv.addEventListener('click', (e) => {
+            const target = e.target;
+            const projectCard = target.closest('.project-card');
+            const projectId = projectCard ? projectCard.dataset.projectId : null;
+
+            if (!projectId) return;
+
+            const action = target.dataset.action;
+
+            if (action) {
+                switch (action) {
+                    case 'toggle-status':
+                        toggleProjectStatus(projectId);
+                        break;
+                    case 'delete-project':
+                        if (confirm('Are you sure you want to delete this project? All tasks will be lost.')) {
+                            deleteProject(projectId);
+                        }
+                        break;
+                    case 'add-task':
+                        const taskInput = projectCard.querySelector('.task-description-input');
+                        if (taskInput) {
+                            addTask(projectId, taskInput.value);
+                            taskInput.value = '';
+                        }
+                        break;
+                    case 'toggle-task-completion':
+                        const taskItem = target.closest('.task-item');
+                        const taskId = taskItem ? taskItem.dataset.taskId : null;
+                        if (taskId) {
+                            toggleTaskCompletion(projectId, taskId);
+                        }
+                        break;
+                    case 'delete-task':
+                        const taskItemToDelete = target.closest('.task-item');
+                        const taskIdToDelete = taskItemToDelete ? taskItemToDelete.dataset.taskId : null;
+                        if (taskIdToDelete && confirm('Are you sure you want to delete this task?')) {
+                            deleteTask(projectId, taskIdToDelete);
+                        }
+                        break;
+                }
+            } else if (target.closest('.project-header') && !target.closest('.project-actions')) {
+                const details = projectCard.querySelector('.project-details');
+                if (details) {
+                    details.classList.toggle('hidden');
+                }
+            }
+        });
+
+        projectListDiv.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && e.target.classList.contains('task-description-input')) {
+                const projectCard = e.target.closest('.project-card');
+                const projectId = projectCard ? projectCard.dataset.projectId : null;
+                if (projectId) {
+                    addTask(projectId, e.target.value);
+                    e.target.value = '';
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>

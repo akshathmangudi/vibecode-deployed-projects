@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Page</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #e0f7fa;
+            color: #333;
+            text-align: center;
+        }
+
+        #app {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #007bff;
+            font-size: 2.8em;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        #currentTime {
+            font-size: 1em;
+            color: #777;
+            margin-top: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1 id="greeting"></h1>
+        <p>Welcome to your simple and self-contained web application.</p>
+        <p>This page was dynamically rendered just for you!</p>
+        <p id="currentTime"></p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const greetingElement = document.getElementById('greeting');
+            const currentTimeElement = document.getElementById('currentTime');
+            const now = new Date();
+            const hours = now.getHours();
+            let greetingText;
+
+            if (hours < 12) {
+                greetingText = "Good morning!";
+            } else if (hours < 18) {
+                greetingText = "Good afternoon!";
+            } else {
+                greetingText = "Good evening!";
+            }
+
+            greetingElement.textContent = greetingText;
+
+            function updateTime() {
+                const current = new Date();
+                const options = {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                };
+                currentTimeElement.textContent = `Today is ${current.toLocaleDateString(undefined, options)}`;
+            }
+
+            updateTime();
+            setInterval(updateTime, 1000);
+        });
+    </script>
+</body>
+</html>

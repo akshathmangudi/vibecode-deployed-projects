@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoserLove: Find Your Fellow Failure!</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        #app-container {
+            text-align: center;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid #e0e0e0;
+        }
+
+        h1 {
+            color: #8b0000;
+            margin-bottom: 25px;
+            font-size: 2.2em;
+            letter-spacing: -0.5px;
+        }
+
+        #profile-card {
+            background-color: #fdfdfd;
+            border: 1px solid #e8e8e8;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #profile-img {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 4px solid #d3d3d3;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #profile-name {
+            color: #555;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+
+        #profile-bio {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+            padding: 0 10px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .buttons button {
+            background-color: #c0392b; /* Reddish */
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            flex-grow: 1;
+            max-width: 200px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .buttons button:hover {
+            background-color: #e74c3c; /* Lighter red */
+            transform: translateY(-2px);
+        }
+
+        .buttons button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #reject-btn {
+            background-color: #7f8c8d; /* Grey */
+        }
+
+        #reject-btn:hover {
+            background-color: #95a5a6; /* Lighter grey */
+        }
+
+        #message {
+            margin-top: 25px;
+            font-weight: bold;
+            font-size: 1.2em;
+            min-height: 20px; /* To prevent layout shift */
+            opacity: 0;
+            transition: opacity 0.5s ease-out;
+            color: #27ae60; /* Green for success */
+        }
+
+        #message.active {
+            opacity: 1;
+        }
+
+        #message.error {
+            color: #e74c3c; /* Red for error/rejection */
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <h1>LoserLove: Find Your Fellow Failure!</h1>
+        <div id="profile-card">
+            <img id="profile-img" src="" alt="Profile Picture">
+            <h2 id="profile-name"></h2>
+            <p id="profile-bio"></p>
+            <div class="buttons">
+                <button id="connect-btn">Connect (Why not?)</button>
+                <button id="reject-btn">Hard Pass (You can do worse!)</button>
+            </div>
+        </div>
+        <p id="message"></p>
+    </div>
+
+    <script>
+        const profiles = [
+            {
+                name: "Gary, 32",
+                bio: "Fluent in meme-speak, aspiring professional couch potato. My biggest achievement is consistently hitting snooze. Looking for someone who also enjoys the comfort of their own mediocrity.",
+                imageUrl: "https://picsum.photos/id/1005/300/300"
+            },
+            {
+                name: "Brenda, 29",
+                bio: "My houseplants keep dying, and I still talk to my cat like he understands advanced astrophysics. I once won a staring contest with a squirrel. Seeking a co-pilot for my journey to nowhere in particular.",
+                imageUrl: "https://picsum.photos/id/1025/300/300"
+            },
+            {
+                name: "Kevin, 35",
+                bio: "Still lives with his mom (it's rent-free, okay?). Expert in competitive napping and identifying obscure 90s cartoon characters. My superpower is procrastinating until the last possible second. Let's fail together!",
+                imageUrl: "https://picsum.photos/id/1060/300/300"
+            },
+            {
+                name: "Samantha, 28",
+                bio: "My idea of a wild Friday night is ordering pizza and watching documentaries about ancient pottery. I collect lint. If you can tolerate my obsession with organizing my spice rack alphabetically, we might be a match.",
+                imageUrl: "https://picsum.photos/id/1074/300/300"
+            },
+            {
+                name: "Theodore, 41",
+                bio: "Self-proclaimed expert on conspiracy theories involving garden gnomes. My only real talent is remembering useless trivia. I'm looking for someone who appreciates the art of strategic avoidance and the comfort of silence.",
+                imageUrl: "https://picsum.photos/id/1084/300/300"
+            },
+            {
+                name: "Lisa, 30",
+                bio: "My spirit animal is a sloth. I often forget where I put my keys, my phone, and sometimes even my purpose in life. I’m an expert at parallel parking… in my dreams. Let's embrace our shared mediocrity!",
+                imageUrl: "https://picsum.photos/id/1011/300/300"
+            },
+            {
+                name: "Mark, 33",
+                bio: "I once spent an entire weekend trying to fix a leaky faucet, only to call a plumber on Monday. My only culinary skill is microwaving. Seeking a fellow participant in life’s gentle decline.",
+                imageUrl: "https://picsum.photos/id/1039/300/300"
+            }
+        ];
+
+        let currentProfileIndex = 0;
+        const profileImg = document.getElementById('profile-img');
+        const profileName = document.getElementById('profile-name');
+        const profileBio = document.getElementById('profile-bio');
+        const connectBtn = document.getElementById('connect-btn');
+        const rejectBtn = document.getElementById('reject-btn');
+        const messageDisplay = document.getElementById('message');
+
+        function displayProfile(index) {
+            const profile = profiles[index];
+            profileImg.src = profile.imageUrl;
+            profileImg.alt = profile.name;
+            profileName.textContent = profile.name;
+            profileBio.textContent = profile.bio;
+            hideMessage();
+        }
+
+        function showMessage(msg, type = 'success') {
+            messageDisplay.textContent = msg;
+            messageDisplay.className = 'active';
+            if (type === 'error') {
+                messageDisplay.classList.add('error');
+            } else {
+                messageDisplay.classList.remove('error');
+            }
+            // Hide message after a short delay
+            setTimeout(hideMessage, 1500);
+        }
+
+        function hideMessage() {
+            messageDisplay.classList.remove('active', 'error');
+            messageDisplay.textContent = '';
+        }
+
+        function nextProfile() {
+            currentProfileIndex = (currentProfileIndex + 1) % profiles.length;
+            setTimeout(() => { // Small delay to allow message to be seen
+                displayProfile(currentProfileIndex);
+            }, 300);
+        }
+
+        connectBtn.addEventListener('click', () => {
+            showMessage("You connected! (They're probably just as desperate.)");
+            nextProfile();
+        });
+
+        rejectBtn.addEventListener('click', () => {
+            showMessage("Hard Pass! (Good job setting low standards!)", 'error');
+            nextProfile();
+        });
+
+        // Initialize the app
+        displayProfile(currentProfileIndex);
+    </script>
+</body>
+</html>

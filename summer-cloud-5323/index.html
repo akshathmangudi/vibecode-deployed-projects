@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nike - Just Do It.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --nike-black: #111;
+            --nike-white: #fff;
+            --nike-light-grey: #f5f5f5;
+            --nike-medium-grey: #757575;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--nike-black);
+            line-height: 1.6;
+            background-color: var(--nike-white);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            text-align: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border-radius: 5px;
+        }
+
+        .btn-dark {
+            background-color: var(--nike-black);
+            color: var(--nike-white);
+        }
+
+        .btn-dark:hover {
+            background-color: var(--nike-medium-grey);
+        }
+
+        .btn-light {
+            background-color: var(--nike-white);
+            color: var(--nike-black);
+            border: 1px solid var(--nike-black);
+        }
+
+        .btn-light:hover {
+            background-color: var(--nike-light-grey);
+        }
+
+        .main-header {
+            background-color: var(--nike-white);
+            border-bottom: 1px solid var(--nike-light-grey);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .top-bar {
+            background-color: var(--nike-light-grey);
+            padding: 5px 20px;
+            display: flex;
+            justify-content: flex-end;
+            font-size: 0.8em;
+            border-bottom: 1px solid #eee;
+        }
+
+        .top-nav a {
+            margin-left: 15px;
+            color: var(--nike-medium-grey);
+        }
+
+        .top-nav a:hover {
+            color: var(--nike-black);
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            position: relative;
+        }
+
+        .logo svg {
+            color: var(--nike-black);
+            height: 36px;
+            width: auto;
+        }
+
+        .main-nav .nav-list {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            background-color: var(--nike-white);
+            position: absolute;
+            top: 100%;
+            left: 0;
+            padding: 20px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            border-top: 1px solid var(--nike-light-grey);
+        }
+
+        .main-nav.active .nav-list {
+            display: flex;
+        }
+
+        .main-nav .nav-list li {
+            margin: 10px 0;
+        }
+
+        .main-nav .nav-list a {
+            font-weight: 600;
+            color: var(--nike-black);
+            display: block;
+            padding: 5px 0;
+        }
+
+        .main-nav .nav-list a:hover {
+            color: var(--nike-medium-grey);
+        }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-box {
+            position: relative;
+            display: none;
+        }
+
+        .search-input {
+            border: none;
+            background-color: var(--nike-light-grey);
+            padding: 8px 12px 8px 40px;
+            border-radius: 20px;
+            outline: none;
+            width: 150px;
+            transition: width 0.3s ease;
+        }
+
+        .search-input:focus {
+            width: 200px;
+        }
+
+        .search-btn {
+            background: transparent;
+            border: none;
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .search-btn svg {
+            height: 20px;
+            width: 20px;
+            color: var(--nike-medium-grey);
+        }
+
+        .icon-link svg {
+            height: 24px;
+            width: 24px;
+            color: var(--nike-black);
+        }
+
+        .icon-link:hover svg {
+            color: var(--nike-medium-grey);
+        }
+
+        .menu-toggle {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 24px;
+            height: 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .hamburger {
+            width: 100%;
+            height: 2px;
+            background: var(--nike-black);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .menu-toggle.active .hamburger:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+        }
+        .menu-toggle.active .hamburger:nth-child(2) {
+            opacity: 0;
+        }
+        .menu-toggle.active .hamburger:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+        }
+
+        main {
+            padding-bottom: 50px;
+        }
+
+        .hero-section {
+            background-image: url('https://source.unsplash.com/random/1600x900/?nike,running,shoes,athlete');
+            background-size: cover;
+            background-position: center;
+            color: var(--nike-white);
+            text-align: center;
+            padding: 100px 20px;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+        }
+
+        .hero-content h1 {
+            font-family: 'Anton', sans-serif;
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .hero-content p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+
+        .hero-buttons .btn {
+            margin: 0 10px;
+        }
+
+        .featured-section, .promo-section {
+            padding: 50px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .featured-section h2, .promo-section h2 {
+            font-family: 'Anton', sans-serif;
+            font-size: 2.2em;
+            text-align: center;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .category-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            background-size: cover;
+            background-position: center;
+            min-height: 250px;
+            color: var(--nike-white);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            padding: 20px;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0));
+            z-index: 0;
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-content h3 {
+            font-family: 'Anton', sans-serif;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .card-men {
+            background-image: url('https://source.unsplash.com/random/800x600/?men,sportswear,nike');
+        }
+        .card-women {
+            background-image: url('https://source.unsplash.com/random/800x600/?women,fitness,nike');
+        }
+        .card-shoes {
+            background-image: url('https://source.unsplash.com/random/400x300/?nike,sneakers');
+        }
+        .card-apparel {
+            background-image: url('https://source.unsplash.com/random/400x300/?nike,clothing');
+        }
+
+        .promo-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .promo-item {
+            background-size: cover;
+            background-position: center;
+            min-height: 350px;
+            display: flex;
+            align-items: flex-end;
+            padding: 30px;
+            color: var(--nike-white);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .promo-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0));
+            z-index: 0;
+        }
+
+        .promo-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .promo-content h3 {
+            font-family: 'Anton', sans-serif;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .promo-content p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .promo-item-1 {
+            background-image: url('https://source.unsplash.com/random/800x500/?nike,airmax');
+        }
+        .promo-item-2 {
+            background-image: url('https://source.unsplash.com/random/800x500/?nike,techwear');
+        }
+
+        footer {
+            background-color: var(--nike-black);
+            color: var(--nike-white);
+            padding: 40px 20px 20px;
+            font-size: 0.9em;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--nike-medium-grey);
+        }
+
+        .footer-column h4 {
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            font-size: 1.1em;
+        }
+
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-column a {
+            color: var(--nike-light-grey);
+        }
+
+        .footer-column a:hover {
+            color: var(--nike-white);
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: flex-start;
+        }
+
+        .footer-social a svg {
+            color: var(--nike-white);
+            transition: color 0.3s ease;
+        }
+
+        .footer-social a:hover svg {
+            color: var(--nike-medium-grey);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            color: var(--nike-medium-grey);
+        }
+
+        @media (min-width: 768px) {
+            .top-bar {
+                padding: 5px 40px;
+            }
+            .nav-bar {
+                padding: 10px 40px;
+            }
+
+            .main-nav .nav-list {
+                display: flex;
+                flex-direction: row;
+                position: static;
+                width: auto;
+                padding: 0;
+                box-shadow: none;
+                border-top: none;
+            }
+
+            .main-nav .nav-list li {
+                margin: 0 15px;
+            }
+
+            .menu-toggle {
+                display: none;
+            }
+
+            .search-box {
+                display: block;
+            }
+
+            .hero-content h1 {
+                font-size: 5em;
+            }
+            .hero-content p {
+                font-size: 1.5em;
+            }
+
+            .category-grid {
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: repeat(2, minmax(200px, 1fr));
+            }
+
+            .large-card {
+                grid-column: span 2;
+            }
+            .small-card {
+                grid-column: span 1;
+            }
+
+            .category-card {
+                min-height: 350px;
+            }
+
+            .promo-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .footer-content {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: flex-start;
+                text-align: left;
+            }
+
+            .footer-column {
+                flex: 1;
+                min-width: 150px;
+            }
+
+            .footer-social {
+                margin-top: 0;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .hero-content h1 {
+                font-size: 6em;
+            }
+
+            .main-nav .nav-list li {
+                margin: 0 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="top-bar">
+            <nav class="top-nav">
+                <a href="#" class="top-link">Find a Store</a>
+                <a href="#" class="top-link">Help</a>
+                <a href="#" class="top-link">Join Us</a>
+                <a href="#" class="top-link">Sign In</a>
+            </nav>
+        </div>
+        <div class="nav-bar">
+            <div class="logo">
+                <a href="#">
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" role="img" width="60px" height="60px" fill="none">
+                        <path fill="currentColor" fill-rule="evenodd" d="M21.487 9.878c0-.62-.016-1.24-.031-1.861-.06-2.4-.954-4.7-2.617-6.52A9.453 9.453 0 0012 0C7.26 0 3.253 2.923 1.543 7.27l-.025.074-.035.1-.035.101-.035.111c-.046.126-.08.27-.126.406-.057.17-.113.34-.16.51-.06.2-.113.4-.16.6-.046.2-.08.4-.113.6-.035.2-.06.4-.08.6-.025.2-.035.4-.046.6-.016.2-.016.4-.016.6 0 .62.016 1.24.031 1.861.06 2.4.954 4.7 2.617 6.52A9.453 9.453 0 0012 24c4.74 0 8.747-2.923 10.457-7.27l.025-.074.035-.1.035-.101.035-.111c.046-.126.08-.27.126-.406.057-.17.113-.34.16-.51.06-.2.113-.4.16-.6.046-.2.08-.4.113-.6.035-.2.06-.4.08-.6.025-.2.035-.4.046-.6.016-.2.016-.4.016-.6zM9.42 2.664c.264-1.077 1.05-1.954 2.15-2.285 2.544-.75 5.228.618 6.52 2.872 1.484 2.55.973 5.75-.41 8.01-1.383 2.257-4.057 3.518-6.6 3.03-2.543-.487-4.48-2.316-5.11-4.78-.63-2.464.38-5.067 2.45-6.847z"></path>
+                    </svg>
+                </a>
+            </div>
+            <nav class="main-nav">
+                <ul class="nav-list">
+                    <li><a href="#">New Releases</a></li>
+                    <li><a href="#">Men</a></li>
+                    <li><a href="#">Women</a></li>
+                    <li><a href="#">Kids</a></li>
+                    <li><a href="#">Sale</a></li>
+                    <li><a href="#">SNKRS</a></li>
+                </ul>
+            </nav>
+            <div class="nav-icons">
+                <div class="search-box">
+                    <input type="text" placeholder="Search" class="search-input">
+                    <button class="search-btn"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" role="img" width="24px" height="24px" fill="none"><path stroke="currentColor" stroke-width="1.5" d="M16.794 16.578A8.348 8.348 0 0019.5 11c0-4.636-3.764-8.4-8.4-8.4S2.7 6.364 2.7 11c0 4.636 3.764 8.4 8.4 8.4a8.348 8.348 0 005.578-2.006l4.245 4.245a.75.75 0 001.06-1.06l-4.245-4.245zM11.1 17.5c3.59 0 6.5-2.91 6.5-6.5S14.69 4.5 11.1 4.5 4.6 7.41 4.6 11s2.91 6.5 6.5 6.5z"></path></svg></button>
+                </div>
+                <a href="#" class="icon-link"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" role="img" width="24px" height="24px" fill="none"><path stroke="currentColor" stroke-width="1.5" d="M2.25 2.25h1.5l1.69 6.223A2 2 0 007.348 10h9.096a2 2 0 001.908-1.527L21.049 4.31a.75.75 0 00-.022-.245c-.066-.217-.267-.358-.493-.358H5.25a.75.75 0 00-.737.592L2.25 2.25zm.51 16.5c0 .414.336.75.75.75h14.25a.75.75 0 000-1.5H3.51a.75.75 0 00-.75.75zM15 21a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm6.75 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path></svg></a>
+            </div>
+            <button class="menu-toggle" aria-label="Toggle mobile menu">
+                <span class="hamburger"></span>
+                <span class="hamburger"></span>
+                <span class="hamburger"></span>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>NEW ARRIVALS</h1>
+                <p>Gear up for greatness. The latest styles are here.</p>
+                <div class="hero-buttons">
+                    <a href="#" class="btn btn-dark">Shop Men's</a>
+                    <a href="#" class="btn btn-dark">Shop Women's</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="featured-section">
+            <h2>Featured Categories</h2>
+            <div class="category-grid">
+                <a href="#" class="category-card large-card card-men">
+                    <div class="card-content">
+                        <h3>Men's Collection</h3>
+                        <button class="btn btn-light">Shop Now</button>
+                    </div>
+                </a>
+                <a href="#" class="category-card large-card card-women">
+                    <div class="card-content">
+                        <h3>Women's Collection</h3>
+                        <button class="btn btn-light">Shop Now</button>
+                    </div>
+                </a>
+                <a href="#" class="category-card small-card card-shoes">
+                    <div class="card-content">
+                        <h3>Shoes</h3>
+                        <button class="btn btn-light">Shop Now</button>
+                    </div>
+                </a>
+                <a href="#" class="category-card small-card card-apparel">
+                    <div class="card-content">
+                        <h3>Apparel</h3>
+                        <button class="btn btn-light">Shop Now</button>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="promo-section">
+            <h2>Just In</h2>
+            <div class="promo-grid">
+                <div class="promo-item promo-item-1">
+                    <div class="promo-content">
+                        <h3>Nike Air Max Pulse</h3>
+                        <p>Feel the rhythm, ignite your stride.</p>
+                        <a href="#" class="btn btn-dark">Shop Now</a>
+                    </div>
+                </div>
+                <div class="promo-item promo-item-2">
+                    <div class="promo-content">
+                        <h3>Nike Dri-FIT</h3>
+                        <p>Stay cool, dry, and focused.</p>
+                        <a href="#" class="btn btn-dark">Shop Now</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h4>Get Help</h4>
+                <ul>
+                    <li><a href="#">Order Status</a></li>
+                    <li><a href="#">Shipping & Delivery</a></li>
+                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">Payment Options</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About Nike</a></li>
+                    <li><a href="#">News</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Investors</a></li>
+                    <li><a href="#">Purpose</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Promotions & Discounts</h4>
+                <ul>
+                    <li><a href="#">Student</a></li>
+                    <li><a href="#">Military</a></li>
+                    <li><a href="#">Teacher</a></li>
+                    <li><a href="#">Healthcare Professionals</a></li>
+                </ul>
+            </div>
+            <div class="footer-social">
+                <a href="#" aria-label="Twitter"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" role="img" width="24px" height="24px" fill="none"><path fill="currentColor" fill-rule="evenodd" d="M22.954 5.37a.64.64 0 00-.704-.085 1.5 1.5 0 00-.477.304l-.068.077c-.896 1.15-2.023 2.126-3.267 2.91-1.397.88-2.92 1.346-4.524 1.346-2.15 0-3.874-.83-5.01-2.484-1.137-1.654-1.346-3.64-.626-5.836a.65.65 0 00-.63-.526c-.36 0-.64.12-.84.34-.19.22-.27.5-.27.84 0 .34-.02.68-.04.99-.03.32-.07.64-.1.97-.04.32-.08.64-.13.97-.07.34-.14.68-.22 1.02-.33 1.48-.96 2.76-1.89 3.84-.93 1.08-1.99 1.95-3.18 2.59a.65.65 0 00-.31.63c0 .36.12.64.34.84.22.19.5.27.84.27h.03c1.9 0 3.7-.63 5.4-1.87 1.7-1.25 3.06-2.9 4.09-4.96.65 1.76 1.83 3.03 3.53 3.82 1.7.79 3.4.99 5.1.59a.65.65 0 00.59-.35.64.64 0 00.08-.66c-.05-.18-.12-.34-.2-.5l-.04-.06c-.05-.09-.09-.16-.14-.22z"></path></svg></a>
+                <a href="#" aria-label="Facebook"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" role="img" width="24px" height="24px" fill="none"><path fill="currentColor" fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75S6.615 21.75 12 21.75s9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12 20.25c-4.55 0-8.25-3.7-8.25-8.25S7.45 3.75 12 3.75s8.25 3.7 8.25 8.25-3.7 8.25-8.25 8.25zm.525-4.22h-1.5v-4.5h-2.25v-1.5h2.25v-1.125c0-1.242.758-2.025 2.222-2.025h1.278v1.5h-1.111c-.37 0-.611.12-.722.375-.11.255-.167.63-.167 1.125v.125h2v1.5h-2.125v4.5z"></path></svg></a>
+                <a href="#" aria-label="Youtube"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" role="img" width="24px" height="24px" fill="none"><path fill="currentColor" fill-rule="evenodd" d="M22.954 5.37a.64.64 0 00-.704-.085 1.5 1.5 0 00-.477.304l-.068.077c-.896 1.15-2.023 2.126-3.267 2.91-1.397.88-2.92 1.346-4.524 1.346-2.15 0-3.874-.83-5.01-2.484-1.137-1.654-1.346-3.64-.626-5.836a.65.65 0 00-.63-.526c-.36 0-.64.12-.84.34-.19.22-.27.5-.27.84 0 .34-.02.68-.04.99-.03.32-.07.64-.1.97-.04.32-.08.64-.13.97-.07.34-.14.68-.22 1.02-.33 1.48-.96 2.76-1.89 3.84-.93 1.08-1.99 1.95-3.18 2.59a.65.65 0 00-.31.63c0 .36.12.64.34.84.22.19.5.27.84.27h.03c1.9 0 3.7-.63 5.4-1.87 1.7-1.25 3.06-2.9 4.09-4.96.65 1.76 1.83 3.03 3.53 3.82 1.7.79 3.4.99 5.1.59a.65.65 0 00.59-.35.64.64 0 00.08-.66c-.05-.18-.12-.34-.2-.5l-.04-.06c-.05-.09-.09-.16-.14-.22z"></path></svg></a>
+                <a href="#" aria-label="Instagram"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" role="img" width="24px" height="24px" fill="none"><path fill="currentColor" fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75S6.615 21.75 12 21.75s9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12 20.25c-4.55 0-8.25-3.7-8.25-8.25S7.45 3.75 12 3.75s8.25 3.7 8.25 8.25-3.7 8.25-8.25 8.25zm.525-4.22h-1.5v-4.5h-2.25v-1.5h2.25v-1.125c0-1.242.758-2.025 2.222-2.025h1.278v1.5h-1.111c-.37 0-.611.12-.722.375-.11.255-.167.63-.167 1.125v.125h2v1.5h-2.125v4.5z"></path></svg></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Nike, Inc. All Rights Reserved</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const mainNav = document.querySelector('.main-nav');
+            const navList = document.querySelector('.nav-list');
+
+            menuToggle.addEventListener('click', () => {
+                menuToggle.classList.toggle('active');
+                mainNav.classList.toggle('active');
+                if (mainNav.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            });
+
+            navList.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth < 768) {
+                        menuToggle.classList.remove('active');
+                        mainNav.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 768) {
+                    menuToggle.classList.remove('active');
+                    mainNav.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple To-Do App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .input-section {
+            display: flex;
+            margin-bottom: 25px;
+        }
+
+        #todo-input {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px 0 0 5px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        #todo-input:focus {
+            border-color: #3498db;
+        }
+
+        #add-todo-btn {
+            padding: 12px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s ease;
+        }
+
+        #add-todo-btn:hover {
+            background-color: #2980b9;
+        }
+
+        #todo-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #todo-list li {
+            display: flex;
+            align-items: center; /* Align items vertically in the middle */
+            background-color: #f9f9f9;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #eee;
+            transition: background-color 0.2s ease;
+            word-break: break-word; /* Ensure long text wraps */
+        }
+
+        #todo-list li:hover {
+            background-color: #eef;
+        }
+
+        #todo-list li.completed {
+            text-decoration: line-through;
+            color: #888;
+            background-color: #e0e0e0;
+        }
+
+        #todo-list li .todo-checkbox {
+            margin-right: 10px; /* Space between checkbox and text */
+            transform: scale(1.2); /* Slightly larger checkbox for easier clicking */
+            flex-shrink: 0; /* Prevent checkbox from shrinking */
+        }
+
+        #todo-list li .todo-text {
+            flex-grow: 1; /* Allow text to take available space */
+            margin-right: 10px; /* Space between text and delete button */
+        }
+
+        #todo-list li .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+            flex-shrink: 0; /* Prevent button from shrinking */
+        }
+
+        #todo-list li .delete-btn:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>To-Do List</h1>
+        <div class="input-section">
+            <input type="text" id="todo-input" placeholder="Add a new to-do...">
+            <button id="add-todo-btn">Add To-Do</button>
+        </div>
+        <ul id="todo-list"></ul>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const todoInput = document.getElementById('todo-input');
+            const addTodoBtn = document.getElementById('add-todo-btn');
+            const todoList = document.getElementById('todo-list');
+
+            let todos = []; // Array to hold todo objects { text: string, completed: boolean }
+
+            // Function to load todos from localStorage
+            function loadTodos() {
+                const storedTodos = localStorage.getItem('todos');
+                if (storedTodos) {
+                    todos = JSON.parse(storedTodos);
+                    todos.forEach(todo => addTodoToDOM(todo));
+                }
+            }
+
+            // Function to save todos to localStorage
+            function saveTodos() {
+                localStorage.setItem('todos', JSON.stringify(todos));
+            }
+
+            // Function to add a todo item to the DOM
+            function addTodoToDOM(todo) {
+                const listItem = document.createElement('li');
+                listItem.classList.add('todo-item');
+                if (todo.completed) {
+                    listItem.classList.add('completed');
+                }
+
+                // Create checkbox
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = todo.completed;
+                checkbox.classList.add('todo-checkbox');
+
+                // Create span for todo text
+                const todoTextSpan = document.createElement('span');
+                todoTextSpan.textContent = todo.text;
+                todoTextSpan.classList.add('todo-text');
+
+                // Create delete button
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.classList.add('delete-btn');
+
+                // --- Event Listeners ---
+
+                // Checkbox change listener
+                checkbox.addEventListener('change', () => {
+                    todo.completed = checkbox.checked; // Update data model
+                    listItem.classList.toggle('completed', checkbox.checked); // Toggle class based on checkbox state
+                    saveTodos();
+                });
+
+                // Delete button click listener
+                deleteBtn.addEventListener('click', (event) => {
+                    event.stopPropagation(); // Prevent checkbox change event from firing if click also bubbles
+                    const index = Array.from(todoList.children).indexOf(listItem);
+                    if (index > -1) {
+                        todos.splice(index, 1); // Remove from array
+                        todoList.removeChild(listItem); // Remove from DOM
+                        saveTodos();
+                    }
+                });
+
+                // Append elements to listItem
+                listItem.appendChild(checkbox);
+                listItem.appendChild(todoTextSpan);
+                listItem.appendChild(deleteBtn);
+                todoList.appendChild(listItem);
+            }
+
+            // Function to handle adding a new todo
+            function addNewTodo() {
+                const todoText = todoInput.value.trim();
+                if (todoText === '') {
+                    alert('Please enter a to-do item!');
+                    return;
+                }
+
+                const newTodo = { text: todoText, completed: false };
+                todos.push(newTodo);
+                addTodoToDOM(newTodo);
+                saveTodos();
+                todoInput.value = ''; // Clear input field
+            }
+
+            // Event listeners
+            addTodoBtn.addEventListener('click', addNewTodo);
+
+            todoInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    addNewTodo();
+                }
+            });
+
+            // Load todos when the page loads
+            loadTodos();
+        });
+    </script>
+</body>
+</html>

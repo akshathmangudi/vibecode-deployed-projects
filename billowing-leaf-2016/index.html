@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Small Business</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Lato', sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.7;
+            color: #4a4a4a;
+            background-color: #fdfdfd;
+            padding-top: 70px;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 25px;
+        }
+
+        header {
+            background-color: #6d7f72;
+            color: #fdfdfd;
+            padding: 1rem 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        header nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 25px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.9rem;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+        }
+
+        header ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        header ul li {
+            margin-left: 25px;
+        }
+
+        header ul li a {
+            color: #fdfdfd;
+            text-decoration: none;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+        }
+
+        header ul li a:hover {
+            color: #b89569;
+        }
+
+        .hero {
+            background-color: #f2f4f1;
+            color: #4a4a4a;
+            text-align: center;
+            padding: 120px 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .hero h2 {
+            font-size: 3.2rem;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #6d7f72;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #b89569;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .button:hover {
+            background-color: #a3815c;
+            transform: translateY(-2px);
+        }
+
+        section {
+            padding: 50px 0;
+            background-color: white;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        section h2 {
+            text-align: center;
+            font-size: 2.8rem;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            margin-bottom: 40px;
+            color: #6d7f72;
+        }
+
+        #services .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            padding: 0 20px;
+        }
+
+        .service-item {
+            background-color: #fdfdfd;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #eee;
+        }
+
+        .service-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .service-item h3 {
+            color: #b89569;
+            margin-top: 0;
+            font-size: 1.8rem;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .service-item p {
+            font-weight: 300;
+        }
+
+        #contact form {
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #f2f4f1;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #6d7f72;
+            font-size: 1.1rem;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group textarea {
+            width: calc(100% - 20px);
+            padding: 12px;
+            border: 1px solid #dcdcdc;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            box-sizing: border-box;
+            background-color: white;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="email"]:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #b89569;
+            box-shadow: 0 0 0 3px rgba(184, 149, 105, 0.2);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+        }
+
+        #contact form button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+        }
+
+        footer {
+            background-color: #6d7f72;
+            color: #fdfdfd;
+            text-align: center;
+            padding: 25px 0;
+            margin-top: 25px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        footer p {
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+            header nav {
+                flex-direction: column;
+                align-items: center;
+                padding: 0 15px;
+            }
+
+            header ul {
+                margin-top: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            header ul li {
+                margin: 0 10px 10px 10px;
+            }
+
+            .hero {
+                padding: 100px 15px;
+            }
+            .hero h2 {
+                font-size: 2.5rem;
+            }
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            section h2 {
+                font-size: 2.2rem;
+            }
+
+            #services .service-grid {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.7rem;
+            }
+
+            header ul li {
+                margin: 0 8px 8px 8px;
+            }
+
+            .hero {
+                padding: 80px 15px;
+            }
+
+            section h2 {
+                font-size: 1.8rem;
+            }
+
+            .button {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+
+            .form-group input[type="text"],
+            .form-group input[type="email"],
+            .form-group textarea {
+                padding: 10px;
+                font-size: 1rem;
+            }
+
+            #contact form {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <h1>My Small Business</h1>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <h2>Welcome to My Small Business</h2>
+            <p>Your trusted partner for amazing solutions.</p>
+            <a href="#contact" class="button">Get a Free Quote</a>
+        </section>
+
+        <section id="about" class="container">
+            <h2>About Us</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </section>
+
+        <section id="services" class="container">
+            <h2>Our Services</h2>
+            <div class="service-grid">
+                <div class="service-item">
+                    <h3>Service One</h3>
+                    <p>Description for service one. We provide high-quality solutions tailored to your needs.</p>
+                </div>
+                <div class="service-item">
+                    <h3>Service Two</h3>
+                    <p>Description for service two. Our experts are here to help you achieve your goals.</p>
+                </div>
+                <div class="service-item">
+                    <h3>Service Three</h3>
+                    <p>Description for service three. Reliable and efficient services, guaranteed satisfaction.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="container">
+            <h2>Contact Us</h2>
+            <p>Have questions or need a quote? Fill out the form below and we'll get back to you shortly.</p>
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message:</label>
+                    <textarea id="message" name="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="button">Send Message</button>
+                <p id="formMessage" style="display: none; margin-top: 10px;"></p>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 My Small Business. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('nav a').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    const headerOffset = document.querySelector('header').offsetHeight;
+
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - headerOffset,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            const contactForm = document.getElementById('contactForm');
+            const formMessage = document.getElementById('formMessage');
+
+            if (contactForm) {
+                contactForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    const name = document.getElementById('name').value;
+                    const email = document.getElementById('email').value;
+                    const message = document.getElementById('message').value;
+
+                    console.log('Form Submitted!');
+                    console.log('Name:', name);
+                    console.log('Email:', email);
+                    console.log('Message:', message);
+
+                    formMessage.style.display = 'block';
+                    formMessage.style.color = '#27ae60';
+                    formMessage.textContent = 'Thank you for your message! We will get back to you shortly.';
+
+                    contactForm.reset();
+
+                    setTimeout(() => {
+                        formMessage.style.display = 'none';
+                        formMessage.textContent = '';
+                    }, 5000);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
