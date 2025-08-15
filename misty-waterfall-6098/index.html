@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple AI Chat</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        #app {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        h1 {
+            background-color: #6a0dad;
+            color: white;
+            padding: 20px;
+            margin: 0;
+            font-size: 1.8em;
+            text-align: center;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+
+        #chat-window {
+            display: flex;
+            flex-direction: column;
+            height: 500px; /* Fixed height for chat area */
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding-right: 10px; /* For scrollbar space */
+            display: flex;
+            flex-direction: column;
+        }
+
+        #messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #messages::-webkit-scrollbar-thumb {
+            background-color: #ddd;
+            border-radius: 4px;
+        }
+
+        #messages::-webkit-scrollbar-track {
+            background-color: #f0f0f0;
+        }
+
+        .message {
+            padding: 10px 15px;
+            border-radius: 18px;
+            margin-bottom: 8px;
+            max-width: 75%;
+            word-wrap: break-word;
+            line-height: 1.4;
+            font-size: 0.95em;
+        }
+
+        .user-message {
+            background-color: #e6e6fa; /* Lavender */
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot-message {
+            background-color: #f0f8ff; /* Alice Blue */
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        #input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        #user-input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        #user-input:focus {
+            border-color: #6a0dad;
+        }
+
+        #send-button {
+            padding: 12px 20px;
+            background-color: #6a0dad;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        #send-button:hover {
+            background-color: #530a84;
+        }
+
+        #send-button:active {
+            background-color: #3b075e;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Simple AI Chat</h1>
+        <div id="chat-window">
+            <div id="messages">
+                <div class="message bot-message">Hello! I am a simple bot. Ask me anything!</div>
+            </div>
+            <div id="input-area">
+                <input type="text" id="user-input" placeholder="Type your message...">
+                <button id="send-button">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const messagesDiv = document.getElementById('messages');
+
+        function appendMessage(sender, text) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            if (sender === 'user') {
+                messageElement.classList.add('user-message');
+            } else {
+                messageElement.classList.add('bot-message');
+            }
+            messageElement.textContent = text;
+            messagesDiv.appendChild(messageElement);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight; // Scroll to bottom
+        }
+
+        function getBotResponse(userMessage) {
+            const lowerMessage = userMessage.toLowerCase();
+            let response = "I'm not sure how to respond to that. Can you try asking something else?";
+
+            if (lowerMessage.includes("hello") || lowerMessage.includes("hi")) {
+                response = "Hi there! How can I help you today?";
+            } else if (lowerMessage.includes("how are you")) {
+                response = "I'm just a computer program, so I don't have feelings, but I'm functioning perfectly!";
+            } else if (lowerMessage.includes("your name")) {
+                response = "I don't have a name. I am a simple bot designed to demonstrate AI interaction.";
+            } else if (lowerMessage.includes("joke")) {
+                response = "Why don't scientists trust atoms? Because they make up everything!";
+            } else if (lowerMessage.includes("time") || lowerMessage.includes("date")) {
+                response = "I cannot tell you the current time or date accurately as I don't have real-time access to such information.";
+            } else if (lowerMessage.includes("weather")) {
+                response = "I'm sorry, I cannot provide real-time weather information.";
+            } else if (lowerMessage.includes("thank")) {
+                response = "You're welcome!";
+            } else if (lowerMessage.includes("bye") || lowerMessage.includes("goodbye")) {
+                response = "Goodbye! Have a great day!";
+            } else if (lowerMessage.includes("help")) {
+                response = "I can answer simple questions or chat. Try asking me about my name, or for a joke!";
+            } else if (lowerMessage.includes("creator") || lowerMessage.includes("who made you")) {
+                response = "I was created by a developer as a demonstration.";
+            } else if (lowerMessage.match(/\b(what is|what's)\b.*\b(ai|artificial intelligence)\b/)) {
+                response = "AI stands for Artificial Intelligence. It's a field of computer science that focuses on creating machines that can perform tasks that typically require human intelligence.";
+            } else if (lowerMessage.includes("how do you work")) {
+                response = "I work by recognizing keywords and phrases in your input and providing a pre-programmed response based on those matches.";
+            } else if (lowerMessage.includes("color") && lowerMessage.includes("favorite")) {
+                response = "As a program, I don't have preferences like a favorite color.";
+            } else if (lowerMessage.includes("tell me something new")) {
+                response = "Did you know that the shortest war in history lasted only 38 to 45 minutes? It was between Britain and Zanzibar on August 27, 1896.";
+            } else if (lowerMessage.includes("how old are you")) {
+                response = "I don't have an age in the human sense. I was just recently brought into existence.";
+            }
+
+            return response;
+        }
+
+        function sendMessage() {
+            const userText = userInput.value.trim();
+            if (userText === "") {
+                return;
+            }
+
+            appendMessage('user', userText);
+            userInput.value = ''; // Clear input field
+
+            setTimeout(() => {
+                const botResponse = getBotResponse(userText);
+                appendMessage('bot', botResponse);
+            }, 500); // Simulate processing time
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

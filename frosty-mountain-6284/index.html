@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaSCo - Simple Glass Theme</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --primary-color-dark: #0056b3;
+            --primary-color-rgb: 0, 123, 255;
+            --primary-color-dark-rgb: 0, 86, 179;
+
+            --glass-border-light-rgb: 220, 220, 220;
+            --glass-border-dark-rgb: 60, 60, 60;
+            --shadow-base-rgb: 0, 0, 0;
+
+            --bg-color: #f0f2f5;
+            --text-color: #333;
+            --card-bg-base-rgb: 255, 255, 255;
+            --header-bg-alpha: 0.8;
+            --footer-bg: #e9ecef;
+            --border-color: #ddd;
+
+            --card-bg-rgb: var(--card-bg-base-rgb);
+            --glass-border-rgb: var(--glass-border-light-rgb);
+            --header-bg-color: rgba(var(--card-bg-base-rgb), var(--header-bg-alpha));
+        }
+
+        body.dark-mode {
+            --bg-color: #2c2f33;
+            --text-color: #f5f6f7;
+            --card-bg-base-rgb: 44, 47, 51;
+            --glass-border-rgb: var(--glass-border-dark-rgb);
+            --header-bg-alpha: 0.8;
+            --footer-bg: #23272a;
+            --border-color: #444;
+
+            --header-bg-color: rgba(var(--card-bg-base-rgb), var(--header-bg-alpha));
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--bg-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: var(--header-bg-color);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: var(--text-color);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(var(--glass-border-rgb), 0.3);
+            box-shadow: 0 2px 10px rgba(var(--shadow-base-rgb), 0.05);
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-left: 25px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--primary-color);
+        }
+
+        .theme-switcher {
+            display: flex;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            display: none;
+        }
+
+        .theme-toggle-label {
+            width: 50px;
+            height: 26px;
+            background-color: var(--primary-color);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .theme-toggle-label::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 5px rgba(var(--shadow-base-rgb), 0.2);
+        }
+
+        .theme-toggle:checked + .theme-toggle-label {
+            background-color: #666;
+        }
+
+        .theme-toggle:checked + .theme-toggle-label::after {
+            transform: translateX(24px);
+        }
+
+        section {
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        section h1, section h2 {
+            font-size: 2.8em;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        section p {
+            font-size: 1.2em;
+            max-width: 700px;
+            margin: 0 auto 30px auto;
+            line-height: 1.8;
+            color: var(--text-color);
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--bg-color) 0%, var(--bg-color) 70%, var(--primary-color) 100%);
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            padding: 100px 0;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            width: 200px;
+            height: 200px;
+            background: rgba(var(--glass-border-light-rgb), 0.1);
+            border-radius: 50%;
+            filter: blur(50px);
+            z-index: 0;
+            animation: float1 10s infinite ease-in-out;
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: rgba(var(--primary-color-dark-rgb), 0.1);
+            border-radius: 50%;
+            filter: blur(50px);
+            z-index: 0;
+            animation: float2 10s infinite ease-in-out reverse;
+        }
+
+        @keyframes float1 {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(20px, 20px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        @keyframes float2 {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(-20px, -20px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        .hero-section .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(var(--shadow-base-rgb), 0.1);
+        }
+
+        .cta-button:hover {
+            background-color: var(--primary-color-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(var(--shadow-base-rgb), 0.15);
+        }
+
+        .cta-button.outline {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            box-shadow: none;
+        }
+
+        .cta-button.outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(var(--primary-color-dark-rgb), 0.2);
+        }
+
+        .feature-card, .pricing-card {
+            background: rgba(var(--card-bg-base-rgb), 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--glass-border-rgb), 0.3);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: left;
+            box-shadow: 0 4px 30px rgba(var(--shadow-base-rgb), 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s;
+        }
+
+        .feature-card:hover, .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 40px rgba(var(--shadow-base-rgb), 0.1);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .feature-card h3 {
+            color: var(--primary-color);
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            font-size: 1em;
+            text-align: left;
+            margin: 0;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .pricing-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .pricing-card h3 {
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .pricing-card .price {
+            font-size: 3em;
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 20px;
+        }
+
+        .pricing-card .price span {
+            font-size: 0.5em;
+            font-weight: normal;
+            color: var(--text-color);
+        }
+
+        .pricing-card ul {
+            list-style: none;
+            margin-bottom: 30px;
+            padding: 0;
+            text-align: center;
+        }
+
+        .pricing-card ul li {
+            padding: 8px 0;
+            color: var(--text-color);
+        }
+
+        .pricing-card.highlighted {
+            border-color: var(--primary-color);
+            box-shadow: 0 6px 30px rgba(var(--primary-color-dark-rgb), 0.1);
+            transform: scale(1.03);
+        }
+
+        .pricing-card.highlighted:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 10px 50px rgba(var(--primary-color-dark-rgb), 0.2);
+        }
+
+        .cta-section {
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-color-dark));
+            color: white;
+            padding: 80px 0;
+        }
+
+        .cta-section h2 {
+            color: white;
+        }
+
+        .cta-section p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .cta-section .cta-button {
+            background-color: white;
+            color: var(--primary-color);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .cta-section .cta-button:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+        }
+
+        footer {
+            background: var(--footer-bg);
+            color: var(--text-color);
+            padding: 30px 0;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+        }
+
+        footer .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 0.9em;
+        }
+
+        .footer-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 0.9em;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            header .container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            header nav {
+                margin-top: 15px;
+                margin-bottom: 15px;
+            }
+
+            nav a {
+                margin: 0 10px;
+                display: inline-block;
+            }
+
+            section {
+                padding: 60px 0;
+            }
+
+            section h1 {
+                font-size: 2.2em;
+            }
+
+            section h2 {
+                font-size: 2em;
+            }
+
+            .cta-button {
+                padding: 12px 25px;
+                font-size: 1em;
+            }
+
+            .features-grid, .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            footer .container {
+                flex-direction: column;
+            }
+
+            .footer-links {
+                margin-top: 15px;
+            }
+
+            .footer-links a {
+                margin: 0 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 1.5em;
+            }
+
+            nav a {
+                margin: 0 8px;
+                font-size: 0.9em;
+            }
+
+            section h1 {
+                font-size: 1.8em;
+            }
+
+            section p {
+                font-size: 1em;
+            }
+
+            .feature-card, .pricing-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">SaaSCo</div>
+            <nav>
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#contact">Contact</a>
+            </nav>
+            <div class="theme-switcher">
+                <input type="checkbox" id="theme-toggle" class="theme-toggle" aria-label="Toggle light and dark mode">
+                <label for="theme-toggle" class="theme-toggle-label"></label>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="hero-section">
+            <div class="container">
+                <h1>Revolutionize Your Workflow</h1>
+                <p>Simple, powerful, and intuitive software to boost your productivity.</p>
+                <button class="cta-button">Get Started Now</button>
+            </div>
+        </section>
+
+        <section id="features" class="features-section">
+            <div class="container">
+                <h2>Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>Effortless Integration</h3>
+                        <p>Seamlessly connect with your existing tools and services.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Real-time Analytics</h3>
+                        <p>Gain actionable insights with our comprehensive data dashboards.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Secure & Scalable</h3>
+                        <p>Your data is safe with us, built on a robust and scalable infrastructure.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Intuitive Interface</h3>
+                        <p>Designed for simplicity, making complex tasks feel easy.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="pricing-section">
+            <div class="container">
+                <h2>Simple Pricing</h2>
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <h3>Starter</h3>
+                        <p class="price">$9<span>/month</span></p>
+                        <ul>
+                            <li>5 Projects</li>
+                            <li>Basic Support</li>
+                            <li>1GB Storage</li>
+                        </ul>
+                        <button class="cta-button outline">Choose Plan</button>
+                    </div>
+                    <div class="pricing-card highlighted">
+                        <h3>Pro</h3>
+                        <p class="price">$29<span>/month</span></p>
+                        <ul>
+                            <li>Unlimited Projects</li>
+                            <li>Priority Support</li>
+                            <li>100GB Storage</li>
+                        </ul>
+                        <button class="cta-button">Choose Plan</button>
+                    </div>
+                    <div class="pricing-card">
+                        <h3>Enterprise</h3>
+                        <p class="price">$99<span>/month</span></p>
+                        <ul>
+                            <li>Custom Features</li>
+                            <li>Dedicated Support</li>
+                            <li>Unlimited Storage</li>
+                        </ul>
+                        <button class="cta-button outline">Choose Plan</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="cta-section">
+            <div class="container">
+                <h2>Ready to Transform Your Business?</h2>
+                <p>Join thousands of satisfied customers. Start your free trial today!</p>
+                <button class="cta-button">Sign Up For Free</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 SaaSCo. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggle = document.getElementById('theme-toggle');
+            const body = document.body;
+
+            const setTheme = (isDark) => {
+                if (isDark) {
+                    body.classList.add('dark-mode');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    body.classList.remove('dark-mode');
+                    localStorage.setItem('theme', 'light');
+                }
+            };
+
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                setTheme(savedTheme === 'dark');
+                themeToggle.checked = (savedTheme === 'dark');
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme(true);
+                themeToggle.checked = true;
+            } else {
+                setTheme(false);
+                themeToggle.checked = false;
+            }
+
+            themeToggle.addEventListener('change', () => {
+                setTheme(themeToggle.checked);
+            });
+
+            document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            document.querySelectorAll('.cta-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    alert('Thank you for your interest! (This is a demo CTA)');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Services & Pricing</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --accent-color: #28a745;
+            --background-light: #f8f9fa;
+            --background-dark: #343a40;
+            --text-color-light: #f8f9fa;
+            --text-color-dark: #343a40;
+            --card-background: #ffffff;
+            --border-color: #e9ecef;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color-dark);
+            background-color: var(--background-light);
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--background-dark);
+            color: var(--text-color-light);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px var(--shadow-color);
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--text-color-light);
+            text-decoration: none;
+        }
+
+        nav ul {
+            list-style: none;
+        }
+
+        nav ul li {
+            display: inline-block;
+            margin-left: 25px;
+        }
+
+        nav ul li a {
+            color: var(--text-color-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        section {
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        section:nth-of-type(even) {
+            background-color: var(--background-light);
+        }
+
+        h1, h2 {
+            color: var(--primary-color);
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.8em;
+            padding-top: 40px;
+        }
+
+        h2 {
+            font-size: 2.2em;
+        }
+
+        h3 {
+            color: var(--text-color-dark);
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        p {
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .card h3 {
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .card .price {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin: 20px 0;
+        }
+
+        .card .price span {
+            font-size: 0.6em;
+            color: var(--secondary-color);
+            font-weight: normal;
+        }
+
+        .card ul {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0 30px 0;
+            text-align: left;
+            width: 100%;
+        }
+
+        .card ul li {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            color: var(--text-color-dark);
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .card ul li::before {
+            content: '✔';
+            color: var(--accent-color);
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--text-color-light);
+            padding: 12px 25px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: auto; /* Pushes button to bottom of card */
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        #contact-info p {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        #contact-info a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        #contact-info a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .social-links {
+            margin-top: 30px;
+        }
+
+        .social-links a {
+            display: inline-block;
+            margin: 0 15px;
+            font-size: 1.8em;
+            color: var(--secondary-color);
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--primary-color);
+        }
+
+        footer {
+            background-color: var(--background-dark);
+            color: var(--text-color-light);
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            font-size: 0.9em;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            header .container {
+                flex-direction: column;
+            }
+            .logo {
+                margin-bottom: 15px;
+            }
+            nav ul li {
+                margin: 0 10px;
+            }
+            section {
+                padding: 60px 0;
+            }
+            h1 {
+                font-size: 2.2em;
+            }
+            h2 {
+                font-size: 1.8em;
+            }
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            nav ul li {
+                display: block;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="#" class="logo">BizSolutions</a>
+            <nav>
+                <ul>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" style="background-color: var(--primary-color); color: var(--text-color-light); padding: 100px 0;">
+            <div class="container">
+                <h1>Unlock Your Business Potential</h1>
+                <p style="font-size: 1.3em; max-width: 800px; margin: 0 auto 30px;">
+                    We offer tailored solutions to help your business thrive online. From stunning websites to strategic digital marketing, we've got you covered.
+                </p>
+                <a href="#services" class="btn" style="background-color: var(--accent-color); color: var(--text-color-light);">Explore Our Services</a>
+            </div>
+        </section>
+
+        <section id="services">
+            <div class="container">
+                <h2>Our Services</h2>
+                <div class="grid-container">
+                    <div class="card">
+                        <h3>Custom Web Development</h3>
+                        <p>We build responsive, high-performance websites tailored to your unique business needs, ensuring a strong online presence.</p>
+                        <p>Technologies: HTML5, CSS3, JavaScript, Modern Frameworks.</p>
+                    </div>
+                    <div class="card">
+                        <h3>UI/UX Design</h3>
+                        <p>Crafting intuitive and engaging user experiences, we focus on user-centric design to ensure your visitors have a seamless journey.</p>
+                        <p>Includes: Wireframing, Prototyping, Usability Testing.</p>
+                    </div>
+                    <div class="card">
+                        <h3>E-commerce Solutions</h3>
+                        <p>From product catalogs to secure payment gateways, we create robust e-commerce platforms to boost your online sales.</p>
+                        <p>Platforms: Shopify, WooCommerce, Custom Builds.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Digital Marketing & SEO</h3>
+                        <p>Increase your visibility and attract more customers with our expert SEO and digital marketing strategies.</p>
+                        <p>Includes: Keyword Research, On-Page SEO, Content Strategy.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" style="background-color: var(--background-light);">
+            <div class="container">
+                <h2>Flexible Pricing Plans</h2>
+                <p>Choose the plan that best fits your business goals and budget.</p>
+                <div class="grid-container">
+                    <div class="card pricing-plan">
+                        <h3>Basic Starter</h3>
+                        <div class="price">$499<span>/project</span></div>
+                        <ul>
+                            <li>✔ Single Page Website</li>
+                            <li>✔ Responsive Design</li>
+                            <li>✔ Basic SEO Setup</li>
+                            <li>✔ 1-Month Support</li>
+                        </ul>
+                        <a href="#contact" class="btn">Get Started</a>
+                    </div>
+                    <div class="card pricing-plan">
+                        <h3>Standard Business</h3>
+                        <div class="price">$1,499<span>/project</span></div>
+                        <ul>
+                            <li>✔ Up to 5-Page Website</li>
+                            <li>✔ Advanced Responsive Design</li>
+                            <li>✔ Standard SEO Optimization</li>
+                            <li>✔ Content Integration</li>
+                            <li>✔ 3-Months Support & Updates</li>
+                        </ul>
+                        <a href="#contact" class="btn">Choose Plan</a>
+                    </div>
+                    <div class="card pricing-plan">
+                        <h3>Premium Enterprise</h3>
+                        <div class="price">$3,999<span>/project</span></div>
+                        <ul>
+                            <li>✔ Custom Multi-Page Website</li>
+                            <li>✔ E-commerce Integration</li>
+                            <li>✔ Comprehensive SEO & Marketing</li>
+                            <li>✔ Custom Feature Development</li>
+                            <li>✔ 1-Year Priority Support</li>
+                            <li>✔ Dedicated Project Manager</li>
+                        </ul>
+                        <a href="#contact" class="btn">Inquire Now</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact">
+            <div class="container">
+                <h2>Get in Touch</h2>
+                <p>Have questions or ready to start your project? We're here to help!</p>
+                <div id="contact-info">
+                    <p><strong>Email:</strong> <a href="mailto:info@bizsolutions.com">info@bizsolutions.com</a></p>
+                    <p><strong>Phone:</strong> <a href="tel:+11234567890">+1 (123) 456-7890</a></p>
+                    <p><strong>Address:</strong> 123 Tech Avenue, Suite 100, Innovation City, CA 90210</p>
+                </div>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook">📘</a>
+                    <a href="#" aria-label="Twitter">🐦</a>
+                    <a href="#" aria-label="LinkedIn">🔗</a>
+                    <a href="#" aria-label="Instagram">📸</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 BizSolutions. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

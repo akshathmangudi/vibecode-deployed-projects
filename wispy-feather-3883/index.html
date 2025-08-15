@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ludo P2P</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: #333;
+        }
+        #app {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        #connection-setup {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .connection-section {
+            flex: 1;
+            min-width: 300px;
+            background-color: #e8f0fe;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .connection-section h3 {
+            color: #2980b9;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.9em;
+            resize: vertical;
+            min-height: 80px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #connection-status {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        #connection-status.Connected {
+            color: #2ecc71;
+        }
+
+        #game-container {
+            display: none; /* Hidden by default */
+            border-top: 1px solid #eee;
+            padding-top: 25px;
+        }
+        #game-info {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        #game-info p {
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #555;
+        }
+        #dice-display {
+            font-size: 1.8em;
+            color: #e67e22;
+        }
+        #current-player-display {
+            font-size: 1.3em;
+            text-transform: capitalize;
+        }
+        #roll-dice-btn {
+            background-color: #3498db;
+        }
+        #roll-dice-btn:hover {
+            background-color: #2980b9;
+        }
+        #ludo-board-container {
+            width: 600px;
+            height: 600px;
+            margin: 0 auto;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background-color: #f7f7f7;
+            position: relative;
+        }
+        #ludo-board {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .ludo-piece {
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+        .ludo-piece:hover {
+            transform: scale(1.1);
+        }
+        .ludo-piece.red-piece { stroke: darkred; }
+        .ludo-piece.green-piece { stroke: darkgreen; }
+        .ludo-piece.blue-piece { stroke: darkblue; }
+        .ludo-piece.yellow-piece { stroke: #b8860b; }
+
+        #game-messages {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #ecf0f1;
+            border-radius: 8px;
+            max-height: 150px;
+            overflow-y: auto;
+            text-align: left;
+            font-size: 0.9em;
+            color: #666;
+            border: 1px solid #ccc;
+        }
+        #game-messages p {
+            margin: 5px 0;
+            padding-bottom: 3px;
+            border-bottom: 1px dashed #ddd;
+        }
+        #game-messages p:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Ludo P2P</h1>
+
+        <div id="connection-setup">
+            <div class="connection-section">
+                <h3>Create Game (Host: Red Player)</h3>
+                <button id="create-offer-btn">Create Game Offer</button>
+                <p>Share this Offer Code (copy/paste):</p>
+                <textarea id="offer-sdp" readonly rows="5"></textarea>
+                <p>Paste Answer Code from Friend:</p>
+                <textarea id="answer-sdp-input" rows="5"></textarea>
+                <button id="set-remote-answer-btn">Connect with Answer</button>
+            </div>
+            <div class="connection-section">
+                <h3>Join Game (Client: Green Player)</h3>
+                <p>Paste Offer Code from Host:</p>
+                <textarea id="offer-sdp-input" rows="5"></textarea>
+                <button id="create-answer-btn">Generate Answer</button>
+                <p>Share this Answer Code (copy/paste):</p>
+                <textarea id="answer-sdp" readonly rows="5"></textarea>
+            </div>
+            <p style="width: 100%; text-align: center; font-size: 1.1em; color: #555;">
+                Connection Status: <span id="connection-status">Disconnected</span>
+            </p>
+        </div>
+
+        <div id="game-container">
+            <h2>Ludo Game</h2>
+            <div id="game-info">
+                <p>Current Turn: <span id="current-player-display"></span></p>
+                <p>Dice Roll: <span id="dice-display"></span></p>
+                <button id="roll-dice-btn">Roll Dice</button>
+            </div>
+            <div id="ludo-board-container">
+                <svg id="ludo-board" width="600" height="600" viewBox="0 0 600 600">
+                    <!-- Board elements will be drawn dynamically by JavaScript -->
+                </svg>
+            </div>
+            <div id="game-messages"></div>
+        </div>
+    </div>
+
+    <script>
+        let peerConnection;
+        let dataChannel;
+        let isHost = false;
+
+        const iceServers = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+            ]
+        };
+
+        const connectionSetupDiv = document.getElementById('connection-setup');
+        const gameContainerDiv = document.getElementById('game-container');
+        const createOfferBtn = document.getElementById('create-offer-btn');
+        const offerSdpTextarea = document.getElementById('offer-sdp');
+        const answerSdpInputTextarea = document.getElementById('answer-sdp-input');
+        const setRemoteAnswerBtn = document.getElementById('set-remote-answer-btn');
+        const offerSdpInputTextarea = document.getElementById('offer-sdp-input');
+        const createAnswerBtn = document.getElementById('create-answer-btn');
+        const answerSdpTextarea = document.getElementById('answer-sdp');
+        const connectionStatusSpan = document.getElementById('connection-status');
+        const currentTurnDisplay = document.getElementById('current-player-display');
+        const diceDisplay = document.getElementById('dice-display');
+        const rollDiceBtn = document.getElementById('roll-dice-btn');
+        const gameMessagesDiv = document.getElementById('game-messages');
+        const ludoBoardSvg = document.getElementById('ludo-board');
+
+        const LUDO_COLORS = ['red', 'green']; // Simplified to 2 players (Red, Green)
+        const PIECES_PER_PLAYER = 4;
+        const TOTAL_MAIN_PATH_TILES = 52;
+        const HOME_PATH_LENGTH = 6;
+
+        const RED_START_MAIN_PATH = 0; // Conceptual index on a 52-tile main path
+        const GREEN_START_MAIN_PATH = 13; // Other player's start
+
+        const RED_HOME_ENTRY_MAIN_PATH = 51; // Last tile before entering Red's home path
+        const GREEN_HOME_ENTRY_MAIN_PATH = 12; // Last tile before entering Green's home path
+
+        const NEST_POSITIONS = { // Approx SVG coordinates for nests
+            'red': {x: 100, y: 100},
+            'green': {x: 400, y: 100},
+        };
+        const BOARD_CENTER = {x: 300, y: 300}; // Center of the SVG board
+
+        let gameInitialized = false;
+        let players = [];
+        let currentPlayerIndex = 0;
+        let diceValue = 0;
+        let boardState = {}; // { pieceId: 'nest' | mainPathIndex | 'home_color_N' | 'home' }
+        let selectedPiece = null;
+
+        function logMessage(message) {
+            const p = document.createElement('p');
+            p.textContent = message;
+            gameMessagesDiv.prepend(p);
+            if (gameMessagesDiv.children.length > 10) {
+                gameMessagesDiv.removeChild(gameMessagesDiv.lastChild);
+            }
+        }
+
+        function initGame() {
+            players = [];
+            players.push({
+                id: 0,
+                color: LUDO_COLORS[0], // Red
+                pieces: [],
+                homePieces: 0,
+            });
+            players.push({
+                id: 1,
+                color: LUDO_COLORS[1], // Green
+                pieces: [],
+                homePieces: 0,
+            });
+
+            players.forEach(player => {
+                for (let j = 0; j < PIECES_PER_PLAYER; j++) {
+                    const pieceId = `${player.color}-${j}`;
+                    player.pieces.push({
+                        id: pieceId,
+                        color: player.color,
+                        currentPos: 'nest',
+                        inNest: true,
+                        inHome: false,
+                    });
+                    boardState[pieceId] = 'nest';
+                }
+            });
+
+            currentPlayerIndex = 0;
+            diceValue = 0;
+            selectedPiece = null;
+
+            renderBoard();
+            updateGameInfo();
+            gameInitialized = true;
+            logMessage("Game initialized. Roll the dice to start!");
+        }
+
+        function updateGameInfo() {
+            currentTurnDisplay.textContent = players[currentPlayerIndex] ? players[currentPlayerIndex].color.toUpperCase() : 'N/A';
+            diceDisplay.textContent = diceValue === 0 ? '-' : diceValue;
+
+            const isMyTurn = (isHost && currentPlayerIndex === 0) || (!isHost && currentPlayerIndex === 1);
+            rollDiceBtn.disabled = !isMyTurn || diceValue !== 0; // Disable if not my turn or dice already rolled
+        }
+
+        function getPieceRenderCoords(piece) {
+            const nestOffset = 25; // Offset for pieces within nest
+            const mainPathRadius = 250;
+            const homePathOffset = 40; // Spacing for pieces in home path
+
+            if (piece.inNest) {
+                const nestPos = NEST_POSITIONS[piece.color];
+                const pieceIndexInNest = players.find(p => p.color === piece.color).pieces.indexOf(piece);
+                return {
+                    x: nestPos.x + (pieceIndexInNest % 2) * nestOffset,
+                    y: nestPos.y + Math.floor(pieceIndexInNest / 2) * nestOffset
+                };
+            } else if (piece.inHome) {
+                return {
+                    x: BOARD_CENTER.x + (Math.random() - 0.5) * 60,
+                    y: BOARD_CENTER.y + (Math.random() - 0.5) * 60
+                };
+            } else {
+                let currentPos = boardState[piece.id];
+                if (typeof currentPos === 'number') { // Main path index
+                    const angle = (currentPos / TOTAL_MAIN_PATH_TILES) * 2 * Math.PI;
+                    return {
+                        x: BOARD_CENTER.x + mainPathRadius * Math.cos(angle),
+                        y: BOARD_CENTER.y + mainPathRadius * Math.sin(angle)
+                    };
+                } else if (typeof currentPos === 'string' && currentPos.startsWith('home_')) { // Color-specific home path
+                    const stepsIntoHome = parseInt(currentPos.split('_')[1]);
+                    // Simple linear path towards center
+                    if (piece.color === 'red') return {x: BOARD_CENTER.x + 100 - (stepsIntoHome * 10), y: BOARD_CENTER.y - 100 + (stepsIntoHome * 10)};
+                    if (piece.color === 'green') return {x: BOARD_CENTER.x - 100 + (stepsIntoHome * 10), y: BOARD_CENTER.y + 100 - (stepsIntoHome * 10)};
+                }
+            }
+            return {x: 0, y: 0};
+        }
+
+        function renderBoard() {
+            ludoBoardSvg.innerHTML = '';
+
+            // Board background
+            ludoBoardSvg.innerHTML += `<rect x="0" y="0" width="600" height="600" fill="#eee" stroke="black" stroke-width="2"/>`;
+
+            // Nests
+            ludoBoardSvg.innerHTML += `<rect x="50" y="50" width="200" height="200" fill="red" stroke="darkred" stroke-width="2"/>`;
+            ludoBoardSvg.innerHTML += `<rect x="350" y="50" width="200" height="200" fill="green" stroke="darkgreen" stroke-width="2"/>`;
+            ludoBoardSvg.innerHTML += `<rect x="50" y="350" width="200" height="200" fill="blue" stroke="darkblue" stroke-width="2" opacity="0.5"/>`;
+            ludoBoardSvg.innerHTML += `<rect x="350" y="350" width="200" height="200" fill="yellow" stroke="#b8860b" stroke-width="2" opacity="0.5"/>`;
+
+            // Center Home Area
+            ludoBoardSvg.innerHTML += `<rect x="250" y="250" width="100" height="100" fill="#ccc" stroke="black" stroke-width="1"/>`;
+
+            // Illustrative main path circles
+            const mainPathRadius = 250;
+            for(let i=0; i<TOTAL_MAIN_PATH_TILES; i++) {
+                const angle = (i / TOTAL_MAIN_PATH_TILES) * 2 * Math.PI;
+                const x = BOARD_CENTER.x + mainPathRadius * Math.cos(angle);
+                const y = BOARD_CENTER.y + mainPathRadius * Math.sin(angle);
+                ludoBoardSvg.innerHTML += `<circle cx="${x}" cy="${y}" r="8" fill="#aaa" stroke="black" opacity="0.5"/>`;
+            }
+
+            players.forEach(player => {
+                player.pieces.forEach(piece => {
+                    const coords = getPieceRenderCoords(piece);
+                    ludoBoardSvg.innerHTML += `<circle cx="${coords.x}" cy="${coords.y}" r="15" fill="${piece.color}" stroke="white" stroke-width="2" data-piece-id="${piece.id}" class="ludo-piece ${piece.color}-piece" />`;
+                });
+            });
+
+            addPieceClickListeners();
+        }
+
+        function getPieceById(pieceId) {
+            for (const player of players) {
+                for (const piece of player.pieces) {
+                    if (piece.id === pieceId) {
+                        return piece;
+                    }
+                }
+            }
+            return null;
+        }
+
+        function addPieceClickListeners() {
+            document.querySelectorAll('.ludo-piece').forEach(pieceEl => {
+                pieceEl.removeEventListener('click', handlePieceClick); // Prevent duplicate listeners
+                pieceEl.addEventListener('click', handlePieceClick);
+            });
+        }
+
+        function handlePieceClick(event) {
+            const pieceId = event.target.dataset.pieceId;
+            const piece = getPieceById(pieceId);
+
+            if (!piece) return;
+
+            const currentPlayer = players[currentPlayerIndex];
+            if (currentPlayer.color !== piece.color) {
+                logMessage(`That's not your piece!`);
+                return;
+            }
+            if (diceValue === 0) {
+                logMessage(`Roll the dice first!`);
+                return;
+            }
+
+            if (!canMovePiece(piece, diceValue)) {
+                logMessage(`Piece ${piece.id} cannot move with a ${diceValue}.`);
+                selectedPiece = null;
+                return;
+            }
+
+            selectedPiece = piece;
+            logMessage(`Selected piece: ${piece.id}.`);
+            // Auto-move if only one valid option
+            if (canAnyPieceMove(currentPlayer, diceValue) && getMovablePieces(currentPlayer, diceValue).length === 1) {
+                tryMovePiece(selectedPiece.id, diceValue);
+                sendGameStateUpdate();
+                nextTurn();
+            }
+        }
+
+        function getMovablePieces(player, diceRoll) {
+            return player.pieces.filter(piece => canMovePiece(piece, diceRoll));
+        }
+
+        function canMovePiece(piece, steps) {
+            if (piece.inHome) return false;
+
+            if (piece.inNest) {
+                return steps === 6;
+            } else {
+                let currentPathIndex = boardState[piece.id];
+                if (typeof currentPathIndex !== 'number' && !currentPathIndex.startsWith('home_')) return false;
+
+                let targetPathIndex = (typeof currentPathIndex === 'number' ? currentPathIndex : 0) + steps;
+
+                // Check for entering home path
+                let isEnteringRedHome = (piece.color === 'red' && currentPathIndex <= RED_HOME_ENTRY_MAIN_PATH && targetPathIndex > RED_HOME_ENTRY_MAIN_PATH);
+                let isEnteringGreenHome = (piece.color === 'green' && currentPathIndex <= GREEN_HOME_ENTRY_MAIN_PATH && targetPathIndex > GREEN_HOME_ENTRY_MAIN_PATH);
+
+                if (isEnteringRedHome || isEnteringGreenHome) {
+                    const homeEntryTile = (piece.color === 'red' ? RED_HOME_ENTRY_MAIN_PATH : GREEN_HOME_ENTRY_MAIN_PATH);
+                    const stepsIntoHome = targetPathIndex - homeEntryTile;
+                    return stepsIntoHome <= HOME_PATH_LENGTH;
+                } else if (typeof currentPathIndex === 'string' && currentPathIndex.startsWith('home_')) {
+                    const stepsIn = parseInt(currentPathIndex.split('_')[1]);
+                    return stepsIn + steps <= HOME_PATH_LENGTH;
+                } else {
+                    return true; // Assume any move on main path is valid unless overshooting home (already handled)
+                }
+            }
+        }
+
+        function rollDice() {
+            if (!gameInitialized) {
+                logMessage("Game not initialized. Wait for connection or initialize.");
+                return;
+            }
+            const currentPlayer = players[currentPlayerIndex];
+            if ((isHost && currentPlayer.id !== 0) || (!isHost && currentPlayer.id !== 1)) {
+                logMessage("It's not your turn!");
+                return;
+            }
+
+            if (diceValue !== 0) { // If dice already rolled and waiting for move
+                if (selectedPiece && tryMovePiece(selectedPiece.id, diceValue)) {
+                    logMessage(`Moved ${selectedPiece.id} with ${diceValue}.`);
+                    sendGameStateUpdate();
+                    nextTurn();
+                } else {
+                    logMessage(`Cannot move selected piece with ${diceValue}. Choose another or wait for a valid move.`);
+                }
+                return;
+            }
+
+            const roll = Math.floor(Math.random() * 6) + 1;
+            diceValue = roll;
+            logMessage(`${currentPlayer.color} rolled a ${diceValue}.`);
+            updateGameInfo();
+            renderBoard();
+
+            const movablePieces = getMovablePieces(currentPlayer, diceValue);
+
+            if (movablePieces.length === 0) {
+                logMessage(`${currentPlayer.color} has no valid moves. Passing turn.`);
+                sendGameStateUpdate();
+                nextTurn();
+            } else if (movablePieces.length === 1 && diceValue !== 6) { // Auto-move if only one option AND not a 6 (6 gives another roll)
+                selectedPiece = movablePieces[0];
+                logMessage(`Auto-selecting and moving ${selectedPiece.id}.`);
+                if (tryMovePiece(selectedPiece.id, diceValue)) {
+                    sendGameStateUpdate();
+                    nextTurn();
+                } else {
+                    logMessage(`Auto-move failed for ${selectedPiece.id}.`);
+                }
+            } else {
+                logMessage(`Please select a piece to move.`);
+            }
+        }
+
+        function tryMovePiece(pieceId, steps) {
+            const piece = getPieceById(pieceId);
+            if (!piece || !canMovePiece(piece, steps)) return false;
+
+            const player = players.find(p => p.color === piece.color);
+            let newBoardPos = null;
+
+            if (piece.inNest) {
+                newBoardPos = (piece.color === 'red' ? RED_START_MAIN_PATH : GREEN_START_MAIN_PATH);
+                piece.inNest = false;
+            } else {
+                let currentPathIndex = boardState[piece.id];
+                let targetPathIndex = (typeof currentPathIndex === 'number' ? currentPathIndex : 0) + steps;
+
+                let isEnteringRedHome = (piece.color === 'red' && typeof currentPathIndex === 'number' && currentPathIndex <= RED_HOME_ENTRY_MAIN_PATH && targetPathIndex > RED_HOME_ENTRY_MAIN_PATH);
+                let isEnteringGreenHome = (piece.color === 'green' && typeof currentPathIndex === 'number' && currentPathIndex <= GREEN_HOME_ENTRY_MAIN_PATH && targetPathIndex > GREEN_HOME_ENTRY_MAIN_PATH);
+
+                if (isEnteringRedHome || isEnteringGreenHome) {
+                    const homeEntryTile = (piece.color === 'red' ? RED_HOME_ENTRY_MAIN_PATH : GREEN_HOME_ENTRY_MAIN_PATH);
+                    const stepsIntoHome = targetPathIndex - homeEntryTile;
+
+                    piece.currentPos = `home_${piece.color}_${stepsIntoHome}`;
+                    if (stepsIntoHome === HOME_PATH_LENGTH) {
+                        piece.inHome = true;
+                        player.homePieces++;
+                        logMessage(`${piece.id} reached final home!`);
+                    }
+                    newBoardPos = piece.currentPos;
+                } else if (typeof currentPathIndex === 'string' && currentPathIndex.startsWith('home_')) {
+                    const stepsIn = parseInt(currentPathIndex.split('_')[1]);
+                    const newStepsIn = stepsIn + steps;
+                    piece.currentPos = `home_${piece.color}_${newStepsIn}`;
+                    if (newStepsIn === HOME_PATH_LENGTH) {
+                        piece.inHome = true;
+                        player.homePieces++;
+                        logMessage(`${piece.id} reached final home!`);
+                    }
+                    newBoardPos = piece.currentPos;
+                } else {
+                    newBoardPos = targetPathIndex % TOTAL_MAIN_PATH_TILES;
+                }
+            }
+
+            boardState[pieceId] = newBoardPos;
+            // Capture logic (simplified: if another piece of different color is on the same non-safe tile, send it back to nest)
+            // This is complex and skipped for this single-file demo to keep code size down.
+            
+            checkWinCondition();
+            return true;
+        }
+
+        function checkWinCondition() {
+            players.forEach(player => {
+                if (player.homePieces === PIECES_PER_PLAYER && gameInitialized) {
+                    logMessage(`${player.color} has won the game!`);
+                    gameInitialized = false;
+                    rollDiceBtn.disabled = true;
+                    // Send win message to peer
+                    if (dataChannel && dataChannel.readyState === 'open') {
+                        dataChannel.send(JSON.stringify({type: 'WIN', winner: player.color}));
+                    }
+                }
+            });
+        }
+
+        function nextTurn() {
+            if (!gameInitialized) return;
+
+            if (diceValue !== 6) { // If not a 6, pass turn
+                currentPlayerIndex = (currentPlayerIndex + 1) % LUDO_COLORS.length;
+            } else {
+                logMessage(`${players[currentPlayerIndex].color} rolled a 6 and gets another turn!`);
+            }
+            diceValue = 0; // Reset dice for next roll
+            selectedPiece = null;
+
+            logMessage(`It's ${players[currentPlayerIndex].color}'s turn.`);
+            updateGameInfo();
+            renderBoard();
+        }
+
+        function createPeerConnection(isCreator) {
+            peerConnection = new RTCPeerConnection(iceServers);
+            connectionStatusSpan.textContent = 'Connecting...';
+            connectionStatusSpan.classList.remove('Connected');
+
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    logMessage('New ICE candidate...');
+                    // No need to update SDP textareas with every candidate in this manual signaling
+                }
+            };
+
+            peerConnection.oniceconnectionstatechange = () => {
+                connectionStatusSpan.textContent = peerConnection.iceConnectionState;
+                logMessage(`ICE connection state: ${peerConnection.iceConnectionState}`);
+                if (peerConnection.iceConnectionState === 'connected' || peerConnection.iceConnectionState === 'completed') {
+                    logMessage('WebRTC connection established!');
+                    connectionStatusSpan.classList.add('Connected');
+                    connectionSetupDiv.style.display = 'none';
+                    gameContainerDiv.style.display = 'block';
+                    if (isCreator) { // Host initializes game for both
+                         initGame();
+                         sendGameStateUpdate();
+                    }
+                } else if (peerConnection.iceConnectionState === 'failed' || peerConnection.iceConnectionState === 'closed' || peerConnection.iceConnectionState === 'disconnected') {
+                    logMessage('WebRTC connection failed, closed, or disconnected.');
+                    connectionStatusSpan.classList.remove('Connected');
+                    connectionStatusSpan.textContent = 'Failed/Closed';
+                    gameContainerDiv.style.display = 'none';
+                    connectionSetupDiv.style.display = 'flex';
+                }
+            };
+
+            if (isCreator) {
+                dataChannel = peerConnection.createDataChannel('ludo_game');
+                setupDataChannel(dataChannel);
+            } else {
+                peerConnection.ondatachannel = (event) => {
+                    dataChannel = event.channel;
+                    setupDataChannel(dataChannel);
+                };
+            }
+        }
+
+        function setupDataChannel(channel) {
+            dataChannel.onopen = () => {
+                logMessage('Data channel opened!');
+                connectionStatusSpan.textContent = 'Connected';
+                connectionStatusSpan.classList.add('Connected');
+                // Host sends initial state after data channel opens
+                if (isHost && !gameInitialized) {
+                     initGame();
+                     sendGameStateUpdate();
+                }
+            };
+            dataChannel.onmessage = (event) => {
+                logMessage('Data channel message received.');
+                handleIncomingMessage(JSON.parse(event.data));
+            };
+            dataChannel.onclose = () => {
+                logMessage('Data channel closed!');
+                connectionStatusSpan.textContent = 'Disconnected';
+                connectionStatusSpan.classList.remove('Connected');
+                gameContainerDiv.style.display = 'none';
+                connectionSetupDiv.style.display = 'flex';
+            };
+            dataChannel.onerror = (error) => {
+                logMessage('Data channel error: ' + error);
+            };
+        }
+
+        function sendGameStateUpdate() {
+            if (dataChannel && dataChannel.readyState === 'open') {
+                const state = {
+                    type: 'GAME_STATE',
+                    players: players,
+                    currentPlayerIndex: currentPlayerIndex,
+                    diceValue: diceValue,
+                    boardState: boardState,
+                    gameInitialized: gameInitialized,
+                };
+                dataChannel.send(JSON.stringify(state));
+                logMessage('Game state sent.');
+            } else {
+                logMessage('Data channel not open to send state.');
+            }
+        }
+
+        function handleIncomingMessage(message) {
+            if (message.type === 'GAME_STATE') {
+                players = message.players;
+                currentPlayerIndex = message.currentPlayerIndex;
+                diceValue = message.diceValue;
+                boardState = message.boardState;
+                gameInitialized = message.gameInitialized;
+                logMessage('Game state updated from peer.');
+                updateGameInfo();
+                renderBoard();
+            } else if (message.type === 'WIN') {
+                logMessage(`${message.winner} has won the game (confirmed by peer)!`);
+                gameInitialized = false;
+                rollDiceBtn.disabled = true;
+            }
+        }
+
+        createOfferBtn.addEventListener('click', async () => {
+            isHost = true;
+            createPeerConnection(true);
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+
+            // Give some time for ICE candidates to gather
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            offerSdpTextarea.value = JSON.stringify(peerConnection.localDescription);
+            logMessage('Offer created. Share this code with your friend.');
+        });
+
+        setRemoteAnswerBtn.addEventListener('click', async () => {
+            try {
+                const answerSdp = JSON.parse(answerSdpInputTextarea.value);
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(answerSdp));
+                logMessage('Remote answer set. Connection should establish shortly.');
+            } catch (e) {
+                logMessage('Error setting remote answer: ' + e.message);
+            }
+        });
+
+        createAnswerBtn.addEventListener('click', async () => {
+            isHost = false;
+            createPeerConnection(false);
+            try {
+                const offerSdp = JSON.parse(offerSdpInputTextarea.value);
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(offerSdp));
+
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+
+                // Give some time for ICE candidates to gather
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                answerSdpTextarea.value = JSON.stringify(peerConnection.localDescription);
+                logMessage('Answer created. Share this code back to the host.');
+            } catch (e) {
+                logMessage('Error creating answer: ' + e.message);
+            }
+        });
+
+        rollDiceBtn.addEventListener('click', rollDice);
+    </script>
+</body>
+</html>

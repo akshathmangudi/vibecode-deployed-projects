@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoderConnect - The Developer Community Platform</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --text-color: #212529;
+            --border-color: #dee2e6;
+            --shadow: rgba(0, 0, 0, 0.05);
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: var(--card-background);
+            box-shadow: 0 0 15px var(--shadow);
+            border-radius: 8px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin: -20px -20px 20px -20px;
+            padding-bottom: 25px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        nav {
+            background-color: #343a40;
+            padding: 10px 0;
+            border-radius: 0 0 8px 8px;
+            margin: -10px -20px 20px -20px;
+            box-shadow: 0 2px 5px var(--shadow);
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin: 0 15px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        nav ul li a:hover,
+        nav ul li a.active {
+            background-color: #495057;
+        }
+
+        section {
+            display: none;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
+            margin-top: 20px;
+        }
+
+        section.active {
+            display: block;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 2em;
+        }
+
+        .section-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px var(--shadow);
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            margin-bottom: 5px;
+        }
+
+        .card pre {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            font-size: 0.9em;
+        }
+
+        .card strong {
+            color: var(--secondary-color);
+        }
+
+        .card .meta {
+            font-size: 0.9em;
+            color: #6a6a6a;
+            margin-top: 10px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 10px;
+        }
+
+        .skill-tag {
+            display: inline-block;
+            background-color: #e0f7fa;
+            color: #00796b;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            font-size: 0.85em;
+        }
+
+        form {
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        form h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        form input[type="text"],
+        form input[type="email"],
+        form input[type="url"],
+        form textarea,
+        form select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-family: var(--font-family);
+            font-size: 1em;
+        }
+
+        form textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        form button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
+        }
+
+        form button:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 10px;
+            }
+
+            header {
+                padding: 10px 0;
+                margin: -10px -10px 10px -10px;
+            }
+
+            header h1 {
+                font-size: 2em;
+            }
+
+            nav {
+                margin: -5px -10px 10px -10px;
+            }
+
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            nav ul li {
+                margin: 5px 0;
+            }
+
+            .section-content {
+                grid-template-columns: 1fr;
+            }
+
+            form input[type="text"],
+            form input[type="email"],
+            form input[type="url"],
+            form textarea,
+            form select {
+                width: calc(100% - 20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CoderConnect</h1>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="#" data-section="profiles-section" class="active">Profiles</a></li>
+                <li><a href="#" data-section="forums-section">Forums</a></li>
+                <li><a href="#" data-section="code-section">Code Share</a></li>
+                <li><a href="#" data-section="jobs-section">Job Board</a></li>
+            </ul>
+        </nav>
+
+        <section id="profiles-section" class="active">
+            <h2>User Profiles</h2>
+            <div id="profiles-list" class="section-content">
+                <!-- Profiles will be loaded here -->
+            </div>
+            <form id="add-profile-form">
+                <h3>Add New Profile</h3>
+                <label for="profile-name">Name:</label>
+                <input type="text" id="profile-name" required>
+                <label for="profile-bio">Bio:</label>
+                <textarea id="profile-bio" required></textarea>
+                <label for="profile-skills">Skills (comma-separated):</label>
+                <input type="text" id="profile-skills" placeholder="e.g., JavaScript, Python, React">
+                <label for="profile-github">GitHub (optional):</label>
+                <input type="url" id="profile-github" placeholder="https://github.com/your-username">
+                <button type="submit">Add Profile</button>
+            </form>
+        </section>
+
+        <section id="forums-section">
+            <h2>Community Forums</h2>
+            <div id="forums-list" class="section-content">
+                <!-- Forum posts will be loaded here -->
+            </div>
+            <form id="add-forum-post-form">
+                <h3>Create New Forum Post</h3>
+                <label for="post-title">Title:</label>
+                <input type="text" id="post-title" required>
+                <label for="post-author">Your Name:</label>
+                <input type="text" id="post-author" required>
+                <label for="post-content">Content:</label>
+                <textarea id="post-content" required></textarea>
+                <button type="submit">Post to Forum</button>
+            </form>
+        </section>
+
+        <section id="code-section">
+            <h2>Code Sharing</h2>
+            <div id="code-list" class="section-content">
+                <!-- Code snippets will be loaded here -->
+            </div>
+            <form id="add-code-snippet-form">
+                <h3>Share New Code Snippet</h3>
+                <label for="snippet-title">Title:</label>
+                <input type="text" id="snippet-title" required>
+                <label for="snippet-author">Your Name:</label>
+                <input type="text" id="snippet-author" required>
+                <label for="snippet-language">Language:</label>
+                <input type="text" id="snippet-language" placeholder="e.g., JavaScript, Python, CSS" required>
+                <label for="snippet-code">Code:</label>
+                <textarea id="snippet-code" rows="10" required></textarea>
+                <button type="submit">Share Code</button>
+            </form>
+        </section>
+
+        <section id="jobs-section">
+            <h2>Job Board</h2>
+            <div id="jobs-list" class="section-content">
+                <!-- Job listings will be loaded here -->
+            </div>
+            <form id="add-job-listing-form">
+                <h3>Post New Job Listing</h3>
+                <label for="job-title">Job Title:</label>
+                <input type="text" id="job-title" required>
+                <label for="job-company">Company:</label>
+                <input type="text" id="job-company" required>
+                <label for="job-location">Location:</label>
+                <input type="text" id="job-location" placeholder="e.g., Remote, New York, USA" required>
+                <label for="job-description">Description:</label>
+                <textarea id="job-description" required></textarea>
+                <label for="job-url">Application URL (optional):</label>
+                <input type="url" id="job-url" placeholder="https://company.com/apply">
+                <button type="submit">Post Job</button>
+            </form>
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Data Storage (simulated backend using localStorage) ---
+            const getData = (key, defaultValue) => {
+                try {
+                    const data = localStorage.getItem(key);
+                    return data ? JSON.parse(data) : defaultValue;
+                } catch (e) {
+                    console.error("Error reading from localStorage:", e);
+                    return defaultValue;
+                }
+            };
+
+            const saveData = (key, data) => {
+                try {
+                    localStorage.setItem(key, JSON.stringify(data));
+                } catch (e) {
+                    console.error("Error saving to localStorage:", e);
+                }
+            };
+
+            let usersData = getData('coderConnectUsers', [
+                { id: 1, name: 'Alice Developer', bio: 'Full-stack developer passionate about open source and community building.', skills: ['JavaScript', 'React', 'Node.js', 'PostgreSQL'], github: 'https://github.com/alicedev' },
+                { id: 2, name: 'Bob Coder', bio: 'Backend engineer specializing in scalable systems and distributed computing.', skills: ['Python', 'Django', 'AWS', 'Docker'], github: 'https://github.com/bobcoder' },
+                { id: 3, name: 'Charlie Frontend', bio: 'Frontend enthusiast creating beautiful and responsive user interfaces.', skills: ['HTML', 'CSS', 'Vue.js', 'Webpack'], github: 'https://github.com/charliefe' }
+            ]);
+
+            let forumPostsData = getData('coderConnectForumPosts', [
+                { id: 1, title: 'Best Practices for Async/Await in JavaScript', author: 'Alice Developer', content: 'What are your go-to patterns for handling complex asynchronous operations in modern JavaScript?', date: '2023-10-26' },
+                { id: 2, title: 'Choosing the Right Database for a New Project', author: 'Bob Coder', content: 'SQL vs NoSQL? What factors do you consider when selecting a database for a new application?', date: '2023-10-25' }
+            ]);
+
+            let codeSnippetsData = getData('coderConnectCodeSnippets', [
+                { id: 1, title: 'Python FizzBuzz optimized', author: 'Bob Coder', language: 'Python', code: 'def fizzbuzz(n):\n    return ["FizzBuzz" if i % 15 == 0 else "Fizz" if i % 3 == 0 else "Buzz" if i % 5 == 0 else str(i) for i in range(1, n + 1)]' },
+                { id: 2, title: 'Simple React Component Example', author: 'Charlie Frontend', language: 'JavaScript (React)', code: 'import React from \'react\';\n\nconst WelcomeMessage = ({ name }) => {\n  return (\n    <div>\n      <h1>Hello, {name}!</h1>\n      <p>Welcome to CoderConnect!</p>\n    </div>\n  );\n};\n\nexport default WelcomeMessage;' }
+            ]);
+
+            let jobListingsData = getData('coderConnectJobListings', [
+                { id: 1, title: 'Senior Frontend Engineer', company: 'Innovate Solutions Inc.', location: 'Remote', description: 'Seeking an experienced frontend engineer with expertise in React and TypeScript.', url: 'https://innovate.com/careers/senior-fe' },
+                { id: 2, title: 'DevOps Specialist', company: 'CloudWorks', location: 'San Francisco, CA', description: 'Looking for a DevOps expert to manage our AWS infrastructure and CI/CD pipelines.', url: 'https://cloudworks.com/jobs/devops' }
+            ]);
+
+            // --- DOM Elements ---
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('nav ul li a');
+
+            const profilesList = document.getElementById('profiles-list');
+            const addProfileForm = document.getElementById('add-profile-form');
+
+            const forumsList = document.getElementById('forums-list');
+            const addForumPostForm = document.getElementById('add-forum-post-form');
+
+            const codeList = document.getElementById('code-list');
+            const addCodeSnippetForm = document.getElementById('add-code-snippet-form');
+
+            const jobsList = document.getElementById('jobs-list');
+            const addJobListingForm = document.getElementById('add-job-listing-form');
+
+            // --- Helper Functions ---
+            const showSection = (sectionId) => {
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(sectionId).classList.add('active');
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.dataset.section === sectionId) {
+                        link.classList.add('active');
+                    }
+                });
+            };
+
+            const generateId = () => Date.now(); // Simple unique ID generator
+
+            // --- Render Functions ---
+            const renderUsers = () => {
+                profilesList.innerHTML = '';
+                usersData.forEach(user => {
+                    const skillsHtml = user.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('');
+                    const githubLink = user.github ? `<p><strong>GitHub:</strong> <a href="${user.github}" target="_blank">${user.github.split('/').pop()}</a></p>` : '';
+                    profilesList.innerHTML += `
+                        <div class="card profile-card">
+                            <h3>${user.name}</h3>
+                            <p><strong>Bio:</strong> ${user.bio}</p>
+                            <p><strong>Skills:</strong> ${skillsHtml}</p>
+                            ${githubLink}
+                        </div>
+                    `;
+                });
+            };
+
+            const renderForumPosts = () => {
+                forumsList.innerHTML = '';
+                forumPostsData.sort((a, b) => new Date(b.date) - new Date(a.date));
+                forumPostsData.forEach(post => {
+                    forumsList.innerHTML += `
+                        <div class="card forum-post-card">
+                            <h3>${post.title}</h3>
+                            <p>${post.content}</p>
+                            <div class="meta">
+                                <strong>Posted by:</strong> ${post.author} on ${post.date}
+                            </div>
+                        </div>
+                    `;
+                });
+            };
+
+            const renderCodeSnippets = () => {
+                codeList.innerHTML = '';
+                codeSnippetsData.forEach(snippet => {
+                    codeList.innerHTML += `
+                        <div class="card code-snippet-card">
+                            <h3>${snippet.title}</h3>
+                            <p><strong>Language:</strong> ${snippet.language}</p>
+                            <pre><code>${snippet.code}</code></pre>
+                            <div class="meta">
+                                <strong>Shared by:</strong> ${snippet.author}
+                            </div>
+                        </div>
+                    `;
+                });
+            };
+
+            const renderJobListings = () => {
+                jobsList.innerHTML = '';
+                jobListingsData.forEach(job => {
+                    const jobUrlLink = job.url ? `<p><a href="${job.url}" target="_blank">Apply Here</a></p>` : '';
+                    jobsList.innerHTML += `
+                        <div class="card job-card">
+                            <h3>${job.title}</h3>
+                            <p><strong>Company:</strong> ${job.company}</p>
+                            <p><strong>Location:</strong> ${job.location}</p>
+                            <p><strong>Description:</strong> ${job.description}</p>
+                            ${jobUrlLink}
+                        </div>
+                    `;
+                });
+            };
+
+            // --- Event Listeners ---
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showSection(e.target.dataset.section);
+                });
+            });
+
+            addProfileForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('profile-name').value;
+                const bio = document.getElementById('profile-bio').value;
+                const skills = document.getElementById('profile-skills').value.split(',').map(s => s.trim()).filter(s => s);
+                const github = document.getElementById('profile-github').value;
+
+                const newProfile = {
+                    id: generateId(),
+                    name,
+                    bio,
+                    skills,
+                    github
+                };
+                usersData.push(newProfile);
+                saveData('coderConnectUsers', usersData);
+                renderUsers();
+                addProfileForm.reset();
+            });
+
+            addForumPostForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const title = document.getElementById('post-title').value;
+                const author = document.getElementById('post-author').value;
+                const content = document.getElementById('post-content').value;
+
+                const newPost = {
+                    id: generateId(),
+                    title,
+                    author,
+                    content,
+                    date: new Date().toISOString().split('T')[0]
+                };
+                forumPostsData.push(newPost);
+                saveData('coderConnectForumPosts', forumPostsData);
+                renderForumPosts();
+                addForumPostForm.reset();
+            });
+
+            addCodeSnippetForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const title = document.getElementById('snippet-title').value;
+                const author = document.getElementById('snippet-author').value;
+                const language = document.getElementById('snippet-language').value;
+                const code = document.getElementById('snippet-code').value;
+
+                const newSnippet = {
+                    id: generateId(),
+                    title,
+                    author,
+                    language,
+                    code
+                };
+                codeSnippetsData.push(newSnippet);
+                saveData('coderConnectCodeSnippets', codeSnippetsData);
+                renderCodeSnippets();
+                addCodeSnippetForm.reset();
+            });
+
+            addJobListingForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const title = document.getElementById('job-title').value;
+                const company = document.getElementById('job-company').value;
+                const location = document.getElementById('job-location').value;
+                const description = document.getElementById('job-description').value;
+                const url = document.getElementById('job-url').value;
+
+                const newJob = {
+                    id: generateId(),
+                    title,
+                    company,
+                    location,
+                    description,
+                    url
+                };
+                jobListingsData.push(newJob);
+                saveData('coderConnectJobListings', jobListingsData);
+                renderJobListings();
+                addJobListingForm.reset();
+            });
+
+            // --- Initial Render ---
+            renderUsers();
+            renderForumPosts();
+            renderCodeSnippets();
+            renderJobListings();
+            showSection('profiles-section');
+        });
+    </script>
+</body>
+</html>

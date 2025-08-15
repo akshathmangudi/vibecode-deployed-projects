@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Stopwatch</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            background-color: #f0f2f5; /* Light theme background */
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: #333333; /* Dark text for light theme */
+        }
+        #app {
+            background-color: #ffffff; /* White background */
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Light theme shadow */
+            width: 100%;
+            max-width: 600px;
+            box-sizing: border-box;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50; /* Darker text */
+            margin-bottom: 25px;
+            font-size: 2em;
+        }
+        #addTimerBtn {
+            display: block;
+            width: fit-content;
+            margin: 0 auto 30px auto;
+            padding: 12px 25px;
+            background-color: #007bff; /* Primary blue */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3); /* Adjusted shadow */
+        }
+        #addTimerBtn:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+            transform: translateY(-1px);
+        }
+        #addTimerBtn:active {
+            transform: translateY(1px);
+        }
+        #timersContainer {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .timer-card {
+            background-color: #ffffff; /* White card background */
+            border: 1px solid #dddddd; /* Light border */
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Light theme shadow */
+        }
+        .timer-display {
+            font-family: 'Consolas', 'Menlo', monospace;
+            font-size: 2.8em;
+            color: #2c3e50; /* Dark text */
+            background-color: #f8f9fa; /* Very light background for display */
+            padding: 10px 20px;
+            border-radius: 8px;
+            min-width: 250px;
+            text-align: center;
+            letter-spacing: 1px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Light theme shadow */
+        }
+        .timer-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .timer-controls button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            color: white; /* Default to white text, adjusted for yellow button */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Light theme shadow */
+        }
+        .timer-controls button:hover {
+            transform: translateY(-1px);
+        }
+        .timer-controls button:active {
+            transform: translateY(1px);
+        }
+        .timer-controls button:disabled {
+            opacity: 0.6; /* Slightly less opaque */
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        .start-btn {
+            background-color: #28a745; /* Green */
+        }
+        .start-btn:hover:not(:disabled) {
+            background-color: #218838;
+        }
+        .stop-btn {
+            background-color: #dc3545; /* Red */
+        }
+        .stop-btn:hover:not(:disabled) {
+            background-color: #c82333;
+        }
+        .reset-btn {
+            background-color: #ffc107; /* Yellow */
+            color: #212529; /* Dark text for light theme readability */
+        }
+        .reset-btn:hover:not(:disabled) {
+            background-color: #e0a800;
+        }
+        .remove-btn {
+            background-color: #6c757d; /* Gray */
+            padding: 8px 15px;
+            font-size: 0.9em;
+        }
+        .remove-btn:hover:not(:disabled) {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Multi-Stopwatch</h1>
+        <button id="addTimerBtn">Add New Stopwatch</button>
+        <div id="timersContainer">
+            <!-- Timers will be added here -->
+        </div>
+    </div>
+
+    <script>
+        const timersContainer = document.getElementById('timersContainer');
+        const addTimerBtn = document.getElementById('addTimerBtn');
+
+        let nextTimerId = 0;
+        const timers = new Map(); // Stores { id: { elapsed, intervalId, startTime, isRunning, displayElement } }
+
+        // Formats milliseconds into HH:MM:SS.mmm
+        function formatTime(ms) {
+            const hours = Math.floor(ms / 3600000);
+            ms %= 3600000;
+            const minutes = Math.floor(ms / 60000);
+            ms %= 60000;
+            const seconds = Math.floor(ms / 1000);
+            ms %= 1000;
+            const milliseconds = Math.floor(ms);
+
+            return [
+                hours.toString().padStart(2, '0'),
+                minutes.toString().padStart(2, '0'),
+                seconds.toString().padStart(2, '0')
+            ].join(':') + '.' + milliseconds.toString().padStart(3, '0');
+        }
+
+        function updateDisplay(timerId) {
+            const timer = timers.get(timerId);
+            if (!timer) return;
+
+            let currentElapsed = timer.elapsed;
+            if (timer.isRunning) {
+                currentElapsed += Date.now() - timer.startTime;
+            }
+            timer.displayElement.textContent = formatTime(currentElapsed);
+        }
+
+        function startTimer(timerId) {
+            const timer = timers.get(timerId);
+            if (!timer || timer.isRunning) return;
+
+            timer.isRunning = true;
+            timer.startTime = Date.now(); // Store current time to calculate delta
+            timer.intervalId = setInterval(() => updateDisplay(timerId), 10); // Update every 10ms for smooth display
+
+            const card = timer.displayElement.closest('.timer-card');
+            card.querySelector('.start-btn').disabled = true;
+            card.querySelector('.stop-btn').disabled = false;
+            card.querySelector('.reset-btn').disabled = false;
+        }
+
+        function stopTimer(timerId) {
+            const timer = timers.get(timerId);
+            if (!timer || !timer.isRunning) return;
+
+            clearInterval(timer.intervalId);
+            timer.elapsed += Date.now() - timer.startTime; // Add elapsed time to total
+            timer.isRunning = false;
+            timer.intervalId = null;
+
+            const card = timer.displayElement.closest('.timer-card');
+            card.querySelector('.start-btn').disabled = false;
+            card.querySelector('.stop-btn').disabled = true;
+        }
+
+        function resetTimer(timerId) {
+            const timer = timers.get(timerId);
+            if (!timer) return;
+
+            stopTimer(timerId); // Ensure it's stopped before resetting
+            timer.elapsed = 0;
+            timer.startTime = null;
+            updateDisplay(timerId); // Update display to 00:00:00.000
+
+            const card = timer.displayElement.closest('.timer-card');
+            card.querySelector('.start-btn').disabled = false;
+            card.querySelector('.reset-btn').disabled = true; // Reset button can be disabled until start
+        }
+
+        function removeTimer(timerId) {
+            const timer = timers.get(timerId);
+            if (!timer) return;
+
+            stopTimer(timerId); // Stop interval before removing
+            timers.delete(timerId);
+            const card = timer.displayElement.closest('.timer-card');
+            if (card) {
+                card.remove();
+            }
+        }
+
+        function addTimer() {
+            const id = nextTimerId++;
+
+            const timerCard = document.createElement('div');
+            timerCard.classList.add('timer-card');
+            timerCard.setAttribute('data-timer-id', id);
+
+            const timerDisplay = document.createElement('div');
+            timerDisplay.classList.add('timer-display');
+            timerDisplay.textContent = '00:00:00.000';
+
+            const controls = document.createElement('div');
+            controls.classList.add('timer-controls');
+
+            const startBtn = document.createElement('button');
+            startBtn.classList.add('start-btn');
+            startBtn.textContent = 'Start';
+            startBtn.addEventListener('click', () => startTimer(id));
+
+            const stopBtn = document.createElement('button');
+            stopBtn.classList.add('stop-btn');
+            stopBtn.textContent = 'Stop';
+            stopBtn.disabled = true; // Initially disabled
+            stopBtn.addEventListener('click', () => stopTimer(id));
+
+            const resetBtn = document.createElement('button');
+            resetBtn.classList.add('reset-btn');
+            resetBtn.textContent = 'Reset';
+            resetBtn.disabled = true; // Initially disabled
+            resetBtn.addEventListener('click', () => resetTimer(id));
+
+            const removeBtn = document.createElement('button');
+            removeBtn.classList.add('remove-btn');
+            removeBtn.textContent = 'Remove';
+            removeBtn.addEventListener('click', () => removeTimer(id));
+
+            controls.appendChild(startBtn);
+            controls.appendChild(stopBtn);
+            controls.appendChild(resetBtn);
+            controls.appendChild(removeBtn);
+
+            timerCard.appendChild(timerDisplay);
+            timerCard.appendChild(controls);
+
+            timersContainer.appendChild(timerCard);
+
+            // Initialize timer state in the Map
+            timers.set(id, {
+                elapsed: 0,
+                intervalId: null,
+                startTime: null,
+                isRunning: false,
+                displayElement: timerDisplay
+            });
+        }
+
+        addTimerBtn.addEventListener('click', addTimer);
+
+        // Add an initial timer on load
+        document.addEventListener('DOMContentLoaded', addTimer);
+    </script>
+</body>
+</html>

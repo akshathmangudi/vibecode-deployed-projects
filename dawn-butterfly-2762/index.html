@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoderConnect - Your Hub for Developers</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --text-color: #343a40;
+            --border-color: #dee2e6;
+            --hover-color: #e9ecef;
+            --code-background: #282c34;
+            --code-text: #abb2bf;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        nav ul li a:hover,
+        nav ul li a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        main {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: var(--card-background);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            min-height: calc(100vh - 120px); /* Adjust based on header/footer height */
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-right: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .profile-info h3 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+
+        .profile-info p {
+            margin: 5px 0 0;
+            color: var(--secondary-color);
+        }
+
+        .profile-section h4 {
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .profile-skills span {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            margin: 0 5px 5px 0;
+            font-size: 0.9rem;
+        }
+
+        .forum-list .card {
+            cursor: pointer;
+        }
+
+        .forum-list .card h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        .forum-list .card p {
+            margin: 0;
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+
+        .forum-post {
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .forum-post:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .forum-post-meta {
+            font-size: 0.85rem;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .forum-post-content {
+            margin-top: 0.5rem;
+        }
+
+        .forum-back-button {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .forum-back-button:hover {
+            background-color: #5a6268;
+        }
+
+        .code-sharing-area textarea {
+            width: 100%;
+            height: 300px;
+            background-color: var(--code-background);
+            color: var(--code-text);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 1rem;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            font-size: 0.95rem;
+            resize: vertical;
+            box-sizing: border-box; /* Include padding in width/height */
+        }
+
+        .code-sharing-area pre {
+            background-color: var(--code-background);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-top: 1rem;
+            white-space: pre-wrap; /* Wrap long lines */
+            word-break: break-all; /* Break words to prevent overflow */
+        }
+
+        .code-sharing-area code {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            font-size: 0.95rem;
+        }
+
+        .job-listing .card h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        .job-listing .card p {
+            margin-bottom: 0.5rem;
+        }
+
+        .job-listing .card strong {
+            color: var(--text-color);
+        }
+
+        .job-listing .card .job-meta {
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+            margin-top: 1rem;
+        }
+
+        .job-listing .card .job-apply-link {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .job-listing .card .job-apply-link:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            nav ul li {
+                margin: 5px 10px;
+            }
+
+            main {
+                padding: 1rem;
+                margin: 10px auto;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-avatar {
+                margin: 0 auto 1rem auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>CoderConnect</h1>
+        <nav>
+            <ul>
+                <li><a href="#profile" data-page="profile">Profile</a></li>
+                <li><a href="#forums" data-page="forums">Forums</a></li>
+                <li><a href="#code-sharing" data-page="code-sharing">Code Sharing</a></li>
+                <li><a href="#job-board" data-page="job-board">Job Board</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="app-content">
+        <!-- Content will be loaded here by JavaScript -->
+        <h2 class="section-title">Loading...</h2>
+    </main>
+
+    <script>
+        // Mock Data - In a real app, this would come from a backend API
+        const currentUser = {
+            id: 'user1',
+            name: 'Alice Developer',
+            avatar: 'AD',
+            bio: 'Passionate full-stack developer with 5+ years of experience in JavaScript, React, Node.js, and Python. Always learning new technologies and contributing to open source.',
+            location: 'San Francisco, CA',
+            skills: ['JavaScript', 'React', 'Node.js', 'Python', 'MongoDB', 'AWS', 'Docker', 'Git'],
+            email: 'alice.dev@example.com',
+            social: {
+                github: 'github.com/alice_dev',
+                linkedin: 'linkedin.com/in/alicedev'
+            }
+        };
+
+        const users = [
+            currentUser,
+            {
+                id: 'user2',
+                name: 'Bob Coder',
+                avatar: 'BC',
+                bio: 'Frontend enthusiast specializing in Vue.js and Svelte. Enjoys building performant and beautiful user interfaces.',
+                location: 'New York, NY',
+                skills: ['Vue.js', 'Svelte', 'HTML', 'CSS', 'TypeScript', 'Webpack'],
+                email: 'bob.coder@example.com',
+                social: {
+                    github: 'github.com/bob_coder',
+                    linkedin: 'linkedin.com/in/bobcoder'
+                }
+            },
+            {
+                id: 'user3',
+                name: 'Charlie Backend',
+                avatar: 'CB',
+                bio: 'Backend engineer focused on scalable microservices in Go and Java. Experience with distributed systems and databases.',
+                location: 'Austin, TX',
+                skills: ['Go', 'Java', 'Spring Boot', 'Kafka', 'PostgreSQL', 'Kubernetes'],
+                email: 'charlie.backend@example.com',
+                social: {
+                    github: 'github.com/charlie_backend',
+                    linkedin: 'linkedin.com/in/charliebackend'
+                }
+            }
+        ];
+
+        const forumTopics = [
+            {
+                id: 'topic1',
+                title: 'Best practices for React Hooks?',
+                author: 'Alice Developer',
+                date: '2023-10-26',
+                posts: [
+                    { id: 'post1', author: 'Alice Developer', date: '2023-10-26 10:00 AM', content: 'I\'m looking for advice on writing clean, efficient, and maintainable React Hooks. Any patterns or anti-patterns to share?' },
+                    { id: 'post2', author: 'Bob Coder', date: '2023-10-26 10:30 AM', content: 'Definitely check out the `useCallback` and `useMemo` hooks for performance optimization, but be careful not to overuse them. Also, custom hooks are amazing for logic reuse!' },
+                    { id: 'post3', author: 'Charlie Backend', date: '2023-10-26 11:00 AM', content: 'From a backend perspective, try to keep your component logic lean and move heavy data fetching or state management into dedicated services or contexts.' }
+                ]
+            },
+            {
+                id: 'topic2',
+                title: 'Choosing the right database for a new project',
+                author: 'Bob Coder',
+                date: '2023-10-25',
+                posts: [
+                    { id: 'post4', author: 'Bob Coder', date: '2023-10-25 09:00 AM', content: 'Starting a new project and unsure whether to go with SQL (PostgreSQL, MySQL) or NoSQL (MongoDB, Cassandra). What factors influence your decision?' },
+                    { id: 'post5', author: 'Charlie Backend', date: '2023-10-25 09:45 AM', content: 'It heavily depends on your data structure and access patterns. Relational databases are great for complex queries and ACID compliance. NoSQL excels in scalability for specific use cases (e.g., document stores for flexible schemas).' }
+                ]
+            }
+        ];
+
+        const jobListings = [
+            {
+                id: 'job1',
+                title: 'Senior Frontend Engineer (React)',
+                company: 'Tech Solutions Inc.',
+                location: 'Remote (US)',
+                salary: '$140k - $170k',
+                description: 'We are seeking a talented Senior Frontend Engineer with extensive experience in React, TypeScript, and modern web development practices to lead our next-gen UI initiatives.',
+                requirements: ['5+ years React experience', 'TypeScript', 'Redux/Context API', 'Unit Testing'],
+                applyLink: '#'
+            },
+            {
+                id: 'job2',
+                title: 'Backend Developer (Node.js/Go)',
+                company: 'Global Innovations',
+                location: 'New York, NY',
+                salary: '$130k - $160k',
+                description: 'Join our growing backend team to build scalable APIs and microservices using Node.js and Go. Experience with cloud platforms (AWS/Azure/GCP) is a plus.',
+                requirements: ['3+ years Node.js or Go', 'RESTful APIs', 'SQL/NoSQL databases', 'Cloud experience'],
+                applyLink: '#'
+            },
+            {
+                id: 'job3',
+                title: 'DevOps Engineer',
+                company: 'Cloud Native Co.',
+                location: 'Seattle, WA',
+                salary: '$120k - $150k',
+                description: 'We need an experienced DevOps Engineer to manage our CI/CD pipelines, container orchestration (Kubernetes), and infrastructure as code (Terraform).',
+                requirements: ['Kubernetes', 'Docker', 'Terraform', 'CI/CD (Jenkins/GitLab CI)', 'Linux'],
+                applyLink: '#'
+            }
+        ];
+
+        // DOM Elements
+        const appContent = document.getElementById('app-content');
+        const navLinks = document.querySelectorAll('nav ul li a');
+
+        // Page Rendering Functions
+        function renderProfilePage() {
+            let html = `<h2 class="section-title">My Profile</h2>`;
+            html += `<div class="card">
+                <div class="profile-header">
+                    <div class="profile-avatar">${currentUser.avatar}</div>
+                    <div class="profile-info">
+                        <h3>${currentUser.name}</h3>
+                        <p>${currentUser.location}</p>
+                    </div>
+                </div>
+                <div class="profile-section">
+                    <h4>Bio</h4>
+                    <p>${currentUser.bio}</p>
+                </div>
+                <div class="profile-section">
+                    <h4>Skills</h4>
+                    <p class="profile-skills">
+                        ${currentUser.skills.map(skill => `<span>${skill}</span>`).join('')}
+                    </p>
+                </div>
+                <div class="profile-section">
+                    <h4>Contact & Social</h4>
+                    <p><strong>Email:</strong> <a href="mailto:${currentUser.email}">${currentUser.email}</a></p>
+                    <p><strong>GitHub:</strong> <a href="https://${currentUser.social.github}" target="_blank">${currentUser.social.github}</a></p>
+                    <p><strong>LinkedIn:</strong> <a href="https://${currentUser.social.linkedin}" target="_blank">${currentUser.social.linkedin}</a></p>
+                </div>
+            </div>`;
+
+            html += `<h2 class="section-title">Other Users</h2>`;
+            users.filter(u => u.id !== currentUser.id).forEach(user => {
+                html += `<div class="card">
+                    <div class="profile-header">
+                        <div class="profile-avatar">${user.avatar}</div>
+                        <div class="profile-info">
+                            <h3>${user.name}</h3>
+                            <p>${user.location}</p>
+                        </div>
+                    </div>
+                    <p>${user.bio.substring(0, 100)}...</p>
+                    <p class="profile-skills">
+                        ${user.skills.slice(0, 3).map(skill => `<span>${skill}</span>`).join('')}
+                        ${user.skills.length > 3 ? '<span>...</span>' : ''}
+                    </p>
+                </div>`;
+            });
+
+            appContent.innerHTML = html;
+        }
+
+        function renderForumsPage(topicId = null) {
+            if (topicId) {
+                const topic = forumTopics.find(t => t.id === topicId);
+                if (!topic) {
+                    appContent.innerHTML = `<h2 class="section-title">Forum Topic Not Found</h2><p>The requested topic could not be found.</p><a href="#forums" class="forum-back-button" data-page="forums">Back to Forums</a>`;
+                    return;
+                }
+
+                let html = `<a href="#forums" class="forum-back-button" data-page="forums">Back to All Topics</a>`;
+                html += `<h2 class="section-title">${topic.title}</h2>`;
+                html += `<div class="card">`;
+                topic.posts.forEach(post => {
+                    html += `<div class="forum-post">
+                        <div class="forum-post-meta"><strong>${post.author}</strong> on ${post.date}</div>
+                        <div class="forum-post-content">${post.content}</div>
+                    </div>`;
+                });
+                html += `</div>`; // Close card
+                // Simulate a reply section (no actual functionality)
+                html += `
+                <div class="card" style="margin-top: 20px;">
+                    <h3>Post a Reply (Simulated)</h3>
+                    <textarea style="width: 100%; height: 100px; margin-bottom: 10px; border: 1px solid var(--border-color); padding: 10px; border-radius: 5px;" placeholder="Type your reply here..."></textarea>
+                    <button style="background-color: var(--primary-color); color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer;">Submit Reply</button>
+                    <p style="font-size: 0.85rem; color: var(--secondary-color); margin-top: 10px;">(Note: This is a demo; replies are not saved.)</p>
+                </div>
+                `;
+
+                appContent.innerHTML = html;
+
+                // Add event listener for the back button, if it's dynamic
+                appContent.querySelector('.forum-back-button')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    history.pushState(null, '', e.target.href); // Update URL hash
+                    renderPage('forums');
+                });
+
+            } else {
+                let html = `<h2 class="section-title">Forums</h2>`;
+                html += `<div class="forum-list">`;
+                forumTopics.forEach(topic => {
+                    html += `<div class="card forum-topic-card" data-topic-id="${topic.id}">
+                        <h3>${topic.title}</h3>
+                        <p>By ${topic.author} on ${topic.date}</p>
+                        <p>${topic.posts.length} posts</p>
+                    </div>`;
+                });
+                html += `</div>`;
+                appContent.innerHTML = html;
+
+                // Add click listeners to topic cards
+                appContent.querySelectorAll('.forum-topic-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const id = card.dataset.topicId;
+                        history.pushState(null, '', `#forums/${id}`); // Update URL hash
+                        renderForumsPage(id);
+                    });
+                });
+            }
+        }
+
+        function renderCodeSharePage() {
+            let html = `<h2 class="section-title">Code Sharing</h2>`;
+            html += `<div class="card code-sharing-area">
+                <h3>Paste Your Code Here</h3>
+                <textarea id="code-input" placeholder="Paste your code here..."></textarea>
+                <button id="format-code-btn" style="background-color: var(--primary-color); color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">Format Code</button>
+                <button id="copy-code-btn" style="background-color: var(--secondary-color); color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; margin-left: 10px;">Copy Code</button>
+                <h3>Formatted Code Preview</h3>
+                <pre><code id="code-preview"></code></pre>
+                <p style="font-size: 0.85rem; color: var(--secondary-color); margin-top: 10px;">(Note: Basic text formatting only, no advanced syntax highlighting without external libraries.)</p>
+            </div>`;
+            appContent.innerHTML = html;
+
+            const codeInput = document.getElementById('code-input');
+            const codePreview = document.getElementById('code-preview');
+            const formatBtn = document.getElementById('format-code-btn');
+            const copyBtn = document.getElementById('copy-code-btn');
+
+            formatBtn.addEventListener('click', () => {
+                const code = codeInput.value;
+                codePreview.textContent = code; // Using textContent for safety and basic pre-formatting
+            });
+
+            copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(codePreview.textContent)
+                    .then(() => alert('Code copied to clipboard!'))
+                    .catch(err => console.error('Failed to copy text: ', err));
+            });
+        }
+
+        function renderJobBoardPage() {
+            let html = `<h2 class="section-title">Job Board</h2>`;
+            html += `<div class="job-listings">`;
+            jobListings.forEach(job => {
+                html += `<div class="card job-listing">
+                    <h3>${job.title}</h3>
+                    <p><strong>Company:</strong> ${job.company}</p>
+                    <p><strong>Location:</strong> ${job.location}</p>
+                    <p><strong>Salary:</strong> ${job.salary}</p>
+                    <p>${job.description}</p>
+                    <h4>Requirements:</h4>
+                    <ul>
+                        ${job.requirements.map(req => `<li>${req}</li>`).join('')}
+                    </ul>
+                    <a href="${job.applyLink}" target="_blank" class="job-apply-link">Apply Now (Simulated)</a>
+                </div>`;
+            });
+            html += `</div>`;
+            appContent.innerHTML = html;
+        }
+
+        // Main Navigation Logic
+        function renderPage(pageName) {
+            // Remove active class from all links
+            navLinks.forEach(link => link.classList.remove('active'));
+
+            // Add active class to the current link
+            const currentPageLink = document.querySelector(`nav ul li a[data-page="${pageName.split('/')[0]}"]`); // Match base page name for active class
+            if (currentPageLink) {
+                currentPageLink.classList.add('active');
+            }
+
+            if (pageName.startsWith('forums/')) {
+                const topicId = pageName.split('/')[1];
+                renderForumsPage(topicId);
+            } else {
+                switch (pageName) {
+                    case 'profile':
+                        renderProfilePage();
+                        break;
+                    case 'forums':
+                        renderForumsPage();
+                        break;
+                    case 'code-sharing':
+                        renderCodeSharePage();
+                        break;
+                    case 'job-board':
+                        renderJobBoardPage();
+                        break;
+                    default:
+                        // Default to profile page if unknown hash
+                        history.replaceState(null, '', '#profile');
+                        renderProfilePage();
+                        break;
+                }
+            }
+            appContent.scrollTop = 0; // Scroll to top of content on page change
+        }
+
+        // Event Listeners for Navigation
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const pageName = e.target.dataset.page;
+                history.pushState(null, '', e.target.href); // Update URL hash
+                renderPage(pageName);
+            });
+        });
+
+        // Handle initial load and browser back/forward
+        window.addEventListener('popstate', () => {
+            const hash = window.location.hash.substring(1);
+            renderPage(hash || 'profile'); // Default to 'profile' if no hash
+        });
+
+        // Initial page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const initialHash = window.location.hash.substring(1);
+            if (!initialHash) {
+                history.replaceState(null, '', '#profile'); // Set default hash
+            }
+            renderPage(initialHash || 'profile');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Business - Services, Pricing, Contact</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-light: #f8f9fa;
+            --background-dark: #343a40;
+            --text-dark: #212529;
+            --text-light: #ffffff;
+            --card-bg: #ffffff;
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--background-dark);
+            color: var(--text-light);
+            padding: 20px 0;
+            box-shadow: 0 2px 4px var(--shadow-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+
+        header nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            margin-left: 25px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        header nav a:hover {
+            color: var(--primary-color);
+        }
+
+        section {
+            padding: 60px 0;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        section:last-of-type {
+            border-bottom: none;
+        }
+
+        h2 {
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            color: var(--primary-color);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px var(--shadow-color);
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            font-size: 1.5em;
+        }
+
+        .card p {
+            font-size: 1.1em;
+            color: var(--secondary-color);
+        }
+
+        .pricing-card {
+            text-align: center;
+        }
+
+        .pricing-card .price {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--text-dark);
+            margin: 20px 0;
+        }
+
+        .pricing-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .pricing-card ul li {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            color: var(--secondary-color);
+        }
+
+        .button {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 12px 25px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        #contact p {
+            font-size: 1.2em;
+            margin-bottom: 25px;
+        }
+
+        .contact-info p {
+            margin: 15px 0;
+            font-size: 1.1em;
+        }
+
+        .contact-info p strong {
+            color: var(--primary-color);
+        }
+
+        .contact-info a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            background-color: var(--background-dark);
+            color: var(--text-light);
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            header .container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            header nav {
+                margin-top: 15px;
+            }
+
+            header nav a {
+                margin: 0 10px;
+                display: inline-block;
+                margin-bottom: 10px;
+            }
+
+            h2 {
+                font-size: 2em;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 25px;
+            }
+
+            .pricing-card .price {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>My Business</h1>
+            <nav>
+                <a href="#services">Services</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#contact">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="services" class="container">
+            <h2>Services Offered</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>Service 1: Web Design & Development</h3>
+                    <p>Crafting stunning, responsive, and user-friendly websites tailored to your brand's unique identity and business goals, ensuring a powerful online presence.</p>
+                </div>
+                <div class="card">
+                    <h3>Service 2: Search Engine Optimization (SEO)</h3>
+                    <p>Improving your search engine rankings to drive more organic traffic, increase visibility, and attract potential customers actively searching for your services.</p>
+                </div>
+                <div class="card">
+                    <h3>Service 3: Digital Marketing Strategy</h3>
+                    <p>Developing comprehensive digital marketing plans, including social media, email campaigns, and content marketing, to engage your audience and grow your business.</p>
+                </div>
+                <div class="card">
+                    <h3>Service 4: E-commerce Solutions</h3>
+                    <p>Building robust and secure online stores that provide a seamless shopping experience for your customers, from product display to secure payment gateways.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="container">
+            <h2>Pricing Plans</h2>
+            <div class="card-grid">
+                <div class="card pricing-card">
+                    <h3>Basic Plan</h3>
+                    <p class="price">$299<small>/month</small></p>
+                    <ul>
+                        <li>Basic Website Audit</li>
+                        <li>Monthly Performance Report</li>
+                        <li>Email Support</li>
+                        <li>Up to 5 Pages</li>
+                    </ul>
+                    <a href="#contact" class="button">Get Started</a>
+                </div>
+                <div class="card pricing-card">
+                    <h3>Standard Plan</h3>
+                    <p class="price">$599<small>/month</small></p>
+                    <ul>
+                        <li>Comprehensive Website Audit</li>
+                        <li>Advanced SEO Tools</li>
+                        <li>Priority Email & Chat Support</li>
+                        <li>Up to 15 Pages</li>
+                        <li>Social Media Integration</li>
+                    </ul>
+                    <a href="#contact" class="button">Get Started</a>
+                </div>
+                <div class="card pricing-card">
+                    <h3>Premium Plan</h3>
+                    <p class="price">$999<small>/month</small></p>
+                    <ul>
+                        <li>Full Digital Strategy Consultation</li>
+                        <li>Dedicated Account Manager</li>
+                        <li>24/7 Phone & Email Support</li>
+                        <li>Unlimited Pages</li>
+                        <li>E-commerce Functionality</li>
+                        <li>Content Creation Assistance</li>
+                    </ul>
+                    <a href="#contact" class="button">Get Started</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="container">
+            <h2>Contact Us</h2>
+            <p>We'd love to hear from you! Reach out via email, phone, or connect with us on social media for any inquiries or to discuss your project.</p>
+            <div class="contact-info">
+                <p><strong>Email:</strong> <a href="mailto:info@mybusiness.com">info@mybusiness.com</a></p>
+                <p><strong>Phone:</strong> <a href="tel:+1234567890">+1 (234) 567-890</a></p>
+                <p><strong>Address:</strong> 123 Business Rd, Suite 100, City, State, 12345</p>
+                <p><strong>Social Media:</strong>
+                    <a href="https://facebook.com/mybusiness" target="_blank">Facebook</a> |
+                    <a href="https://twitter.com/mybusiness" target="_blank">Twitter</a> |
+                    <a href="https://linkedin.com/company/mybusiness" target="_blank">LinkedIn</a>
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 My Business. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

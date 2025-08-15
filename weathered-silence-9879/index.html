@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Aurora Gems - Jewelry Store</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary-color: #A0522D; /* Sienna */
+            --secondary-color: #F8F8F8; /* White smoke */
+            --accent-color: #FFD700; /* Gold */
+            --text-color: #333;
+            --light-grey: #EEE;
+            --border-radius: 5px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            margin: 0;
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: var(--border-radius);
+            transition: background-color 0.3s ease;
+        }
+
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        #app-container {
+            padding: 30px 20px;
+            background-color: white;
+            min-height: 70vh;
+            border-radius: var(--border-radius);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .product-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            justify-content: center;
+        }
+
+        .product-card {
+            background-color: white;
+            border: 1px solid var(--light-grey);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .product-card img {
+            max-width: 100%;
+            height: 200px;
+            object-fit: contain;
+            border-radius: var(--border-radius);
+            margin-bottom: 10px;
+        }
+
+        .product-card h3 {
+            color: var(--primary-color);
+            font-size: 1.2em;
+            margin: 10px 0 5px;
+        }
+
+        .product-card p {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #8B4513; /* Darker Sienna */
+        }
+
+        .view-details-btn {
+            width: 80%;
+            margin: 0 auto;
+            display: block;
+        }
+
+        /* Product Details Page */
+        .product-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .details-image {
+            max-width: 400px;
+            height: auto;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .details-content {
+            flex: 1;
+            min-width: 300px;
+            max-width: 600px;
+        }
+
+        .details-content h2 {
+            text-align: left;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+        }
+
+        .details-price {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .details-content p {
+            font-size: 1.1em;
+            margin-bottom: 25px;
+            color: #555;
+        }
+
+        .details-content button {
+            margin-right: 15px;
+        }
+
+        /* Cart Page */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid var(--light-grey);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: bold;
+        }
+
+        td {
+            background-color: white;
+        }
+
+        .cart-item-image {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: var(--border-radius);
+        }
+
+        .cart-quantity-input {
+            width: 60px;
+            padding: 8px;
+            border: 1px solid var(--light-grey);
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        tfoot {
+            font-weight: bold;
+            background-color: var(--secondary-color);
+        }
+
+        tfoot td {
+            padding: 15px;
+            font-size: 1.2em;
+            color: var(--primary-color);
+        }
+
+        .cart-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .cart-actions button {
+            padding: 12px 20px;
+            font-size: 1.1em;
+        }
+
+        /* Checkout Form */
+        .checkout-form {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 30px;
+            border: 1px solid var(--light-grey);
+            border-radius: var(--border-radius);
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        .checkout-form h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .checkout-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .checkout-form input[type="text"],
+        .checkout-form input[type="email"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--light-grey);
+            border-radius: var(--border-radius);
+            font-size: 1em;
+        }
+
+        .checkout-form button {
+            display: inline-block;
+            margin-top: 15px;
+            margin-right: 15px;
+        }
+
+        .checkout-summary {
+            background-color: var(--secondary-color);
+            border: 1px solid var(--light-grey);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .checkout-summary h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        .checkout-summary p {
+            margin: 8px 0;
+        }
+
+        /* Order Confirmation */
+        .order-confirmation {
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .order-confirmation h2 {
+            color: #28a745; /* Green for success */
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .order-confirmation p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            color: #555;
+        }
+
+        .continue-shopping-btn {
+            padding: 15px 30px;
+            font-size: 1.2em;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            nav {
+                flex-wrap: wrap;
+                padding: 0 10px;
+            }
+
+            nav a {
+                padding: 8px;
+                font-size: 0.9em;
+            }
+
+            .product-list {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+            }
+
+            .product-details {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .details-image {
+                max-width: 90%;
+            }
+
+            .details-content {
+                padding: 0 10px;
+                text-align: center;
+            }
+
+            .details-content h2, .details-price {
+                text-align: center;
+            }
+
+            .details-content button {
+                display: block;
+                width: calc(100% - 30px);
+                margin: 15px auto;
+            }
+
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            tr { border: 1px solid var(--light-grey); margin-bottom: 15px; border-radius: var(--border-radius);}
+
+            td {
+                border: none;
+                border-bottom: 1px solid var(--light-grey);
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+            }
+
+            td:before {
+                position: absolute;
+                top: 6px;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+                color: var(--primary-color);
+            }
+
+            td:nth-of-type(1):before { content: "Image"; }
+            td:nth-of-type(2):before { content: "Product"; }
+            td:nth-of-type(3):before { content: "Price"; }
+            td:nth-of-type(4):before { content: "Quantity"; }
+            td:nth-of-type(5):before { content: "Subtotal"; }
+            td:nth-of-type(6):before { content: "Action"; }
+
+            .cart-item-image {
+                float: left;
+                margin-right: 15px;
+            }
+            .cart-quantity-input {
+                width: calc(100% - 20px);
+            }
+
+            .cart-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .cart-actions button {
+                width: 100%;
+            }
+
+            .checkout-form {
+                padding: 20px;
+            }
+
+            .checkout-form input[type="text"],
+            .checkout-form input[type="email"] {
+                width: calc(100% - 20px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            #app-container {
+                padding: 15px;
+            }
+            .product-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Aurora Gems</h1>
+            <nav>
+                <a href="#" data-view="home">Home</a>
+                <a href="#" data-category="Necklaces">Necklaces</a>
+                <a href="#" data-category="Earrings">Earrings</a>
+                <a href="#" data-category="Bracelets">Bracelets</a>
+                <a href="#" data-category="Rings">Rings</a>
+                <a href="#" data-view="cart">Cart (<span id="cart-count">0</span>)</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container" id="app-container">
+        <!-- Content will be rendered here by JavaScript -->
+    </main>
+
+    <script>
+        let state = {
+            currentView: 'home',
+            products: [],
+            cart: [],
+            selectedProductId: null
+        };
+
+        const appContainer = document.getElementById('app-container');
+        const cartCountSpan = document.getElementById('cart-count');
+
+        function renderHomeView(category = null) {
+            let filteredProducts = state.products;
+            if (category) {
+                filteredProducts = state.products.filter(p => p.category === category);
+            }
+
+            let productsHtml = filteredProducts.map(p => `
+                <div class="product-card" data-product-id="${p.id}">
+                    <img src="${p.image}" alt="${p.name}">
+                    <h3>${p.name}</h3>
+                    <p>$${p.price.toFixed(2)}</p>
+                    <button class="view-details-btn" data-product-id="${p.id}">View Details</button>
+                </div>
+            `).join('');
+
+            appContainer.innerHTML = `
+                <h2>${category ? category : 'All'} Jewelry</h2>
+                <div class="product-list">
+                    ${productsHtml}
+                </div>
+            `;
+
+            document.querySelectorAll('.product-card, .view-details-btn').forEach(element => {
+                element.addEventListener('click', (e) => {
+                    const productId = parseInt(e.currentTarget.dataset.productId);
+                    state.selectedProductId = productId;
+                    state.currentView = 'productDetails';
+                    render();
+                });
+            });
+        }
+
+        function renderProductDetailsView() {
+            const product = state.products.find(p => p.id === state.selectedProductId);
+            if (!product) {
+                state.currentView = 'home';
+                render();
+                return;
+            }
+
+            appContainer.innerHTML = `
+                <div class="product-details">
+                    <img src="${product.image}" alt="${product.name}" class="details-image">
+                    <div class="details-content">
+                        <h2>${product.name}</h2>
+                        <p class="details-price">$${product.price.toFixed(2)}</p>
+                        <p>${product.description}</p>
+                        <button class="add-to-cart-btn" data-product-id="${product.id}">Add to Cart</button>
+                        <button class="back-to-home-btn">Back to Products</button>
+                    </div>
+                </div>
+            `;
+
+            document.querySelector('.add-to-cart-btn').addEventListener('click', (e) => {
+                const productId = parseInt(e.currentTarget.dataset.productId);
+                addToCart(productId);
+                alert(`${product.name} added to cart!`);
+            });
+
+            document.querySelector('.back-to-home-btn').addEventListener('click', () => {
+                state.currentView = 'home';
+                render();
+            });
+        }
+
+        function renderCartView() {
+            if (state.cart.length === 0) {
+                appContainer.innerHTML = `
+                    <h2>Your Shopping Cart</h2>
+                    <p>Your cart is empty.</p>
+                    <button class="back-to-home-btn">Continue Shopping</button>
+                `;
+                document.querySelector('.back-to-home-btn').addEventListener('click', () => {
+                    state.currentView = 'home';
+                    render();
+                });
+                return;
+            }
+
+            let cartItemsHtml = state.cart.map(item => {
+                const product = state.products.find(p => p.id === item.productId);
+                if (!product) return '';
+                return `
+                    <tr>
+                        <td><img src="${product.image}" alt="${product.name}" class="cart-item-image"></td>
+                        <td>${product.name}</td>
+                        <td>$${product.price.toFixed(2)}</td>
+                        <td>
+                            <input type="number" min="1" value="${item.quantity}" class="cart-quantity-input" data-product-id="${product.id}">
+                        </td>
+                        <td>$${(product.price * item.quantity).toFixed(2)}</td>
+                        <td><button class="remove-from-cart-btn" data-product-id="${product.id}">Remove</button></td>
+                    </tr>
+                `;
+            }).join('');
+
+            const cartTotal = state.cart.reduce((total, item) => {
+                const product = state.products.find(p => p.id === item.productId);
+                return total + (product ? product.price * item.quantity : 0);
+            }, 0);
+
+            appContainer.innerHTML = `
+                <h2>Your Shopping Cart</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Subtotal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${cartItemsHtml}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4">Total:</td>
+                            <td>$${cartTotal.toFixed(2)}</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="cart-actions">
+                    <button class="proceed-to-checkout-btn">Proceed to Checkout</button>
+                    <button class="back-to-home-btn">Continue Shopping</button>
+                </div>
+            `;
+
+            document.querySelectorAll('.remove-from-cart-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productId = parseInt(e.currentTarget.dataset.productId);
+                    removeFromCart(productId);
+                });
+            });
+
+            document.querySelectorAll('.cart-quantity-input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const productId = parseInt(e.currentTarget.dataset.productId);
+                    const newQuantity = parseInt(e.currentTarget.value);
+                    updateCartQuantity(productId, newQuantity);
+                });
+            });
+
+            document.querySelector('.proceed-to-checkout-btn').addEventListener('click', () => {
+                state.currentView = 'checkout';
+                render();
+            });
+
+            document.querySelector('.back-to-home-btn').addEventListener('click', () => {
+                state.currentView = 'home';
+                render();
+            });
+        }
+
+        function renderCheckoutView() {
+            if (state.cart.length === 0) {
+                state.currentView = 'cart';
+                render();
+                return;
+            }
+
+            const cartTotal = state.cart.reduce((total, item) => {
+                const product = state.products.find(p => p.id === item.productId);
+                return total + (product ? product.price * item.quantity : 0);
+            }, 0);
+
+            let orderSummaryHtml = state.cart.map(item => {
+                const product = state.products.find(p => p.id === item.productId);
+                return product ? `<p>${product.name} x ${item.quantity} = $${(product.price * item.quantity).toFixed(2)}</p>` : '';
+            }).join('');
+
+            appContainer.innerHTML = `
+                <h2>Checkout</h2>
+                <div class="checkout-summary">
+                    <h3>Order Summary</h3>
+                    ${orderSummaryHtml}
+                    <p><strong>Total: $${cartTotal.toFixed(2)}</strong></p>
+                </div>
+                <form id="checkout-form" class="checkout-form">
+                    <h3>Shipping Information</h3>
+                    <label for="name">Full Name:</label>
+                    <input type="text" id="name" name="name" required>
+
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+
+                    <label for="address">Address:</label>
+                    <input type="text" id="address" name="address" required>
+
+                    <label for="city">City:</label>
+                    <input type="text" id="city" name="city" required>
+
+                    <label for="zip">Zip Code:</label>
+                    <input type="text" id="zip" name="zip" required>
+
+                    <button type="submit" class="place-order-btn">Place Order</button>
+                    <button type="button" class="back-to-cart-btn">Back to Cart</button>
+                </form>
+            `;
+
+            document.getElementById('checkout-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                state.currentView = 'orderConfirmation';
+                render();
+            });
+            document.querySelector('.back-to-cart-btn').addEventListener('click', () => {
+                state.currentView = 'cart';
+                render();
+            });
+        }
+
+        function renderOrderConfirmationView() {
+            appContainer.innerHTML = `
+                <div class="order-confirmation">
+                    <h2>Order Confirmed!</h2>
+                    <p>Thank you for your purchase. Your order has been placed successfully.</p>
+                    <p>A confirmation email will be sent to your inbox shortly.</p>
+                    <button class="continue-shopping-btn">Continue Shopping</button>
+                </div>
+            `;
+            state.cart = [];
+            updateCartCount();
+
+            document.querySelector('.continue-shopping-btn').addEventListener('click', () => {
+                state.currentView = 'home';
+                render();
+            });
+        }
+
+        function addToCart(productId) {
+            const existingItem = state.cart.find(item => item.productId === productId);
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                state.cart.push({ productId: productId, quantity: 1 });
+            }
+            updateCartCount();
+        }
+
+        function removeFromCart(productId) {
+            state.cart = state.cart.filter(item => item.productId !== productId);
+            updateCartCount();
+            render();
+        }
+
+        function updateCartQuantity(productId, newQuantity) {
+            const item = state.cart.find(item => item.productId === productId);
+            if (item) {
+                if (newQuantity <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    item.quantity = newQuantity;
+                }
+            }
+            updateCartCount();
+            render();
+        }
+
+        function updateCartCount() {
+            const totalItems = state.cart.reduce((total, item) => total + item.quantity, 0);
+            cartCountSpan.textContent = totalItems;
+        }
+
+        function render(category = null) {
+            switch (state.currentView) {
+                case 'home':
+                    renderHomeView(category);
+                    break;
+                case 'productDetails':
+                    renderProductDetailsView();
+                    break;
+                case 'cart':
+                    renderCartView();
+                    break;
+                case 'checkout':
+                    renderCheckoutView();
+                    break;
+                case 'orderConfirmation':
+                    renderOrderConfirmationView();
+                    break;
+                default:
+                    renderHomeView();
+            }
+            window.scrollTo(0, 0);
+        }
+
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (e.target.dataset.view) {
+                    state.currentView = e.target.dataset.view;
+                    render();
+                } else if (e.target.dataset.category) {
+                    state.currentView = 'home';
+                    render(e.target.dataset.category);
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            state.products = [
+                { id: 1, name: "Diamond Solitaire Necklace", category: "Necklaces", price: 1200, image: "https://via.placeholder.com/250x250/FFE4E1/000000?text=Necklace+1", description: "A classic and timeless 1ct diamond solitaire pendant on a delicate sterling silver chain, perfect for everyday elegance or special occasions. Comes with a certified authenticity guarantee." },
+                { id: 2, name: "Ruby Drop Earrings", category: "Earrings", price: 450, image: "https://via.placeholder.com/250x250/FFFACD/000000?text=Earrings+1", description: "Vibrant ruby gemstones set in an elegant 14k gold drop design. These earrings add a pop of color and sophistication to any outfit, featuring secure latch-back closures." },
+                { id: 3, name: "Sapphire Tennis Bracelet", category: "Bracelets", price: 980, image: "https://via.placeholder.com/250x250/F0F8FF/000000?text=Bracelet+1", description: "A stunning tennis bracelet adorned with brilliant blue sapphires, meticulously set in rhodium-plated sterling silver. Flexible and comfortable for all-day wear." },
+                { id: 4, name: "Emerald Cut Engagement Ring", category: "Rings", price: 2500, image: "https://via.placeholder.com/250x250/F5FFFA/000000?text=Ring+1", description: "An exquisite engagement ring featuring a dazzling emerald-cut cubic zirconia (simulated diamond) flanked by smaller accent stones, set in a platinum-plated band. A symbol of enduring love." },
+                { id: 5, name: "Pearl Strand Necklace", category: "Necklaces", price: 320, image: "https://via.placeholder.com/250x250/F0FFFF/000000?text=Necklace+2", description: "A timeless strand of lustrous freshwater pearls, individually knotted for security and elegance. Finished with a secure sterling silver clasp, ideal for classic style." },
+                { id: 6, name: "Silver Hoop Earrings", category: "Earrings", price: 75, image: "https://via.placeholder.com/250x250/E6E6FA/000000?text=Earrings+2", description: "Chic and versatile sterling silver hoop earrings, lightweight and comfortable for daily wear. A perfect addition to any jewelry collection." },
+                { id: 7, name: "Gold Chain Bracelet", category: "Bracelets", price: 150, image: "https://via.placeholder.com/250x250/FAFAD2/000000?text=Bracelet+2", description: "A delicate 18k gold-plated chain bracelet, minimalist in design but rich in appeal. Adjustable length for a perfect fit, suitable for stacking or worn alone." },
+                { id: 8, name: "Vintage Floral Ring", category: "Rings", price: 180, image: "https://via.placeholder.com/250x250/ADD8E6/000000?text=Ring+2", description: "An intricately designed vintage-inspired ring featuring a floral motif with tiny cubic zirconia accents. Crafted from antique silver-plated alloy, a unique statement piece." },
+                { id: 9, name: "Topaz Pendant Necklace", category: "Necklaces", price: 550, image: "https://via.placeholder.com/250x250/B0E0E6/000000?text=Necklace+3", description: "A brilliant blue topaz gemstone set in a minimalist sterling silver bezel, suspended from a delicate chain. Captures light beautifully, offering a serene glow." },
+                { id: 10, name: "Amethyst Stud Earrings", category: "Earrings", price: 210, image: "https://via.placeholder.com/250x250/DDA0DD/000000?text=Earrings+3", description: "Small yet striking amethyst stud earrings, set in classic 10k white gold. Perfect for adding a touch of color to your everyday look." },
+            ];
+            render();
+            updateCartCount();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hover Animated Gulati</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #1a1a2e;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        .gulati-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .gulati-text {
+            font-size: 6em;
+            font-weight: 800;
+            color: #e0f2f7;
+            text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            white-space: nowrap;
+            user-select: none;
+            letter-spacing: 2px;
+        }
+
+        .gulati-text:hover {
+            color: #ffd700;
+            transform: scale(1.15) rotate(5deg);
+            text-shadow: 8px 8px 15px rgba(255, 215, 0, 0.7);
+            letter-spacing: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="gulati-container">
+        <span class="gulati-text">Gulati</span>
+    </div>
+</body>
+</html>

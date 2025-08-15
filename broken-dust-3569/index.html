@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoderConnect Platform</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-color: #f8f9fa;
+            --surface-color: #ffffff;
+            --text-color: #212529;
+            --border-color: #dee2e6;
+            --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            --border-radius: 0.3rem;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        #app {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--surface-color);
+            box-shadow: var(--shadow);
+        }
+
+        #navbar {
+            background-color: var(--primary-color);
+            padding: 1rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            color: #fff;
+            padding: 0.75rem 1.25rem;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+            border-radius: var(--border-radius);
+            margin: 0 0.5rem;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        #content {
+            flex-grow: 1;
+            padding: 2rem;
+        }
+
+        .app-section {
+            display: none;
+        }
+
+        .app-section.active {
+            display: block;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        .card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-right: 1.5rem;
+        }
+
+        .profile-details h2 {
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-details p {
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-skills span {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 0.3rem 0.7rem;
+            border-radius: var(--border-radius);
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .profile-social a {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin-right: 1rem;
+            font-weight: bold;
+        }
+
+        .button {
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .button.secondary {
+            background-color: var(--secondary-color);
+        }
+        .button.secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="url"],
+        .form-group textarea {
+            width: calc(100% - 2rem);
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-family: var(--font-family);
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .forum-topic-list .card {
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .forum-topic-list .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+        }
+        .forum-topic-list .card h3 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+        }
+        .forum-topic-list .card p {
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+        }
+
+        .forum-posts .post-item {
+            border-bottom: 1px dashed var(--border-color);
+            padding: 1rem 0;
+        }
+        .forum-posts .post-item:last-child {
+            border-bottom: none;
+        }
+        .forum-posts .post-item strong {
+            color: var(--primary-color);
+        }
+        .forum-posts .post-item .post-meta {
+            font-size: 0.85rem;
+            color: var(--secondary-color);
+            margin-top: 0.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        pre {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        code {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+        }
+
+        .job-listing-card h3 {
+            margin-bottom: 0.5rem;
+        }
+        .job-listing-card .company-location {
+            font-size: 0.95rem;
+            color: var(--secondary-color);
+            margin-bottom: 0.8rem;
+        }
+        .job-listing-card .requirements span {
+            display: inline-block;
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 0.2rem 0.6rem;
+            border-radius: var(--border-radius);
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+        .job-listing-card .job-link {
+            float: right;
+        }
+        .job-listing-card .job-description {
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            #navbar {
+                flex-direction: column;
+            }
+            .nav-item {
+                width: 100%;
+                text-align: center;
+                margin: 0.25rem 0;
+            }
+            #content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav id="navbar">
+            <a href="#" class="nav-item active" data-section="profile-section">Profile</a>
+            <a href="#" class="nav-item" data-section="forum-section">Forum</a>
+            <a href="#" class="nav-item" data-section="code-section">Code Share</a>
+            <a href="#" class="nav-item" data-section="jobs-section">Job Board</a>
+        </nav>
+
+        <main id="content">
+            <!-- Profile Section -->
+            <section id="profile-section" class="app-section active">
+                <h1>My Profile</h1>
+                <div class="card">
+                    <div class="profile-header">
+                        <div class="profile-avatar" id="profile-avatar-display">CH</div>
+                        <div class="profile-details">
+                            <h2 id="profile-username-display"></h2>
+                            <p id="profile-bio-display"></p>
+                        </div>
+                    </div>
+                    <h3>Skills</h3>
+                    <div class="profile-skills" id="profile-skills-display"></div>
+                    <h3>Connect</h3>
+                    <div class="profile-social">
+                        <a href="#" id="profile-github-display" target="_blank">GitHub</a>
+                        <a href="#" id="profile-linkedin-display" target="_blank">LinkedIn</a>
+                    </div>
+                    <button class="button" id="edit-profile-btn">Edit Profile</button>
+                </div>
+
+                <div id="edit-profile-modal" class="card" style="display: none;">
+                    <h2>Edit Profile</h2>
+                    <div class="form-group">
+                        <label for="edit-username">Username</label>
+                        <input type="text" id="edit-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-bio">Bio</label>
+                        <textarea id="edit-bio" rows="4"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-skills">Skills (comma-separated)</label>
+                        <input type="text" id="edit-skills">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-github">GitHub URL</label>
+                        <input type="url" id="edit-github">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-linkedin">LinkedIn URL</label>
+                        <input type="url" id="edit-linkedin">
+                    </div>
+                    <button class="button" id="save-profile-btn">Save Changes</button>
+                    <button class="button secondary" id="cancel-edit-profile-btn">Cancel</button>
+                </div>
+            </section>
+
+            <!-- Forum Section -->
+            <section id="forum-section" class="app-section">
+                <h1>Forum Topics</h1>
+                <div class="forum-topic-list" id="forum-topic-list">
+                    <!-- Forum topics will be rendered here -->
+                </div>
+
+                <div id="forum-detail-view" style="display: none;">
+                    <button class="button secondary" id="back-to-topics-btn">&larr; Back to Topics</button>
+                    <div class="card">
+                        <h2 id="forum-detail-title"></h2>
+                        <p>By <strong id="forum-detail-author"></strong> on <span id="forum-detail-date"></span></p>
+                        <div class="forum-posts" id="forum-detail-posts">
+                            <!-- Forum posts will be rendered here -->
+                        </div>
+                        <h3>Add a Comment</h3>
+                        <div class="form-group">
+                            <label for="new-post-content">Your Comment</label>
+                            <textarea id="new-post-content" rows="3" required></textarea>
+                        </div>
+                        <button class="button" id="submit-new-post-btn">Post Comment</button>
+                    </div>
+                </div>
+
+                <div id="new-topic-section" class="card" style="display: none;">
+                    <h2>Start a New Topic</h2>
+                    <div class="form-group">
+                        <label for="new-topic-title">Topic Title</label>
+                        <input type="text" id="new-topic-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-topic-initial-post">Initial Post</label>
+                        <textarea id="new-topic-initial-post" rows="5" required></textarea>
+                    </div>
+                    <button class="button" id="submit-new-topic-btn">Create Topic</button>
+                    <button class="button secondary" id="cancel-new-topic-btn">Cancel</button>
+                </div>
+                <button class="button" id="add-new-topic-btn">Start New Topic</button>
+            </section>
+
+            <!-- Code Sharing Section -->
+            <section id="code-section" class="app-section">
+                <h1>Shared Code Snippets</h1>
+                <div id="code-snippets-list">
+                    <!-- Code snippets will be rendered here -->
+                </div>
+
+                <div class="card">
+                    <h2>Share New Code</h2>
+                    <div class="form-group">
+                        <label for="new-code-title">Title</label>
+                        <input type="text" id="new-code-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-code-author">Your Name</label>
+                        <input type="text" id="new-code-author" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-code-content">Code</label>
+                        <textarea id="new-code-content" rows="10" required placeholder="Paste your code here..."></textarea>
+                    </div>
+                    <button class="button" id="submit-new-code-btn">Share Code</button>
+                </div>
+            </section>
+
+            <!-- Job Board Section -->
+            <section id="jobs-section" class="app-section">
+                <h1>Job Board</h1>
+                <div id="job-listings-list">
+                    <!-- Job listings will be rendered here -->
+                </div>
+
+                <div class="card">
+                    <h2>Post a New Job</h2>
+                    <div class="form-group">
+                        <label for="new-job-title">Job Title</label>
+                        <input type="text" id="new-job-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-job-company">Company</label>
+                        <input type="text" id="new-job-company" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-job-location">Location</label>
+                        <input type="text" id="new-job-location" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-job-description">Description</label>
+                        <textarea id="new-job-description" rows="5" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-job-requirements">Requirements (comma-separated)</label>
+                        <input type="text" id="new-job-requirements">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-job-link">Application Link</label>
+                        <input type="url" id="new-job-link">
+                    </div>
+                    <button class="button" id="submit-new-job-btn">Post Job</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const appData = {
+            currentUser: {
+                username: "CoderHero",
+                bio: "Passionate full-stack developer specializing in JavaScript and Python. I love open source and building communities.",
+                skills: ["JavaScript", "Python", "React", "Node.js", "Docker", "AWS", "SQL", "Git"],
+                github: "https://github.com/coderhero",
+                linkedin: "https://linkedin.com/in/coderhero"
+            },
+            forumTopics: [
+                { id: 1, title: "Best practices for API design", author: "DevGuru", date: "2023-10-26", posts: [
+                    { author: "CoderHero", content: "I prefer RESTful APIs with clear endpoints and proper versioning.", date: "2023-10-26 10:00" },
+                    { author: "API_Master", content: "GraphQL is gaining popularity for its flexibility and single endpoint.", date: "2023-10-26 10:15" },
+                    { author: "DevGuru", content: "Both have their pros and cons. Depends on the use case!", date: "2023-10-26 10:30" }
+                ]},
+                { id: 2, title: "Frontend Frameworks: React vs Vue vs Angular", author: "UI_Wizard", date: "2023-10-25", posts: [
+                    { author: "Frontend_Fan", content: "React's component-based approach is very intuitive for me.", date: "2023-10-25 09:00" },
+                    { author: "Vue_Lover", content: "Vue is super easy to get started with and very performant.", date: "2023-10-25 09:30" }
+                ]},
+                { id: 3, title: "Learning Go: Resources and Tips", author: "Gopher", date: "2023-10-24", posts: [
+                    { author: "Go_Newbie", content: "Just started learning Go, any good tutorials?", date: "2023-10-24 14:00" },
+                    { author: "Gopher", content: "The official Go Tour is a great start!", date: "2023-10-24 14:15" }
+                ]}
+            ],
+            codeSnippets: [
+                { id: 1, title: "FizzBuzz in Python", author: "Pythonista", code: "for i in range(1, 101):\n    if i % 15 == 0: print('FizzBuzz')\n    elif i % 3 == 0: print('Fizz')\n    elif i % 5 == 0: print('Buzz')\n    else: print(i)" },
+                { id: 2, title: "Simple async function in JS", author: "JSDev", code: "async function fetchData(url) {\n    try {\n        const response = await fetch(url);\n        if (!response.ok) {\n            throw new Error(`HTTP error! status: ${response.status}`);\n        }\n        const data = await response.json();\n        return data;\n    } catch (error) {\n        console.error('Error fetching data:', error);\n        throw error;\n    }\n}" },
+                { id: 3, title: "Basic CSS Flexbox Layout", author: "CSS_Master", code: ".container {\n  display: flex;\n  justify-content: center; /* Horizontally centers content */\n  align-items: center;    /* Vertically centers content */\n  height: 100vh;\n  border: 1px solid #ccc;\n}\n\n.item {\n  padding: 20px;\n  margin: 10px;\n  background-color: lightblue;\n  flex-grow: 1;\n}" }
+            ],
+            jobListings: [
+                { id: 1, title: "Senior Frontend Engineer", company: "Innovate Solutions", location: "Remote", description: "Seeking an experienced React developer for our flagship product. You will work on complex UIs and collaborate with a talented team.", requirements: ["5+ years React", "TypeScript", "AWS", "UX/UI Principles"], link: "#" },
+                { id: 2, title: "Backend Developer (Node.js)", company: "Global Tech", location: "New York, NY", description: "Build scalable APIs and microservices. Experience with cloud platforms and database design is a plus.", requirements: ["Node.js", "Express", "MongoDB", "RESTful APIs"], link: "#" },
+                { id: 3, title: "DevOps Engineer", company: "CloudWorks Inc.", location: "San Francisco, CA", description: "Automate, deploy, and manage cloud infrastructure. Knowledge of CI/CD pipelines and containerization.", requirements: ["Docker", "Kubernetes", "AWS/Azure/GCP", "CI/CD"], link: "#" }
+            ]
+        };
+
+        let currentForumTopicId = null;
+
+        // --- DOM Elements ---
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('.app-section');
+
+        // Profile Section Elements
+        const profileAvatarDisplay = document.getElementById('profile-avatar-display');
+        const profileUsernameDisplay = document.getElementById('profile-username-display');
+        const profileBioDisplay = document.getElementById('profile-bio-display');
+        const profileSkillsDisplay = document.getElementById('profile-skills-display');
+        const profileGithubDisplay = document.getElementById('profile-github-display');
+        const profileLinkedinDisplay = document.getElementById('profile-linkedin-display');
+        const editProfileBtn = document.getElementById('edit-profile-btn');
+        const editProfileModal = document.getElementById('edit-profile-modal');
+        const editUsernameInput = document.getElementById('edit-username');
+        const editBioTextarea = document.getElementById('edit-bio');
+        const editSkillsInput = document.getElementById('edit-skills');
+        const editGithubInput = document.getElementById('edit-github');
+        const editLinkedinInput = document.getElementById('edit-linkedin');
+        const saveProfileBtn = document.getElementById('save-profile-btn');
+        const cancelEditProfileBtn = document.getElementById('cancel-edit-profile-btn');
+
+        // Forum Section Elements
+        const forumTopicList = document.getElementById('forum-topic-list');
+        const forumDetailView = document.getElementById('forum-detail-view');
+        const forumDetailTitle = document.getElementById('forum-detail-title');
+        const forumDetailAuthor = document.getElementById('forum-detail-author');
+        const forumDetailDate = document.getElementById('forum-detail-date');
+        const forumDetailPosts = document.getElementById('forum-detail-posts');
+        const newPostContent = document.getElementById('new-post-content');
+        const submitNewPostBtn = document.getElementById('submit-new-post-btn');
+        const backToTopicsBtn = document.getElementById('back-to-topics-btn');
+        const addNewTopicBtn = document.getElementById('add-new-topic-btn');
+        const newTopicSection = document.getElementById('new-topic-section');
+        const newTopicTitle = document.getElementById('new-topic-title');
+        const newTopicInitialPost = document.getElementById('new-topic-initial-post');
+        const submitNewTopicBtn = document.getElementById('submit-new-topic-btn');
+        const cancelNewTopicBtn = document.getElementById('cancel-new-topic-btn');
+
+        // Code Section Elements
+        const codeSnippetsList = document.getElementById('code-snippets-list');
+        const newCodeTitle = document.getElementById('new-code-title');
+        const newCodeAuthor = document.getElementById('new-code-author');
+        const newCodeContent = document.getElementById('new-code-content');
+        const submitNewCodeBtn = document.getElementById('submit-new-code-btn');
+
+        // Job Section Elements
+        const jobListingsList = document.getElementById('job-listings-list');
+        const newJobTitle = document.getElementById('new-job-title');
+        const newJobCompany = document.getElementById('new-job-company');
+        const newJobLocation = document.getElementById('new-job-location');
+        const newJobDescription = document.getElementById('new-job-description');
+        const newJobRequirements = document.getElementById('new-job-requirements');
+        const newJobLink = document.getElementById('new-job-link');
+        const submitNewJobBtn = document.getElementById('submit-new-job-btn');
+
+        // --- Navigation Logic ---
+        function showSection(sectionId) {
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.section === sectionId) {
+                    item.classList.add('active');
+                }
+            });
+
+            // Re-render content for the active section
+            switch (sectionId) {
+                case 'profile-section':
+                    renderProfile();
+                    break;
+                case 'forum-section':
+                    renderForum();
+                    break;
+                case 'code-section':
+                    renderCodeSnippets();
+                    break;
+                case 'jobs-section':
+                    renderJobListings();
+                    break;
+            }
+        }
+
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSection(e.target.dataset.section);
+            });
+        });
+
+        // --- Profile Section Functions ---
+        function renderProfile() {
+            const user = appData.currentUser;
+            profileAvatarDisplay.textContent = user.username.substring(0, 2).toUpperCase();
+            profileUsernameDisplay.textContent = user.username;
+            profileBioDisplay.textContent = user.bio;
+
+            profileSkillsDisplay.innerHTML = '';
+            user.skills.forEach(skill => {
+                const span = document.createElement('span');
+                span.textContent = skill;
+                profileSkillsDisplay.appendChild(span);
+            });
+
+            profileGithubDisplay.href = user.github || '#';
+            profileLinkedinDisplay.href = user.linkedin || '#';
+
+            editProfileModal.style.display = 'none'; // Hide edit form by default
+            editProfileBtn.style.display = 'inline-block'; // Show edit button
+        }
+
+        editProfileBtn.addEventListener('click', () => {
+            const user = appData.currentUser;
+            editUsernameInput.value = user.username;
+            editBioTextarea.value = user.bio;
+            editSkillsInput.value = user.skills.join(', ');
+            editGithubInput.value = user.github;
+            editLinkedinInput.value = user.linkedin;
+            editProfileModal.style.display = 'block';
+            editProfileBtn.style.display = 'none';
+        });
+
+        saveProfileBtn.addEventListener('click', () => {
+            appData.currentUser.username = editUsernameInput.value;
+            appData.currentUser.bio = editBioTextarea.value;
+            appData.currentUser.skills = editSkillsInput.value.split(',').map(s => s.trim()).filter(s => s);
+            appData.currentUser.github = editGithubInput.value;
+            appData.currentUser.linkedin = editLinkedinInput.value;
+            renderProfile();
+        });
+
+        cancelEditProfileBtn.addEventListener('click', () => {
+            editProfileModal.style.display = 'none';
+            editProfileBtn.style.display = 'inline-block';
+        });
+
+        // --- Forum Section Functions ---
+        function renderForum() {
+            forumTopicList.innerHTML = '';
+            forumDetailView.style.display = 'none';
+            newTopicSection.style.display = 'none';
+            addNewTopicBtn.style.display = 'inline-block';
+
+            appData.forumTopics.forEach(topic => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.innerHTML = `
+                    <h3>${topic.title}</h3>
+                    <p>By <strong>${topic.author}</strong> on ${topic.date}</p>
+                    <p>${topic.posts.length} comments</p>
+                `;
+                card.addEventListener('click', () => showForumTopicDetail(topic.id));
+                forumTopicList.appendChild(card);
+            });
+        }
+
+        function showForumTopicDetail(topicId) {
+            currentForumTopicId = topicId;
+            const topic = appData.forumTopics.find(t => t.id === topicId);
+            if (!topic) return;
+
+            forumTopicList.style.display = 'none';
+            addNewTopicBtn.style.display = 'none';
+            newTopicSection.style.display = 'none';
+            forumDetailView.style.display = 'block';
+
+            forumDetailTitle.textContent = topic.title;
+            forumDetailAuthor.textContent = topic.author;
+            forumDetailDate.textContent = topic.date;
+            renderForumPosts(topic.posts);
+        }
+
+        function renderForumPosts(posts) {
+            forumDetailPosts.innerHTML = '';
+            if (posts.length === 0) {
+                forumDetailPosts.innerHTML = '<p>No comments yet. Be the first to post!</p>';
+            } else {
+                posts.forEach(post => {
+                    const postItem = document.createElement('div');
+                    postItem.classList.add('post-item');
+                    postItem.innerHTML = `
+                        <p>${post.content}</p>
+                        <p class="post-meta">by <strong>${post.author}</strong> on ${post.date}</p>
+                    `;
+                    forumDetailPosts.appendChild(postItem);
+                });
+            }
+        }
+
+        backToTopicsBtn.addEventListener('click', () => {
+            forumTopicList.style.display = 'block';
+            addNewTopicBtn.style.display = 'inline-block';
+            forumDetailView.style.display = 'none';
+            currentForumTopicId = null;
+        });
+
+        submitNewPostBtn.addEventListener('click', () => {
+            const content = newPostContent.value.trim();
+            if (!content || !currentForumTopicId) return;
+
+            const topic = appData.forumTopics.find(t => t.id === currentForumTopicId);
+            if (topic) {
+                const newPost = {
+                    author: appData.currentUser.username, // Assuming current user is the poster
+                    content: content,
+                    date: new Date().toLocaleString()
+                };
+                topic.posts.push(newPost);
+                renderForumPosts(topic.posts);
+                newPostContent.value = '';
+            }
+        });
+
+        addNewTopicBtn.addEventListener('click', () => {
+            forumTopicList.style.display = 'none';
+            addNewTopicBtn.style.display = 'none';
+            forumDetailView.style.display = 'none';
+            newTopicSection.style.display = 'block';
+            newTopicTitle.value = '';
+            newTopicInitialPost.value = '';
+        });
+
+        cancelNewTopicBtn.addEventListener('click', () => {
+            renderForum();
+        });
+
+        submitNewTopicBtn.addEventListener('click', () => {
+            const title = newTopicTitle.value.trim();
+            const initialPostContent = newTopicInitialPost.value.trim();
+            if (!title || !initialPostContent) {
+                alert('Please fill in both title and initial post.');
+                return;
+            }
+
+            const newTopic = {
+                id: Math.max(...appData.forumTopics.map(t => t.id)) + 1, // Simple ID generation
+                title: title,
+                author: appData.currentUser.username,
+                date: new Date().toLocaleDateString(),
+                posts: [{
+                    author: appData.currentUser.username,
+                    content: initialPostContent,
+                    date: new Date().toLocaleString()
+                }]
+            };
+            appData.forumTopics.push(newTopic);
+            renderForum();
+            showForumTopicDetail(newTopic.id); // Go directly to the new topic
+        });
+
+
+        // --- Code Sharing Section Functions ---
+        function renderCodeSnippets() {
+            codeSnippetsList.innerHTML = '';
+            appData.codeSnippets.forEach(snippet => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.classList.add('code-snippet-card');
+                card.innerHTML = `
+                    <h3>${snippet.title}</h3>
+                    <p>By <strong>${snippet.author}</strong></p>
+                    <pre><code>${escapeHTML(snippet.code)}</code></pre>
+                `;
+                codeSnippetsList.appendChild(card);
+            });
+        }
+
+        submitNewCodeBtn.addEventListener('click', () => {
+            const title = newCodeTitle.value.trim();
+            const author = newCodeAuthor.value.trim();
+            const code = newCodeContent.value.trim();
+
+            if (!title || !author || !code) {
+                alert('Please fill in all fields to share your code.');
+                return;
+            }
+
+            const newSnippet = {
+                id: Math.max(...appData.codeSnippets.map(s => s.id)) + 1, // Simple ID generation
+                title: title,
+                author: author,
+                code: code
+            };
+            appData.codeSnippets.push(newSnippet);
+            renderCodeSnippets();
+            newCodeTitle.value = '';
+            newCodeAuthor.value = '';
+            newCodeContent.value = '';
+            alert('Code snippet shared successfully!');
+        });
+
+        // Helper function to escape HTML for <pre><code>
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.appendChild(document.createTextNode(str));
+            return div.innerHTML;
+        }
+
+        // --- Job Board Section Functions ---
+        function renderJobListings() {
+            jobListingsList.innerHTML = '';
+            appData.jobListings.forEach(job => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.classList.add('job-listing-card');
+                card.innerHTML = `
+                    <h3>${job.title}</h3>
+                    <p class="company-location">${job.company} - ${job.location}</p>
+                    <p class="job-description">${job.description}</p>
+                    <h3>Requirements:</h3>
+                    <div class="requirements">
+                        ${job.requirements.map(req => `<span>${req}</span>`).join('')}
+                    </div>
+                    <a href="${job.link}" target="_blank" class="button job-link">Apply Now</a>
+                `;
+                jobListingsList.appendChild(card);
+            });
+        }
+
+        submitNewJobBtn.addEventListener('click', () => {
+            const title = newJobTitle.value.trim();
+            const company = newJobCompany.value.trim();
+            const location = newJobLocation.value.trim();
+            const description = newJobDescription.value.trim();
+            const requirements = newJobRequirements.value.split(',').map(s => s.trim()).filter(s => s);
+            const link = newJobLink.value.trim();
+
+            if (!title || !company || !location || !description) {
+                alert('Please fill in all required fields (Title, Company, Location, Description).');
+                return;
+            }
+
+            const newJob = {
+                id: Math.max(...appData.jobListings.map(j => j.id)) + 1, // Simple ID generation
+                title: title,
+                company: company,
+                location: location,
+                description: description,
+                requirements: requirements,
+                link: link || '#' // Fallback to # if no link
+            };
+            appData.jobListings.push(newJob);
+            renderJobListings();
+            // Clear form
+            newJobTitle.value = '';
+            newJobCompany.value = '';
+            newJobLocation.value = '';
+            newJobDescription.value = '';
+            newJobRequirements.value = '';
+            newJobLink.value = '';
+            alert('Job posted successfully!');
+        });
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            showSection('profile-section'); // Show profile by default on load
+        });
+    </script>
+</body>
+</html>

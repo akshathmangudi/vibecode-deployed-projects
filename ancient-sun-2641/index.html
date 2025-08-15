@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ludo Local Multiplayer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #app {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            min-width: 400px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        #lobby-screen h1, #setup-screen h2, #game-screen h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        input[type="text"], select {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .join-game-section {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+
+        #player-setup-form div {
+            margin-bottom: 10px;
+        }
+
+        #player-setup-form label {
+            display: inline-block;
+            width: 80px;
+            text-align: right;
+            margin-right: 10px;
+        }
+
+        #game-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #game-info {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #current-player-indicator {
+            margin: 0;
+            font-size: 1.2em;
+            text-transform: capitalize;
+        }
+        #current-player-indicator.red { color: #d32f2f; }
+        #current-player-indicator.green { color: #388e3c; }
+        #current-player-indicator.yellow { color: #fbc02d; }
+        #current-player-indicator.blue { color: #1976d2; }
+
+
+        #dice-container {
+            display: flex;
+            align-items: center;
+        }
+
+        #dice {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            font-weight: bold;
+            margin-right: 15px;
+            background-color: #f9f9f9;
+        }
+
+        #ludo-board {
+            width: 600px;
+            height: 600px;
+            position: relative;
+            background-color: #ddd;
+            border: 2px solid #333;
+            box-sizing: content-box;
+        }
+
+        .home-base {
+            position: absolute;
+            width: 240px;
+            height: 240px;
+            border: 1px solid #555;
+            box-sizing: border-box;
+        }
+        .home-base.red { top: 0; left: 0; background-color: #fce4ec; }
+        .home-base.green { top: 0; left: 360px; background-color: #e8f5e9; }
+        .home-base.yellow { top: 360px; left: 0; background-color: #fffde7; }
+        .home-base.blue { top: 360px; left: 360px; background-color: #e3f2fd; }
+
+        .center-home {
+            position: absolute;
+            top: 240px;
+            left: 240px;
+            width: 120px;
+            height: 120px;
+            background-color: #ccc;
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .board-cell {
+            position: absolute;
+            width: 38px;
+            height: 38px;
+            border: 1px solid #aaa;
+            background-color: #fff;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .board-cell.start.red, .board-cell.home-path.red { background-color: #ef9a9a; }
+        .board-cell.start.green, .board-cell.home-path.green { background-color: #a5d6a7; }
+        .board-cell.start.yellow, .board-cell.home-path.yellow { background-color: #ffee58; }
+        .board-cell.start.blue, .board-cell.home-path.blue { background-color: #90caf9; }
+
+        .board-cell.safe {
+            border: 2px solid gold;
+        }
+
+        .token {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid rgba(0,0,0,0.3);
+            box-sizing: border-box;
+            cursor: pointer;
+            z-index: 10;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .token.red { background-color: #f44336; }
+        .token.green { background-color: #4CAF50; }
+        .token.yellow { background-color: #FFEB3B; }
+        .token.blue { background-color: #2196F3; }
+
+        .token.highlight {
+            box-shadow: 0 0 10px 5px rgba(255, 255, 0, 0.7);
+            cursor: pointer;
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        .token.at-base {
+            cursor: default;
+        }
+
+        .base-spot {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 50%;
+            z-index: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.7em;
+            color: #555;
+        }
+
+        #game-messages {
+            margin-top: 20px;
+            font-size: 1.1em;
+            color: #555;
+            min-height: 25px;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="lobby-screen" class="screen active">
+            <h1>Ludo Local Multiplayer</h1>
+            <p>This is a local multiplayer game. Play on one device!</p>
+            <button id="create-game-btn">Start New Game</button>
+            <div class="join-game-section">
+                <input type="text" id="join-code-input" placeholder="Enter game code">
+                <button id="join-game-btn" disabled>Join Game (Placeholder)</button>
+            </div>
+            <p style="font-size: 0.8em; color: #888;">The "game code" feature is for a future online version. For now, it just starts a local game.</p>
+        </div>
+
+        <div id="setup-screen" class="screen">
+            <h2>Setup New Game</h2>
+            <div class="player-count-selection">
+                <label for="num-players">Number of Players:</label>
+                <select id="num-players">
+                    <option value="2">2 Players</option>
+                    <option value="3">3 Players</option>
+                    <option value="4" selected>4 Players</option>
+                </select>
+            </div>
+            <div id="player-setup-form">
+            </div>
+            <button id="start-game-btn">Start Game</button>
+            <button id="back-to-lobby-btn">Back</button>
+        </div>
+
+        <div id="game-screen" class="screen">
+            <div id="game-info">
+                <h2 id="current-player-indicator"></h2>
+                <div id="dice-container">
+                    <div id="dice">0</div>
+                    <button id="roll-dice-btn">Roll Dice</button>
+                </div>
+            </div>
+            <div id="ludo-board">
+                <div class="home-base red"></div>
+                <div class="home-base green"></div>
+                <div class="home-base yellow"></div>
+                <div class="home-base blue"></div>
+                <div class="center-home">HOME</div>
+            </div>
+            <div id="game-messages"></div>
+            <button id="reset-game-btn">Reset Game</button>
+        </div>
+    </div>
+
+    <script>
+        const app = document.getElementById('app');
+        const lobbyScreen = document.getElementById('lobby-screen');
+        const setupScreen = document.getElementById('setup-screen');
+        const gameScreen = document.getElementById('game-screen');
+
+        const createGameBtn = document.getElementById('create-game-btn');
+        const joinGameBtn = document.getElementById('join-game-btn');
+        const joinCodeInput = document.getElementById('join-code-input');
+
+        const numPlayersSelect = document.getElementById('num-players');
+        const playerSetupForm = document.getElementById('player-setup-form');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const backToLobbyBtn = document.getElementById('back-to-lobby-btn');
+
+        const currentPlayerIndicator = document.getElementById('current-player-indicator');
+        const diceElement = document.getElementById('dice');
+        const rollDiceBtn = document.getElementById('roll-dice-btn');
+        const ludoBoard = document.getElementById('ludo-board');
+        const gameMessages = document.getElementById('game-messages');
+        const resetGameBtn = document.getElementById('reset-game-btn');
+
+        let players = [];
+        let tokens = [];
+        let currentTurnPlayerIndex = 0;
+        let diceValue = 0;
+        let rollsLeft = 0;
+        let gameOver = false;
+
+        const BOARD_CELL_SIZE = 40;
+        const TOKEN_SIZE = 30;
+
+        const COLORS = ['red', 'green', 'yellow', 'blue'];
+        const DEFAULT_PLAYER_NAMES = {
+            red: 'Red',
+            green: 'Green',
+            yellow: 'Yellow',
+            blue: 'Blue'
+        };
+
+        const MAIN_PATH_GRID_COORDS = [
+            {r: 6, c: 1}, {r: 6, c: 2}, {r: 6, c: 3}, {r: 6, c: 4}, {r: 6, c: 5},
+            {r: 5, c: 6}, {r: 4, c: 6}, {r: 3, c: 6}, {r: 2, c: 6}, {r: 1, c: 6},
+            {r: 0, c: 6},
+            {r: 0, c: 7},
+            {r: 1, c: 8}, {r: 2, c: 8}, {r: 3, c: 8}, {r: 4, c: 8}, {r: 5, c: 8},
+            {r: 6, c: 9}, {r: 6, c: 10}, {r: 6, c: 11}, {r: 6, c: 12}, {r: 6, c: 13},
+            {r: 6, c: 14},
+            {r: 7, c: 14},
+            {r: 8, c: 14}, {r: 8, c: 13}, {r: 8, c: 12}, {r: 8, c: 11}, {r: 8, c: 10},
+            {r: 9, c: 8}, {r: 10, c: 8}, {r: 11, c: 8}, {r: 12, c: 8}, {r: 13, c: 8},
+            {r: 14, c: 8},
+            {r: 14, c: 7},
+            {r: 14, c: 6}, {r: 13, c: 6}, {r: 12, c: 6}, {r: 11, c: 6}, {r: 10, c: 6},
+            {r: 8, c: 5}, {r: 8, c: 4}, {r: 8, c: 3}, {r: 8, c: 2}, {r: 8, c: 1},
+            {r: 8, c: 0},
+            {r: 7, c: 0},
+            {r: 6, c: 0}, {r: 6, c: 1}, {r: 6, c: 2}, {r: 6, c: 3}, {r: 6, c: 4},
+        ].map(coord => ({
+            top: coord.r * BOARD_CELL_SIZE + (BOARD_CELL_SIZE - TOKEN_SIZE) / 2,
+            left: coord.c * BOARD_CELL_SIZE + (BOARD_CELL_SIZE - TOKEN_SIZE) / 2
+        }));
+
+        const HOME_PATH_GRID_COORDS = {
+            red: [
+                {r: 7, c: 1}, {r: 7, c: 2}, {r: 7, c: 3}, {r: 7, c: 4}, {r: 7, c: 5}
+            ],
+            green: [
+                {r: 1, c: 7}, {r: 2, c: 7}, {r: 3, c: 7}, {r: 4, c: 7}, {r: 5, c: 7}
+            ],
+            yellow: [
+                {r: 7, c: 13}, {r: 7, c: 12}, {r: 7, c: 11}, {r: 7, c: 10}, {r: 7, c: 9}
+            ],
+            blue: [
+                {r: 13, c: 7}, {r: 12, c: 7}, {r: 11, c: 7}, {r: 10, c: 7}, {r: 9, c: 7}
+            ]
+        };
+
+        const HOME_PATH_COORDS = {};
+        for (const color in HOME_PATH_GRID_COORDS) {
+            HOME_PATH_COORDS[color] = HOME_PATH_GRID_COORDS[color].map(coord => ({
+                top: coord.r * BOARD_CELL_SIZE + (BOARD_CELL_SIZE - TOKEN_SIZE) / 2,
+                left: coord.c * BOARD_CELL_SIZE + (BOARD_CELL_SIZE - TOKEN_SIZE) / 2
+            }));
+        }
+
+        const BASE_GRID_COORDS = {
+            red: [
+                {r: 1, c: 1}, {r: 1, c: 4}, {r: 4, c: 1}, {r: 4, c: 4}
+            ],
+            green: [
+                {r: 1, c: 10}, {r: 1, c: 13}, {r: 4, c: 10}, {r: 4, c: 13}
+            ],
+            yellow: [
+                {r: 10, c: 1}, {r: 10, c: 4}, {r: 13, c: 1}, {r: 13, c: 4}
+            ],
+            blue: [
+                {r: 10, c: 10}, {r: 10, c: 13}, {r: 13, c: 10}, {r: 13, c: 13}
+            ]
+        };
+
+        const BASE_POSITIONS = {};
+        for (const color in BASE_GRID_COORDS) {
+            BASE_POSITIONS[color] = BASE_GRID_COORDS[color].map(coord => ({
+                top: coord.r * BOARD_CELL_SIZE + (BOARD_CELL_SIZE - TOKEN_SIZE) / 2,
+                left: coord.c * BOARD_CELL_SIZE + (BOARD_CELL_SIZE - TOKEN_SIZE) / 2
+            }));
+        }
+
+        const PLAYER_PATH_DATA = {
+            red: {
+                startMain: 0,
+                homeEntranceMain: 51,
+                baseTokenOffsets: [0, 1, 2, 3]
+            },
+            green: {
+                startMain: 13,
+                homeEntranceMain: 12,
+                baseTokenOffsets: [0, 1, 2, 3]
+            },
+            yellow: {
+                startMain: 26,
+                homeEntranceMain: 25,
+                baseTokenOffsets: [0, 1, 2, 3]
+            },
+            blue: {
+                startMain: 39,
+                homeEntranceMain: 38,
+                baseTokenOffsets: [0, 1, 2, 3]
+            }
+        };
+
+        const SAFE_SPOTS = new Set([
+            PLAYER_PATH_DATA.red.startMain, 8,
+            PLAYER_PATH_DATA.green.startMain, 21,
+            PLAYER_PATH_DATA.yellow.startMain, 34,
+            PLAYER_PATH_DATA.blue.startMain, 47
+        ]);
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function generatePlayerSetupFields(num) {
+            playerSetupForm.innerHTML = '';
+            for (let i = 0; i < num; i++) {
+                const playerColor = COLORS[i];
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <label>Player ${i + 1} Color:</label>
+                    <input type="text" value="${DEFAULT_PLAYER_NAMES[playerColor] || 'Player ' + (i+1)}" data-color="${playerColor}" readonly style="background-color: ${playerColor}; color: ${playerColor === 'yellow' ? 'black' : 'white'}; border: none;">
+                    <input type="hidden" class="player-color-input" value="${playerColor}">
+                `;
+                playerSetupForm.appendChild(div);
+            }
+        }
+
+        function setupGame() {
+            players = [];
+            tokens = [];
+            const selectedNumPlayers = parseInt(numPlayersSelect.value);
+            const playerInputs = playerSetupForm.querySelectorAll('input[type="text"]');
+
+            for (let i = 0; i < selectedNumPlayers; i++) {
+                const color = playerInputs[i].dataset.color;
+                const name = playerInputs[i].value;
+                players.push({
+                    id: i,
+                    name: name,
+                    color: color,
+                    tokens: [],
+                    finishedTokens: 0,
+                    rolls: 0
+                });
+            }
+
+            ludoBoard.innerHTML = '';
+            ludoBoard.innerHTML += `<div class="home-base red"></div>
+                                    <div class="home-base green"></div>
+                                    <div class="home-base yellow"></div>
+                                    <div class="home-base blue"></div>
+                                    <div class="center-home">HOME</div>`;
+
+            COLORS.forEach((color) => {
+                if (!players.find(p => p.color === color)) return;
+                for (let i = 0; i < 4; i++) {
+                    const spot = document.createElement('div');
+                    spot.className = 'base-spot';
+                    spot.style.top = BASE_POSITIONS[color][i].top + 'px';
+                    spot.style.left = BASE_POSITIONS[color][i].left + 'px';
+                    spot.id = `base-spot-${color}-${i}`;
+                    ludoBoard.appendChild(spot);
+                }
+            });
+
+            MAIN_PATH_GRID_COORDS.forEach((coord, index) => {
+                const cell = document.createElement('div');
+                cell.className = 'board-cell';
+                cell.id = `cell-${index}`;
+                cell.style.top = (coord.r * BOARD_CELL_SIZE) + 'px';
+                cell.style.left = (coord.c * BOARD_CELL_SIZE) + 'px';
+
+                for (const playerColor in PLAYER_PATH_DATA) {
+                    if (index === PLAYER_PATH_DATA[playerColor].startMain) {
+                        cell.classList.add('start', playerColor);
+                    }
+                }
+                if (SAFE_SPOTS.has(index)) {
+                    cell.classList.add('safe');
+                }
+                ludoBoard.appendChild(cell);
+            });
+
+            for (const color in HOME_PATH_COORDS) {
+                if (!players.find(p => p.color === color)) continue;
+                HOME_PATH_COORDS[color].forEach((coord, index) => {
+                    const cell = document.createElement('div');
+                    cell.className = `board-cell home-path ${color}`;
+                    cell.id = `home-cell-${color}-${index}`;
+                    cell.style.top = (coord.top) + 'px';
+                    cell.style.left = (coord.left) + 'px';
+                    ludoBoard.appendChild(cell);
+                });
+            }
+
+            players.forEach((player, pIdx) => {
+                for (let i = 0; i < 4; i++) {
+                    const token = {
+                        id: `${player.color}-token-${i}`,
+                        playerId: player.id,
+                        color: player.color,
+                        position: 'base',
+                        baseIndex: i,
+                        pathIndex: -1
+                    };
+                    players[pIdx].tokens.push(token);
+                    tokens.push(token);
+
+                    const tokenEl = document.createElement('div');
+                    tokenEl.className = `token ${player.color} at-base`;
+                    tokenEl.id = token.id;
+                    tokenEl.style.top = BASE_POSITIONS[player.color][i].top + 'px';
+                    tokenEl.style.left = BASE_POSITIONS[player.color][i].left + 'px';
+                    ludoBoard.appendChild(tokenEl);
+
+                    tokenEl.addEventListener('click', () => handleTokenClick(token));
+                }
+            });
+
+            currentTurnPlayerIndex = 0;
+            rollsLeft = 0;
+            diceValue = 0;
+            gameOver = false;
+            updateGameInfo();
+            updateRollDiceButtonState();
+            gameMessages.textContent = `${players[currentTurnPlayerIndex].name}'s turn. Roll the dice!`;
+            showScreen('game-screen');
+        }
+
+        function updateGameInfo() {
+            const currentPlayer = players[currentTurnPlayerIndex];
+            currentPlayerIndicator.textContent = `${currentPlayer.name}'s Turn`;
+            currentPlayerIndicator.className = `${currentPlayer.color}`;
+            diceElement.textContent = diceValue === 0 ? '0' : diceValue;
+        }
+
+        function updateRollDiceButtonState() {
+            rollDiceBtn.disabled = gameOver || (diceValue > 0 && getMovableTokens().length > 0);
+        }
+
+        function rollDice() {
+            if (gameOver || (diceValue > 0 && getMovableTokens().length > 0)) {
+                return;
+            }
+
+            diceValue = Math.floor(Math.random() * 6) + 1;
+            diceElement.textContent = diceValue;
+            gameMessages.textContent = `${players[currentTurnPlayerIndex].name} rolled a ${diceValue}.`;
+
+            if (diceValue === 6) {
+                rollsLeft++;
+                if (rollsLeft === 3) {
+                    gameMessages.textContent = `${players[currentTurnPlayerIndex].name} rolled three 6s! Turn skipped.`;
+                    setTimeout(nextTurn, 1500);
+                    return;
+                }
+            } else {
+                rollsLeft = 0;
+            }
+
+            highlightMovableTokens();
+            updateRollDiceButtonState();
+
+            const movableTokens = getMovableTokens();
+            if (movableTokens.length === 0) {
+                gameMessages.textContent += " No moves available.";
+                setTimeout(nextTurn, 1500);
+            }
+        }
+
+        function getMovableTokens() {
+            const currentPlayer = players[currentTurnPlayerIndex];
+            return currentPlayer.tokens.filter(token => {
+                if (token.position === 'finished') return false;
+
+                if (token.position === 'base') {
+                    return diceValue === 6;
+                }
+
+                if (token.position.startsWith('board-')) {
+                    const currentMainPathIndex = token.pathIndex;
+                    const playerPathData = PLAYER_PATH_DATA[token.color];
+
+                    const stepsToGoHomeEntrance = (playerPathData.homeEntranceMain - currentMainPathIndex + 52) % 52;
+
+                    if (stepsToGoHomeEntrance === 0 && currentMainPathIndex !== playerPathData.homeEntranceMain) {
+                        stepsToGoHomeEntrance = 52;
+                    }
+
+                    if (stepsToGoHomeEntrance > 0 && stepsToGoHomeEntrance < diceValue) {
+                        const stepsIntoHome = diceValue - stepsToGoHomeEntrance;
+                        return stepsIntoHome <= 5;
+                    } else if (stepsToGoHomeEntrance >= diceValue) {
+                        return true;
+                    }
+                    return false;
+                }
+
+                if (token.position.startsWith('home-')) {
+                    const currentHomePathIndex = token.pathIndex;
+                    const newHomePathIndex = currentHomePathIndex + diceValue;
+                    return newHomePathIndex <= 5;
+                }
+                return false;
+            });
+        }
+
+
+        function highlightMovableTokens() {
+            document.querySelectorAll('.token.highlight').forEach(el => el.classList.remove('highlight'));
+            const movableTokens = getMovableTokens();
+            movableTokens.forEach(token => {
+                document.getElementById(token.id).classList.add('highlight');
+            });
+        }
+
+        function handleTokenClick(token) {
+            if (gameOver || !document.getElementById(token.id).classList.contains('highlight')) {
+                return;
+            }
+
+            moveToken(token, diceValue);
+            diceValue = 0;
+            document.querySelectorAll('.token.highlight').forEach(el => el.classList.remove('highlight'));
+            updateRollDiceButtonState();
+            checkWinCondition();
+
+            if (!gameOver && (rollsLeft === 0 || !getMovableTokens().length)) {
+                setTimeout(nextTurn, 1000);
+            } else if (!gameOver && rollsLeft > 0) {
+                gameMessages.textContent = `${players[currentTurnPlayerIndex].name} rolled a 6! Roll again.`;
+            }
+        }
+
+        function moveToken(token, steps) {
+            const tokenEl = document.getElementById(token.id);
+            const playerPathData = PLAYER_PATH_DATA[token.color];
+
+            if (token.position === 'base') {
+                token.position = `board-${playerPathData.startMain}`;
+                token.pathIndex = playerPathData.startMain;
+                tokenEl.classList.remove('at-base');
+            } else if (token.position.startsWith('board-')) {
+                let currentMainPathIndex = token.pathIndex;
+                let newMainPathIndex = (currentMainPathIndex + steps) % 52;
+
+                const stepsToGoHomeEntrance = (playerPathData.homeEntranceMain - currentMainPathIndex + 52) % 52;
+                if (stepsToGoHomeEntrance === 0 && currentMainPathIndex !== playerPathData.homeEntranceMain) {
+                    stepsToGoHomeEntrance = 52;
+                }
+
+                if (stepsToGoHomeEntrance < diceValue) {
+                    const stepsIntoHome = diceValue - stepsToGoHomeEntrance;
+                    if (stepsIntoHome <= 5) {
+                        token.position = `home-${stepsIntoHome -1}`;
+                        token.pathIndex = stepsIntoHome - 1;
+                        if (stepsIntoHome === 5) {
+                            setTimeout(() => sendTokenHome(token), 300);
+                        }
+                    }
+                } else {
+                    token.position = `board-${newMainPathIndex}`;
+                    token.pathIndex = newMainPathIndex;
+                }
+            } else if (token.position.startsWith('home-')) {
+                const currentHomePathIndex = token.pathIndex;
+                const newHomePathIndex = currentHomePathIndex + steps;
+                if (newHomePathIndex < 5) {
+                    token.position = `home-${newHomePathIndex}`;
+                    token.pathIndex = newHomePathIndex;
+                } else if (newHomePathIndex === 5) {
+                    token.position = `home-4`;
+                    token.pathIndex = 4;
+                    setTimeout(() => sendTokenHome(token), 300);
+                }
+            }
+
+            updateTokenPositionVisual(token);
+
+            if (token.position.startsWith('board-') && !SAFE_SPOTS.has(token.pathIndex)) {
+                const collidedTokens = tokens.filter(
+                    t => t.id !== token.id &&
+                         t.position === token.position &&
+                         t.color !== token.color &&
+                         t.position.startsWith('board-')
+                );
+                collidedTokens.forEach(collidedToken => {
+                    sendTokenToBase(collidedToken);
+                    gameMessages.textContent = `${token.color}'s token cut ${collidedToken.color}'s token!`;
+                });
+            }
+        }
+
+        function updateTokenPositionVisual(token) {
+            const tokenEl = document.getElementById(token.id);
+            let targetCoords;
+            if (token.position.startsWith('board-')) {
+                targetCoords = MAIN_PATH_GRID_COORDS[token.pathIndex];
+                tokenEl.style.zIndex = 10;
+            } else if (token.position.startsWith('home-')) {
+                targetCoords = HOME_PATH_COORDS[token.color][token.pathIndex];
+                tokenEl.style.zIndex = 10;
+            } else if (token.position === 'base') {
+                targetCoords = BASE_POSITIONS[token.color][token.baseIndex];
+                tokenEl.classList.add('at-base');
+                tokenEl.style.zIndex = 10;
+            } else if (token.position === 'finished') {
+                tokenEl.style.display = 'none';
+                tokenEl.removeEventListener('click', handleTokenClick);
+                return;
+            }
+
+            if (targetCoords) {
+                tokenEl.style.transition = 'all 0.3s ease-out';
+                tokenEl.style.left = targetCoords.left + 'px';
+                tokenEl.style.top = targetCoords.top + 'px';
+            }
+        }
+
+        function sendTokenToBase(token) {
+            token.position = 'base';
+            token.pathIndex = -1;
+            const playerIndex = players.findIndex(p => p.id === token.playerId);
+
+            let baseSpotFound = false;
+            for (let i = 0; i < 4; i++) {
+                const existingTokenInSpot = players[playerIndex].tokens.find(t => t.position === 'base' && t.baseIndex === i);
+                if (!existingTokenInSpot) {
+                    token.baseIndex = i;
+                    baseSpotFound = true;
+                    break;
+                }
+            }
+            if (!baseSpotFound) {
+                 token.baseIndex = token.baseIndex || 0;
+            }
+
+            updateTokenPositionVisual(token);
+        }
+
+        function sendTokenHome(token) {
+            token.position = 'finished';
+            token.pathIndex = -1;
+            const player = players.find(p => p.id === token.playerId);
+            player.finishedTokens++;
+            gameMessages.textContent = `${token.color}'s token reached home! ${player.finishedTokens}/4 tokens home.`;
+            updateTokenPositionVisual(token);
+        }
+
+        function checkWinCondition() {
+            const currentPlayer = players[currentTurnPlayerIndex];
+            if (currentPlayer.finishedTokens === 4) {
+                gameMessages.textContent = `${currentPlayer.name} wins the game!`;
+                gameOver = true;
+                rollDiceBtn.disabled = true;
+                document.querySelectorAll('.token').forEach(el => el.classList.remove('highlight'));
+            }
+        }
+
+        function nextTurn() {
+            if (gameOver) return;
+
+            currentTurnPlayerIndex = (currentTurnPlayerIndex + 1) % players.length;
+            rollsLeft = 0;
+            updateGameInfo();
+            updateRollDiceButtonState();
+            gameMessages.textContent = `${players[currentTurnPlayerIndex].name}'s turn. Roll the dice!`;
+        }
+
+        function resetGame() {
+            if (confirm('Are you sure you want to reset the game and go back to the lobby?')) {
+                players = [];
+                tokens = [];
+                currentTurnPlayerIndex = 0;
+                diceValue = 0;
+                rollsLeft = 0;
+                gameOver = false;
+                ludoBoard.innerHTML = '';
+                showScreen('lobby-screen');
+                gameMessages.textContent = '';
+                diceElement.textContent = '0';
+            }
+        }
+
+        createGameBtn.addEventListener('click', () => {
+            showScreen('setup-screen');
+            generatePlayerSetupFields(parseInt(numPlayersSelect.value));
+        });
+
+        joinGameBtn.addEventListener('click', () => {
+            alert("This is a local multiplayer game. The 'Join Game' feature is a placeholder. Starting a new game!");
+            showScreen('setup-screen');
+            generatePlayerSetupFields(parseInt(numPlayersSelect.value));
+        });
+
+        numPlayersSelect.addEventListener('change', (e) => {
+            generatePlayerSetupFields(parseInt(e.target.value));
+        });
+
+        startGameBtn.addEventListener('click', setupGame);
+        backToLobbyBtn.addEventListener('click', () => showScreen('lobby-screen'));
+        rollDiceBtn.addEventListener('click', rollDice);
+        resetGameBtn.addEventListener('click', resetGame);
+
+        showScreen('lobby-screen');
+    </script>
+</body>
+</html>
